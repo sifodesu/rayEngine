@@ -1,0 +1,1412 @@
+[
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 1,
+        "flags": [
+            "DIALOG",
+            "SOLID"
+        ],
+        "target": "wall_test",
+        "texture": "tile.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 2,
+        "flags": [
+            "SOLID"
+        ],
+        "target": "sign",
+        "targetnames": [
+            "dummymsg"
+        ],
+        "type": "GENERIC"
+    },
+    {
+        "ID": 3,
+        "content": "|firstTalkClean",
+        "target": "dummymsg",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 21,
+        "target": "choiceTick",
+        "texture": "choice.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 22,
+        "target": "bck",
+        "texture": "entry.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 69,
+        "target": "characterMarkerMap",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 70,
+        "flags": [
+            "INV",
+            "SOLID"
+        ],
+        "target": "nullWall",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 71,
+        "target": "encounterbck",
+        "texture": "firstEncounter.png",
+        "type": "GLOBAL"
+    },
+    {
+        "ID": 72,
+        "content": "0 73 flowey",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "target": "doorA",
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 73,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "target": "doorA2",
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 74,
+        "flags": [
+            "SOLID"
+        ],
+        "target": "flowey_dead",
+        "targetnames": [
+            "flowey_desc"
+        ],
+        "texture": "flowey_dead.png",
+        "type": "BUTTON"
+    },
+    {
+        "ID": 75,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 76,
+        "content": "0 75 ripof",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 77,
+        "content": "|deadFlowey",
+        "target": "flowey_desc",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 78,
+        "content": "|script1",
+        "flags": [
+            "CONTACT"
+        ],
+        "target": "floweyCin",
+        "targetnames": [
+            "sampleSound"
+        ],
+        "type": "EVENT_SCRIPTED"
+    },
+    {
+        "ID": 79,
+        "content": "headspin.mp3",
+        "enabled": false,
+        "target": "sampleSound",
+        "type": "SOUND"
+    },
+    {
+        "ID": 80,
+        "flags": [
+            "SOLID"
+        ],
+        "target": "gateway",
+        "targetnames": [
+            "enabTel",
+            "meaning1"
+        ],
+        "texture": "gateway.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 0,
+        "type": "GENERIC"
+    },
+    {
+        "ID": 92,
+        "content": "|meaning1",
+        "target": "meaning1",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 93,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 94,
+        "content": "0 93 ripof",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 95,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 96,
+        "content": "0 95 maintest.txt",
+        "flags": [
+            "PERMANENT",
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 97,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 98,
+        "content": "0 97 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 99,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 100,
+        "content": "0 99 ripof",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 101,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 102,
+        "content": "0 101 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 103,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 104,
+        "content": "0 103 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 105,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 106,
+        "content": "0 105 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 107,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 108,
+        "content": "0 107 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 109,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 110,
+        "content": "0 109 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 111,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 112,
+        "content": "0 111 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 113,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 114,
+        "content": "0 113 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 115,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 116,
+        "content": "0 115 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 117,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 118,
+        "content": "0 117 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 119,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 120,
+        "content": "0 119 maintest.txt",
+        "flags": [
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 121,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 122,
+        "content": "0 121 maintest.txt",
+        "flags": [
+            "PERMANENT",
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 123,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 124,
+        "content": "0 123 meaning",
+        "flags": [
+            "PERMANENT",
+            "CONTACT",
+            "INV"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 125,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 126,
+        "content": "0 125 maintest.txt",
+        "enabled": false,
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "target": "telTest",
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 127,
+        "target": "enabTel",
+        "targetnames": [
+            "telTest"
+        ],
+        "type": "ENABLER"
+    },
+    {
+        "ID": 128,
+        "flags": [
+            "SOLID"
+        ],
+        "target": "shroom",
+        "targetnames": [
+            "dsh1"
+        ],
+        "texture": "shroom.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 129,
+        "content": "Gimme my fix man",
+        "target": "dsh1",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 130,
+        "content": "CONTACT",
+        "target": "smolKnife",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 131,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 132,
+        "content": "0 131 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 133,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 134,
+        "content": "0 133 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 135,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 136,
+        "content": "0 135 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 137,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 138,
+        "content": "0 137 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 139,
+        "flags": [
+            "SOLID"
+        ],
+        "target": "buddy",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 140,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 141,
+        "content": "0 140 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 142,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 143,
+        "content": "0 142 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 144,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 145,
+        "content": "0 144 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 146,
+        "content": "Is it what they call an \"open world\" ?",
+        "flags": [
+            "SOLID"
+        ],
+        "type": "DIALOG"
+    },
+    {
+        "ID": 147,
+        "content": "I WANT TO DIE. FIND A WAY TO END MY DAYS.",
+        "flags": [
+            "SOLID"
+        ],
+        "target": "shroomJR",
+        "type": "DIALOG"
+    },
+    {
+        "ID": 148,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 149,
+        "content": "0 148 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 150,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 151,
+        "content": "0 150 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 152,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 153,
+        "content": "0 152 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 154,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 155,
+        "content": "0 154 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 156,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 157,
+        "content": "0 156 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 158,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 159,
+        "content": "0 158 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 160,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 161,
+        "content": "0 160 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 162,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 163,
+        "content": "0 162 shroomRoom",
+        "flags": [
+            "LOCKX",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 164,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 165,
+        "content": "0 164 shroomRoom",
+        "flags": [
+            "LOCKY",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 166,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 167,
+        "content": "0 166 shroomRoom",
+        "flags": [
+            "LOCKY",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 168,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 169,
+        "content": "0 168 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 170,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "texture": "A2.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 171,
+        "content": "0 170 shroomRoom",
+        "flags": [
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "texture": "A.png",
+        "type": "DOOR"
+    },
+    {
+        "ID": 172,
+        "flags": [
+            "CONTACT"
+        ],
+        "targetnames": [
+            "dsh1"
+        ],
+        "type": "GENERIC"
+    },
+    {
+        "ID": 173,
+        "content": "\"I can't keep my eye off you\"",
+        "flags": [
+            "DIALOG",
+            "SOLID"
+        ],
+        "target": "jano",
+        "texture": "eye.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 174,
+        "content": "You are not allowed to disturb the master of the universe.",
+        "flags": [
+            "CONTACT",
+            "SOLID"
+        ],
+        "target": "gateEye",
+        "targetnames": [
+            "190",
+            "189",
+            "188",
+            "183"
+        ],
+        "type": "DIALOG"
+    },
+    {
+        "ID": 175,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 176,
+        "content": "0 175 yume",
+        "flags": [
+            "LOCKY",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 177,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 178,
+        "content": "0 177 yume",
+        "flags": [
+            "LOCKX",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 179,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 180,
+        "content": "0 179 yume",
+        "flags": [
+            "LOCKY",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 181,
+        "content": "1",
+        "flags": [
+            "INV"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 182,
+        "content": "0 181 yume",
+        "flags": [
+            "LOCKX",
+            "CONTACT",
+            "INV",
+            "PERMANENT"
+        ],
+        "type": "DOOR"
+    },
+    {
+        "ID": 183,
+        "content": "eye chara",
+        "texture": "eye_pupil.png",
+        "type": "FOLLOWER",
+        "useMUnit": true,
+        "x": 5640.0,
+        "y": 3320.0
+    },
+    {
+        "ID": 184,
+        "flags": [
+            "CONTACT"
+        ],
+        "targetnames": [
+            "183"
+        ],
+        "type": "GENERIC"
+    },
+    {
+        "ID": 185,
+        "texture": "D.tga",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 186,
+        "flags": [
+            "DIALOG",
+            "SOLID"
+        ],
+        "target": "wall_test",
+        "texture": "tile.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 187,
+        "content": "\"I can't keep my eye off you\"",
+        "flags": [
+            "DIALOG"
+        ],
+        "target": "jano",
+        "texture": "eye.png",
+        "type": "GENERIC"
+    },
+    {
+        "ID": 188,
+        "content": "eye chara",
+        "texture": "eye_pupil.png",
+        "type": "FOLLOWER",
+        "useMUnit": true,
+        "x": 5620.0,
+        "y": 3239.0
+    },
+    {
+        "ID": 189,
+        "content": "eye chara",
+        "texture": "eye_pupil.png",
+        "type": "FOLLOWER",
+        "useMUnit": true,
+        "x": 5540.0,
+        "y": 3159.0
+    },
+    {
+        "ID": 190,
+        "content": "eye chara",
+        "texture": "eye_pupil.png",
+        "type": "FOLLOWER",
+        "useMUnit": true,
+        "x": 5600.0,
+        "y": 3159.0
+    }
+]
