@@ -12,7 +12,11 @@ std::string musicPath = "../Data/Music/";
 Engine::Engine(const int screenWidth, const int screenHeight) {
     InitWindow(screenWidth, screenHeight, "rayEngine");
     SetTargetFPS(120);
-    texture_m = Texture_m(texturesPath);
+
+    texture_m = new Texture_m();
+    texture_m->load(texturesPath);
+
+    object_m = new Object_m();
 }
 
 void Engine::game_loop() {
@@ -27,5 +31,7 @@ void Engine::game_loop() {
 }
 
 Engine::~Engine() {
+    delete texture_m;
+    delete object_m;
     CloseWindow();
 }

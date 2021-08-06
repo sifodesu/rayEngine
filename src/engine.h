@@ -1,3 +1,4 @@
+#pragma once
 #include "object_m.h"
 #include "texture_m.h"
 
@@ -8,6 +9,6 @@ public:
     ~Engine();
 
 private:
-    Object_m object_m;
-    Texture_m texture_m;
+    Object_m* object_m;
+    Texture_m* texture_m;
 };

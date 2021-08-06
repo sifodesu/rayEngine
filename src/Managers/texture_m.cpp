@@ -2,9 +2,8 @@
 #include "texture_m.h"
 #include "raylib.h"
 
-Texture_m::Texture_m(std::string path) {
-    if (!path.empty())
-        load(path);
+Texture_m::Texture_m() {
+    
 }
 
 void Texture_m::load(std::string path) {
@@ -17,4 +16,9 @@ void Texture_m::load(std::string path) {
         }
         textures[entry.path().filename()] = LoadTexture(entry.path().c_str());
     }
+}
+
+Texture_m::~Texture_m() {
+    for (auto& [name, tex] : textures)
+        UnloadTexture(tex);
 }

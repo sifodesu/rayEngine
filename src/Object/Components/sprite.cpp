@@ -1,5 +1,9 @@
 #include "sprite.h"
 
-void Sprite::routine() {
+Sprite::Sprite(std::string meta) {
     
+}
+
+void Sprite::routine() {
+
 }

@@ -10,6 +10,7 @@
 #include "Box.h"
 #include "raylib.h"
 
+using namespace quadtree;
 
 namespace quadtree {
     struct quadNode {
