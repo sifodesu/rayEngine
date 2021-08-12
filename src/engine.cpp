@@ -1,20 +1,16 @@
 #include <string>
 #include "engine.h" 
 #include "raylib.h"
+#include "definitions.h"
 
-std::string levelPath = "../Data/Levels/";
-std::string texturesPath = "../Data/Textures/";
-std::string asciiPath = "../Data/Polices/";
-std::string blueprintsPath = "../Data/Entities/blueprints.json";
-std::string saveData = "../Data/Saves/"; // save.txt"
-std::string musicPath = "../Data/Music/";
 
 Engine::Engine(const int screenWidth, const int screenHeight) {
+    SetTraceLogLevel(LOG_WARNING);
     InitWindow(screenWidth, screenHeight, "rayEngine");
     SetTargetFPS(120);
 
     texture_m = new Texture_m();
-    texture_m->load(texturesPath);
+    texture_m->load(TEXTURES_PATH);
 
     object_m = new Object_m();
 }

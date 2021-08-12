@@ -1,3 +1,4 @@
+#include "definitions.h"
 #include "object_m.h"
 #include "sprite.h"
 #include "nlohmann/json.hpp"
@@ -16,25 +17,26 @@ void Object_m::load(string path, map<int, GObject*>& container) {
     json objArray = file;
 
     for (auto& ojs : objArray) {
+        int tat = ojs["ID"];
         if (!ojs.contains("ID")) {
             cout << "Error: object with no ID" << endl;
             continue;
         }
         GObject* cur = new GObject(ojs["ID"]);
 
-        for (auto field : ojs.items()) {
-            if (field.key() == "target")
-                cur->target = ojs["target"];
+        for (auto& [key, value] : ojs.items()) {
+            // if (key == "target")
+                // cur->target = value;
 
-            if (field.key() == "targetnames") {
-                for (auto tn : ojs["targetnames"])
-                    cur->targetnames.push_back(tn);
-            }
-
-            if (field.key() == "texture") {
-                auto sprite = new Sprite(ojs["texture"]);
-                cur->addComponent(sprite);
-            }
+            // if (key == "targetnames") {
+            //     for (auto tn : ojs["targetnames"])
+            //         cur->targetnames.push_back(tn);
+            // }
+            
+            // if (key == "texture") {
+            //     auto sprite = new Sprite(value);
+            //     cur->addComponent(sprite);
+            // }
 
 
             // if (field.key() == "flags") {
@@ -71,7 +73,7 @@ void Object_m::load(string path, map<int, GObject*>& container) {
 }
 
 Object_m::Object_m() {
-
+    load(BLUEPRINTS_PATH, blueprints);
 }
 
 Object_m::~Object_m() {

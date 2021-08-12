@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <map>
 #include <vector>
 #include "objComponent.h"
 
@@ -8,12 +9,11 @@ public:
     GObject(int ID);
     ~GObject();
     void addComponent(ObjComponent* c);
-    
+
     void routine();
+    void trigger(const char* type = "");
     const int id;
-    std::string target;
-    std::vector<std::string> targetnames;
 
 private:
-    std::vector<ObjComponent*> components;
+    std::map<const char*, std::vector<ObjComponent*>> components;   //<typeid(), components matching>
 };
