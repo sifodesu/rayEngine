@@ -4,3 +4,5 @@
 #define BLUEPRINTS_PATH  "../Data/Entities/blueprints.json"
 #define SAVE_PATH "../Data/Saves/"
 #define MUSICS_PATH "../Data/Music/"
+
+#define t(...) typeid(__VA_ARGS__).name()

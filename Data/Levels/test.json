@@ -1,25 +1,29 @@
 [
-{
+    {
         "ID": 1,
         "flags": [
             "DIALOG",
             "SOLID"
         ],
         "target": "wall_test",
-        "texture": "tile.png",
+        "sprite": {
+            "filename": "tile.png"
+        },
         "type": "GENERIC",
         "useMUnit": true,
         "x": 40.0,
         "y": 40.0
     },
-{
+    {
         "ID": 2,
         "flags": [
             "DIALOG",
             "SOLID"
         ],
         "target": "wall_test",
-        "texture": "tile.png",
+        "sprite": {
+            "filename": "tile.png"
+        },
         "type": "GENERIC",
         "useMUnit": true,
         "x": 80.0,

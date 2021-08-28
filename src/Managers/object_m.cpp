@@ -7,12 +7,22 @@
 using json = nlohmann::json;
 using namespace std;
 
-void Object_m::load(string path, map<int, GObject *> &container)
-{
-    // char *file = LoadFileText(path.c_str());
+std::map<int, GObject*> Object_m::blueprints_;	// ents which cannot be placed on a map
+std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
+Quadtree Object_m::quad_ents_;
+std::string Object_m::level_name_;
+
+void Object_m::loadBlueprints() {
+    load(BLUEPRINTS_PATH, blueprints_);
+}
+void Object_m::loadLevel(std::string level_name) {
+    load(LEVELS_PATH + level_name, level_ents_);
+}
+
+
+void Object_m::load(string path, map<int, GObject*>& container) {
     std::ifstream file(path.c_str());
-    if (!file)
-    {
+    if (!file) {
         cout << "Error: Couldn't load the file at path " << path << endl;
         return;
     }
@@ -21,70 +31,46 @@ void Object_m::load(string path, map<int, GObject *> &container)
     json objArray;
     file >> objArray;
 
-    for (auto &ojs : objArray)
-    {
-        if (!ojs.contains("ID"))
-        {
+    for (auto& ojs : objArray) {
+        if (!ojs.contains("ID")) {
             cout << "Error: object with no ID" << endl;
             continue;
         }
-        GObject *cur = new GObject(ojs["ID"]);
+        GObject* cur = new GObject(ojs["ID"]);
 
-        for (auto &[key, value] : ojs.items())
-        {
-            // if (key == "target")
-            // cur->target = value;
-
-            //         // if (key == "targetnames") {
-            //         //     for (auto tn : ojs["targetnames"])
-            //         //         cur->targetnames.push_back(tn);
-            //         // }
-
-            //         // if (key == "texture") {
-            //         //     auto sprite = new Sprite(value);
-            //         //     cur->addComponent(sprite);
-            //         // }
-
-            //         // if (field.key() == "flags") {
-            //         //     for (auto fn : ojs["flags"])
-            //         //         cur.flags.push_back(fn);
-            //         // }
-
-            //         // if (field.key() == "content")
-            //         //     cur.meta = ojs["content"];
-
-            //         // if (field.key() == "x") {
-            //         //     cur.movingUnit.hitBox.x = ojs["x"];
-            //         //     std::get<0>(cur.movingUnit.savedCoord) = ojs["x"];
-            //         // }
-
-            //         // if (field.key() == "y") {
-            //         //     cur.movingUnit.hitBox.y = ojs["y"];
-            //         //     std::get<1>(cur.movingUnit.savedCoord) = ojs["y"];
-            //         // }
-
-            //         // if (field.key() == "useMUnit")
-            //         //     cur.useMUnit = ojs["useMUnit"];
-
-            //         // if (field.key() == "enabled") {
-            //         //     cur.default_enabled = ojs["enabled"];
-            //         //     cur.enabled = cur.default_enabled;
-            //         // }
+        for (auto& [key, value] : ojs.items()) {
+            if (key == "sprite") {
+                auto sprite = new Sprite(ojs["sprite"]);
+                cur->addComponent(sprite);
+            }
         }
-        //     container[cur->id] = cur;
+        container[ojs["ID"]] = cur;
+        //put obj in quad.
     }
     file.close();
 }
 
-Object_m::Object_m()
-{
-    load(BLUEPRINTS_PATH, blueprints);
+void Object_m::routine() {
+    for (auto& [id, obj] : level_ents_) {
+        obj->routine();
+    }
+    //update elements in quad
 }
 
-Object_m::~Object_m()
-{
-    for (auto &[id, obj] : blueprints)
+std::vector<GObject*> Object_m::queryQuad(Rectangle rect) {
+    std::vector<quadNode> nodes = quad_ents_.query(Box<float>(rect.x, rect.y, rect.width, rect.height));
+    std::vector<GObject*> ret;
+    for (auto& node : nodes) {
+        if (level_ents_.contains(node.id)) {
+            ret.push_back(level_ents_[node.id]);
+        }
+    }
+    return ret;
+}
+
+void Object_m::unloadAll() {
+    for (auto& [id, obj] : blueprints_)
         delete (obj);
-    for (auto &[id, obj] : levelEnts)
+    for (auto& [id, obj] : level_ents_)
         delete (obj);
 }

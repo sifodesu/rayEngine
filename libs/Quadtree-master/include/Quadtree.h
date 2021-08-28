@@ -90,10 +90,10 @@ namespace quadtree {
             return Box<float>(origin, childSize);
             // Norst East
             case 1:
-            return Box<float>(Vector2<float>(origin.x + childSize.x, origin.y), childSize);
+            return Box<float>(quadtreeVector2::Vector2<float>(origin.x + childSize.x, origin.y), childSize);
             // South West
             case 2:
-            return Box<float>(Vector2<float>(origin.x, origin.y + childSize.y), childSize);
+            return Box<float>(quadtreeVector2::Vector2<float>(origin.x, origin.y + childSize.y), childSize);
             // South East
             case 3:
             return Box<float>(origin + childSize, childSize);

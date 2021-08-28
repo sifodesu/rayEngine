@@ -6,7 +6,8 @@
             "SOLID"
         ],
         "target": "wall_test",
-        "texture": "tile.png",
+        "sprite": { "filename": "tile.png"
+        },
         "type": "GENERIC"
     }
 ]

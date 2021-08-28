@@ -20,7 +20,7 @@ public:
 
     }
 
-    constexpr Box(const Vector2<T>& position, const Vector2<T>& size) noexcept :
+    constexpr Box(const quadtreeVector2::Vector2<T>& position, const quadtreeVector2::Vector2<T>& size) noexcept :
         left(position.x), top(position.y), width(size.x), height(size.y)
     {
 
@@ -36,19 +36,19 @@ public:
         return top + height;
     }
 
-    constexpr Vector2<T> getTopLeft() const noexcept
+    constexpr quadtreeVector2::Vector2<T> getTopLeft() const noexcept
     {
-        return Vector2<T>(left, top);
+        return quadtreeVector2::Vector2<T>(left, top);
     }
 
-    constexpr Vector2<T> getCenter() const noexcept
+    constexpr quadtreeVector2::Vector2<T> getCenter() const noexcept
     {
-        return Vector2<T>(left + width / 2, top + height / 2);
+        return quadtreeVector2::Vector2<T>(left + width / 2, top + height / 2);
     }
 
-    constexpr Vector2<T> getSize() const noexcept
+    constexpr quadtreeVector2::Vector2<T> getSize() const noexcept
     {
-        return Vector2<T>(width, height);
+        return quadtreeVector2::Vector2<T>(width, height);
     }
 
     constexpr bool contains(const Box<T>& box) const noexcept

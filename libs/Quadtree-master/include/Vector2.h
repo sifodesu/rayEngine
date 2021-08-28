@@ -1,6 +1,6 @@
 #pragma once
 
-namespace quadtree
+namespace quadtreeVector2
 {
 
 template<typename T>

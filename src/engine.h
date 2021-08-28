@@ -9,6 +9,8 @@ public:
     ~Engine();
 
 private:
-    Object_m* object_m;
-    Texture_m* texture_m;
+    void render();
+    Camera2D camera_;
+    int screenWidth_;
+    int screenHeight_;
 };

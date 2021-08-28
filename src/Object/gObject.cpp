@@ -1,6 +1,7 @@
 #include <typeinfo>
 #include <iostream>
 #include "gObject.h"
+#include "definitions.h"
 
 using namespace std;
 
@@ -14,11 +15,15 @@ void GObject::addComponent(ObjComponent* c) {
         cout << "ERROR: Trying to add null component" << endl;
         return;
     }
-    components[typeid(*c).name()].push_back(c);
+    components[t(*c)].push_back(c);
 }
 
 void GObject::routine() {
-    
+    for (auto& [type, vec] : components) {
+        for (auto& comp : vec){
+            comp->routine();
+        }
+    }
 }
 
 void GObject::trigger(const char* type) {

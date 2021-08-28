@@ -3,20 +3,26 @@
 #include <fstream>
 #include <string>
 #include <map>
+#include <vector>
 #include "Quadtree.h"
 #include "gObject.h"
+#include "definitions.h"
 
 class Object_m {
 public:
-    Object_m();
-    void load(std::string path, std::map<int, GObject*>& container);
-    ~Object_m();
+    static void loadBlueprints();
+    static void loadLevel(std::string level_name);
+    static void unloadAll();
+
+    static void routine();
+    static std::vector<GObject*> queryQuad(Rectangle rect);
 
 private:
-    std::map<int, GObject*> blueprints;	// ents which cannot be placed on a map
-    std::map<int, GObject*> levelEnts;	// ents of the current level
+    static void load(std::string path, std::map<int, GObject*>& container);
+    static std::map<int, GObject*> blueprints_;	// ents which cannot be placed on a map
+    static std::map<int, GObject*> level_ents_;	// ents of the current level
    
-    Quadtree quadEnts;
+    static Quadtree quad_ents_;
     
-    std::string levelName;
+    static std::string level_name_;
 };
