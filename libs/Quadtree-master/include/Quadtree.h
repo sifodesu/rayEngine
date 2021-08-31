@@ -17,8 +17,8 @@ namespace quadtree {
         int id;
         Rectangle rect;
         bool operator==(const quadNode& rhs) const {
-            return (id == rhs.id) && ((abs(rect.width - rhs.rect.width) < 0.000000001) && (abs(rect.height - rhs.rect.height) < 0.000000001)
-                && (abs(rect.x - rhs.rect.x) < 0.000000001) && (abs(rect.y - rhs.rect.y) < 0.000000001));
+            return (id == rhs.id);// && ((abs(rect.width - rhs.rect.width) < 0.000000001) && (abs(rect.height - rhs.rect.height) < 0.000000001)
+                //&& (abs(rect.x - rhs.rect.x) < 0.000000001) && (abs(rect.y - rhs.rect.y) < 0.000000001));
         }
     };
     // Box<float> titi(quadNode node) {
@@ -41,6 +41,7 @@ namespace quadtree {
                 return Box<float>(node.rect.x, node.rect.y, node.rect.width, node.rect.height);
             };
             mGetBox = titi;
+            size_ = 0;
         }
 
         void add(const quadNode& value) {
@@ -51,7 +52,8 @@ namespace quadtree {
             remove(mRoot.get(), nullptr, mBox, value);
         }
 
-        std::vector<quadNode> query(const Box<float>& box) const {
+        std::vector<quadNode> query(const Rectangle& rect) const {
+            const Box<float> box (rect);
             auto values = std::vector<quadNode>();
             query(mRoot.get(), mBox, box, values);
             return values;
@@ -62,7 +64,9 @@ namespace quadtree {
             findAllIntersections(mRoot.get(), intersections);
             return intersections;
         }
-
+        int size(){
+            return size_;
+        }
     private:
         static constexpr auto quadNodehreshold = std::size_t(8);
         static constexpr auto MaxDepth = std::size_t(64);
@@ -76,6 +80,7 @@ namespace quadtree {
         std::unique_ptr<Node> mRoot;
         std::function<Box<float>(quadNode node)> mGetBox;
         std::equal_to<quadNode> mEqual;
+        int size_;
 
         bool isLeaf(const Node* node) const {
             return !static_cast<bool>(node->children[0]);
@@ -156,8 +161,10 @@ namespace quadtree {
                 if (i != -1)
                     add(node->children[static_cast<std::size_t>(i)].get(), depth + 1, computeBox(box, i), value);
                 // Otherwise, we add the value in the current node
-                else
+                else{ 
                     node->values.push_back(value);
+                    size_++;
+                }
             }
         }
 
@@ -211,6 +218,7 @@ namespace quadtree {
             // Swap with the last element and pop back
             *it = std::move(node->values.back());
             node->values.pop_back();
+            size_--;
         }
 
         void tryMerge(Node* node) {

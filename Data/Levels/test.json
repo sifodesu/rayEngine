@@ -1,32 +1,14 @@
 [
     {
         "ID": 1,
-        "flags": [
-            "DIALOG",
-            "SOLID"
-        ],
-        "target": "wall_test",
-        "sprite": {
-            "filename": "tile.png"
+        "type": "basic",
+        "sprite": { "filename": "tile.png"
         },
-        "type": "GENERIC",
-        "useMUnit": true,
-        "x": 40.0,
-        "y": 40.0
-    },
-    {
-        "ID": 2,
-        "flags": [
-            "DIALOG",
-            "SOLID"
-        ],
-        "target": "wall_test",
-        "sprite": {
-            "filename": "tile.png"
-        },
-        "type": "GENERIC",
-        "useMUnit": true,
-        "x": 80.0,
-        "y": 80.0
+        "body": {   "x": 50,
+                    "y": 50,
+                    "w": 20,
+                    "h": 20,
+                    "solid": true
+        }
     }
 ]

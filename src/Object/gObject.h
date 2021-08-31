@@ -2,18 +2,17 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <raylib.h>
 #include "objComponent.h"
+
 
 class GObject {
 public:
-    GObject(int ID);
-    ~GObject();
-    void addComponent(ObjComponent* c);
-
-    void routine();
-    void trigger(const char* type = "");
-    const int id;
-
-private:
-    std::map<const char*, std::vector<ObjComponent*>> components;   //<typeid(), components matching>
+    GObject(const int id): id_(id) {}
+    
+    virtual void routine() {}
+    virtual void trigger() {}
+    virtual void draw(Vector2 pos) {}
+    
+    const int id_;
 };

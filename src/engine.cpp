@@ -2,19 +2,18 @@
 #include "engine.h" 
 #include "raylib.h"
 #include "definitions.h"
-#include <string>
+#include "rigidBody.h"
 
 
-Engine::Engine(const int screenWidth, const int screenHeight) {
+Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
     InitWindow(screenWidth, screenHeight, "rayEngine");
     screenWidth_ = screenWidth;
     screenHeight_ = screenHeight;
-    camera_ = { {100, 100}, {100, 100}, 0, 1.0f };
     SetTargetFPS(120);
 
     Texture_m::load();
-    Object_m::loadBlueprints();
+    // Object_m::loadBlueprints();
     Object_m::loadLevel("test.json");
 }
 
@@ -23,8 +22,9 @@ void Engine::game_loop() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        BeginMode2D(camera_);
+        BeginMode2D(camera_.getCam());
         Object_m::routine();
+        camera_.routine();
         render();
         EndMode2D();
 
@@ -33,11 +33,14 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    Rectangle camera = { camera_.offset.x, camera_.offset.y,
-    (camera_.target.x - camera_.offset.x) * 2, (camera_.target.y - camera_.offset.y) * 2 };
-
-    std::vector<GObject*> to_render = Object_m::queryQuad(camera);
-    std::cout << to_render.size();
+    auto to_render = RigidBody::query(camera_.getRect());
+    for (auto body : to_render) {
+        if (body) {
+            body->father_->draw(body->getCoord());
+            // body->setSpeed({100, 0});
+            // camera_.to_follow_ = body;
+        }
+    }
 }
 
 Engine::~Engine() {

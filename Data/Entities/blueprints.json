@@ -1,13 +1,14 @@
 [
     {
         "ID": 1,
-        "flags": [
-            "DIALOG",
-            "SOLID"
-        ],
-        "target": "wall_test",
+        "type": "basic",
         "sprite": { "filename": "tile.png"
         },
-        "type": "GENERIC"
+        "body": {   "x": 50,
+                    "y": 50,
+                    "w": 20,
+                    "h": 20,
+                    "solid": true
+        }
     }
 ]

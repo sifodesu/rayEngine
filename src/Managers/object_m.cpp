@@ -1,15 +1,17 @@
+#include <fstream>
 #include "definitions.h"
 #include "object_m.h"
 #include "sprite.h"
 #include "nlohmann/json.hpp"
-#include <fstream>
+#include "rigidBody.h"
+#include "basicEnt.h"
 
 using json = nlohmann::json;
 using namespace std;
 
 std::map<int, GObject*> Object_m::blueprints_;	// ents which cannot be placed on a map
 std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
-Quadtree Object_m::quad_ents_;
+
 std::string Object_m::level_name_;
 
 void Object_m::loadBlueprints() {
@@ -36,16 +38,20 @@ void Object_m::load(string path, map<int, GObject*>& container) {
             cout << "Error: object with no ID" << endl;
             continue;
         }
-        GObject* cur = new GObject(ojs["ID"]);
-
-        for (auto& [key, value] : ojs.items()) {
-            if (key == "sprite") {
-                auto sprite = new Sprite(ojs["sprite"]);
-                cur->addComponent(sprite);
-            }
+        if (container.contains(ojs["ID"])) {
+            cout << "Error: objects with same id. Duplicate not loaded" << endl;
+            continue;
         }
-        container[ojs["ID"]] = cur;
-        //put obj in quad.
+        if (!ojs.contains("type")) {
+            cout << "Error: object with no type" << endl;
+            continue;
+        }
+        GObject* cur = NULL;
+        if (ojs["type"] == "basic")
+            cur = new BasicEnt(ojs);
+
+        if (cur)
+            container[ojs["ID"]] = cur;
     }
     file.close();
 }
@@ -54,19 +60,8 @@ void Object_m::routine() {
     for (auto& [id, obj] : level_ents_) {
         obj->routine();
     }
-    //update elements in quad
 }
 
-std::vector<GObject*> Object_m::queryQuad(Rectangle rect) {
-    std::vector<quadNode> nodes = quad_ents_.query(Box<float>(rect.x, rect.y, rect.width, rect.height));
-    std::vector<GObject*> ret;
-    for (auto& node : nodes) {
-        if (level_ents_.contains(node.id)) {
-            ret.push_back(level_ents_[node.id]);
-        }
-    }
-    return ret;
-}
 
 void Object_m::unloadAll() {
     for (auto& [id, obj] : blueprints_)
