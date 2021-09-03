@@ -1,6 +1,8 @@
+#include <iostream>
 #include "sprite.h"
 #include "texture_m.h"
 using json = nlohmann::json;
+using namespace std;
 
 Sprite::Sprite(std::string filename, int nb_frames, int speed)
     : filename_(filename_), nb_frames_(nb_frames), speed_(speed), index_(0),
@@ -10,6 +12,11 @@ Sprite::Sprite(std::string filename, int nb_frames, int speed)
 }
 
 Sprite::Sprite(json obj) : index_(0), ttl_frame_(0) {
+    if (!obj.contains("sprite")) {
+        cout << "ERROR: no sprite from json" << endl;
+        return;
+    }
+    obj = obj["sprite"];
     if (obj.contains("filename"))
         filename_ = obj["filename"];
 

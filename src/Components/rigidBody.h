@@ -17,6 +17,7 @@ public:
 
     Vector2 getCoord();
     void setSpeed(Vector2 speed);
+    Vector2 getSpeed();
     void routine();
 
     static Quadtree quad;

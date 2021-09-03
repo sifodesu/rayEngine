@@ -5,6 +5,7 @@
 #include "nlohmann/json.hpp"
 #include "rigidBody.h"
 #include "basicEnt.h"
+#include "character.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -49,7 +50,8 @@ void Object_m::load(string path, map<int, GObject*>& container) {
         GObject* cur = NULL;
         if (ojs["type"] == "basic")
             cur = new BasicEnt(ojs);
-
+        if (ojs["type"] == "character")
+            cur = new Character(ojs);
         if (cur)
             container[ojs["ID"]] = cur;
     }

@@ -13,14 +13,21 @@ Camera2D Raycam::getCam() {
 }
 
 Rectangle Raycam::getRect() {
-    return Rectangle{ camera_.target.x - camera_.offset.x, camera_.target.y - camera_.offset.y,
-    (camera_.offset.x) * 2, (camera_.offset.y) * 2 };
+    if (to_follow_)
+        return Rectangle{ camera_.target.x - camera_.offset.x, camera_.target.y - camera_.offset.y,
+        (camera_.offset.x) * 2, (camera_.offset.y) * 2 };
+
+    else
+        return Rectangle{ 0.0f, 0.0f,
+        (camera_.offset.x) * 2, (camera_.offset.y) * 2 };
 }
 
 void Raycam::routine() {
     if (to_follow_) {
         auto coords = to_follow_->getCoord();
-        camera_.target.x = coords.x;
-        camera_.target.y = coords.y;
+        camera_.target = coords;
+    }
+    else {
+        camera_.target = camera_.offset;
     }
 }
