@@ -4,6 +4,7 @@
 #include "definitions.h"
 #include "rigidBody.h"
 #include "input.h"
+#include "runes.h"
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
@@ -17,6 +18,7 @@ Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWi
     InputMap::init();
     // Object_m::loadBlueprints();
     Object_m::loadLevel("test.json");
+    Runes::init();
 }
 
 void Engine::game_loop() {
@@ -24,9 +26,10 @@ void Engine::game_loop() {
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
-        BeginMode2D(camera_.getCam());
         Object_m::routine();
         camera_.routine();
+        Runes::routine();
+        BeginMode2D(camera_.getCam());
         render();
         EndMode2D();
 
@@ -40,11 +43,11 @@ void Engine::render() {
     for (auto body : to_render) {
         if (body) {
             body->father_->draw(body->getCoord());
-            // body->setSpeed({200, 0});
-            // camera_.to_follow_ = body;
-            // std::cout << body->getCoord().x << std::endl;
+            if(body->father_->id_ == 1)
+                camera_.to_follow_ = body;
         }
     }
+    Runes::draw({0, 0});
 }
 
 Engine::~Engine() {

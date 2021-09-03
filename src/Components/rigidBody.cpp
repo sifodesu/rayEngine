@@ -69,11 +69,31 @@ Vector2 RigidBody::getCoord() {
 void RigidBody::setSpeed(Vector2 speed) {
     speed_ = speed;
 }
-Vector2 RigidBody::getSpeed(){
+Vector2 RigidBody::getSpeed() {
     return speed_;
 }
 
+
 void RigidBody::routine() {
+    Rectangle fixSpeed = surface_;
+    if(speed_.x > 0)
+        fixSpeed.width +=1;
+    if(speed_.x < 0)
+        fixSpeed.x -= 1;
+    for (RigidBody* body : query(fixSpeed))
+        if (body->solid_ && (body->pool_id_ != pool_id_))
+            speed_.x = 0;
+    
+    fixSpeed = surface_;
+    if(speed_.y > 0)
+        fixSpeed.height += 1;
+    if(speed_.y < 0)
+        fixSpeed.y -= 1;
+    for (RigidBody* body : query(fixSpeed))
+        if (body->solid_ && (body->pool_id_ != pool_id_))
+            speed_.y = 0;
+    
+
     Vector2 posBackup = { surface_.x, surface_.y };
     double delta = clock_.getLap();
     double distX = delta * speed_.x;
@@ -108,7 +128,9 @@ void RigidBody::routine() {
         else
             break;
     }
+    // if(distX > FLT_EPSILON) {
 
+    // }
     if (abs(posBackup.x - surface_.x) > FLT_EPSILON || abs(posBackup.y - surface_.y) > FLT_EPSILON) {
         quad.remove({ pool_id_, surface_});
         quad.add({ pool_id_, surface_});

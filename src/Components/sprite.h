@@ -13,6 +13,7 @@ public:
     void draw(Vector2 pos);
     void routine();
     void stop(int frame = 0); //freeze the animation on a specific frame
+    Vector2 getFrameDim();
 
 private:
     void updateIndex();

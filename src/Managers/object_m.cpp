@@ -33,7 +33,7 @@ void Object_m::load(string path, map<int, GObject*>& container) {
 
     json objArray;
     file >> objArray;
-
+    
     for (auto& ojs : objArray) {
         if (!ojs.contains("ID")) {
             cout << "Error: object with no ID" << endl;

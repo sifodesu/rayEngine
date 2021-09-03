@@ -5,7 +5,7 @@ using json = nlohmann::json;
 using namespace std;
 
 Sprite::Sprite(std::string filename, int nb_frames, int speed)
-    : filename_(filename_), nb_frames_(nb_frames), speed_(speed), index_(0),
+    : filename_(filename), nb_frames_(nb_frames), speed_(speed), index_(0),
     ttl_frame_(0) {
 
     sprite_sheet_ = Texture_m::getTexture(filename);
@@ -51,4 +51,8 @@ void Sprite::draw(Vector2 pos) {
 void Sprite::stop(int frame) {
     index_ = frame;
     speed_ = 0;
+}
+
+Vector2 Sprite::getFrameDim() {
+    return { sprite_sheet_.width, sprite_sheet_.height };
 }
