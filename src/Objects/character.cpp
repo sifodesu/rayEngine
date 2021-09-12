@@ -50,7 +50,7 @@ void Character::routine() {
     while (Runes::getBullet()) {
         shoot();
     }
-    shoot();
+    // shoot();
 }
 
 void Character::draw() {

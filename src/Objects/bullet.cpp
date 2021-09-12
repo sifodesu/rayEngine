@@ -4,10 +4,14 @@
 using json = nlohmann::json;
 using namespace std;
 
-Bullet::Bullet(json obj) : GObject(obj["ID"]), ttl_(2) {
+Bullet::Bullet(json obj) : GObject(obj["ID"]) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
     body_->setSolid(false);
+    if(obj.contains("ttl"))
+        ttl_ = obj["ttl"];
+    else
+        ttl_ = 10;
 }
 
 Bullet::~Bullet() {
@@ -25,4 +29,8 @@ void Bullet::routine() {
     body_->routine();
     sprite_->routine();
     ttl_ -= clock_.getLap();
+}
+
+double Bullet::getTTL(){
+    return ttl_;
 }

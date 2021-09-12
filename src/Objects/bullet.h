@@ -13,10 +13,12 @@ public:
     void draw();
     void routine();
     void trigger() {}
-
+    double getTTL();
 
     Sprite* sprite_;
     RigidBody* body_;
     Clock clock_;
+
+private:
     double ttl_;
 };

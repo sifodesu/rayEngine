@@ -9,10 +9,6 @@ std::map<int, RigidBody*> RigidBody::pool;
 using json = nlohmann::json;
 using namespace std;
 
-void RigidBody::updateQuad() {
-
-}
-
 //TODO: handle case when out of box quad
 
 RigidBody::RigidBody(Rectangle surface, bool solid) : surface_(surface), solid_(solid) {
@@ -28,7 +24,10 @@ RigidBody::RigidBody(json obj, GObject* father) {
     Rectangle rect{ 0.0f };
     speed_ = { 0 };
     solid_ = true;
+    acceleration_ = 0;
+    curve_ = 0;
     father_ = father;
+    angle_ = 0;
     if (!obj.contains("body")) {
         cout << "ERROR: no rigidbody in json" << endl;
         return;
@@ -50,6 +49,12 @@ RigidBody::RigidBody(json obj, GObject* father) {
     surface_ = rect;
     if (obj.contains("solid"))
         solid_ = obj["solid"];
+
+    if (obj.contains("acceleration"))
+        acceleration_ = obj["acceleration"];
+
+    if (obj.contains("curve"))
+        curve_ = obj["curve"];
 
     if (pool.size())
         pool_id_ = (--pool.end())->first + 1;
@@ -93,69 +98,62 @@ void RigidBody::setSpeed(Vector2 speed) {
 Vector2 RigidBody::getSpeed() {
     return speed_;
 }
+void RigidBody::fixSpeed() {
+    if (solid_) {
+        Rectangle fixSpeed = surface_;
+        if (speed_.x > 0)
+            fixSpeed.width += 1;
+        if (speed_.x < 0)
+            fixSpeed.x -= 1;
+        for (RigidBody* body : query(fixSpeed))
+            if (body->solid_ && (body->pool_id_ != pool_id_))
+                speed_.x = 0;
 
+        fixSpeed = surface_;
+        if (speed_.y > 0)
+            fixSpeed.height += 1;
+        if (speed_.y < 0)
+            fixSpeed.y -= 1;
+        for (RigidBody* body : query(fixSpeed))
+            if (body->solid_ && (body->pool_id_ != pool_id_))
+                speed_.y = 0;
+    }
+}
 
 void RigidBody::routine() {
-    Rectangle fixSpeed = surface_;
-    if (speed_.x > 0)
-        fixSpeed.width += 1;
-    if (speed_.x < 0)
-        fixSpeed.x -= 1;
-    for (RigidBody* body : query(fixSpeed))
-        if (body->solid_ && solid_ && (body->pool_id_ != pool_id_))
-            speed_.x = 0;
-
-    fixSpeed = surface_;
-    if (speed_.y > 0)
-        fixSpeed.height += 1;
-    if (speed_.y < 0)
-        fixSpeed.y -= 1;
-    for (RigidBody* body : query(fixSpeed))
-        if (body->solid_ && solid_ && (body->pool_id_ != pool_id_))
-            speed_.y = 0;
-
-
-    Vector2 posBackup = { surface_.x, surface_.y };
-    double delta = clock_.getLap();
-    double distX = delta * speed_.x;
-    double distY = delta * speed_.y;
-    int signX = distX > 0 ? 1 : -1;
-    int signY = distY > 0 ? 1 : -1;
-    distX = abs(distX); distY = abs(distY);
-
-    if (distX < FLT_EPSILON && distY < FLT_EPSILON)
+    float delta = (float)clock_.getLap();
+    if (abs(speed_.x) < FLT_EPSILON && abs(speed_.y) < FLT_EPSILON)
         return;
 
-    double incX = distX / (distX + distY);
-    double incY = distY / (distX + distY);
-    incX = min(distX, incX);
-    incY = min(distY, incY);
+    float tempX = cos(curve_ * delta) * speed_.x - sin(curve_ * delta) * speed_.y;
+    float tempY = sin(curve_ * delta) * speed_.x + cos(curve_ * delta) * speed_.y;
+    speed_ = { tempX, tempY };
 
-    Rectangle temp = surface_;
+    fixSpeed();
+
     quad.remove({ pool_id_, surface_ });
-    while (distX > FLT_EPSILON || distY > FLT_EPSILON) {
-        if (distX > FLT_EPSILON)
-            temp.x += incX * signX; distX -= incX;
 
-        if (distY > FLT_EPSILON)
-            temp.y += incY * signY; distY -= incY;
+    float speedNorm = sqrt(pow(speed_.x * delta, 2) + pow(speed_.y * delta, 2));
+    Vector2 unitSpeed = { speed_.x * delta / speedNorm, speed_.y * delta / speedNorm };
 
+    while (speedNorm > 0) {
+        Rectangle temp = surface_;
+        temp.x += unitSpeed.x * speedNorm;
+        temp.y += unitSpeed.y * speedNorm;
         bool solid_collide = false;
         for (RigidBody* body : query(temp))
             if (body->solid_ && solid_ && (body->pool_id_ != pool_id_))
                 solid_collide = true;
 
-        if (!solid_collide)
+        if (!solid_collide) {
             surface_ = temp;
-        else
             break;
+        }
+        else
+            speedNorm -= 0.1;
     }
-    // if(distX > FLT_EPSILON) {
 
-    // }
-    // if (abs(posBackup.x - surface_.x) > FLT_EPSILON || abs(posBackup.y - surface_.y) > FLT_EPSILON) {
-
-    // }
     quad.add({ pool_id_, surface_ });
-
+    speed_.x += acceleration_ * delta * speed_.x;
+    speed_.y += acceleration_ * delta * speed_.y;
 }

@@ -34,6 +34,9 @@ private:
     bool solid_;
     int pool_id_;
     Clock clock_;
+    double acceleration_;
+    double curve_;
+    double angle_;
 
-    void updateQuad();
+    void fixSpeed();    //set to 0 if collision
 };
