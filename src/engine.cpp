@@ -16,7 +16,7 @@ Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWi
 
     Texture_m::load();
     InputMap::init();
-    // Object_m::loadBlueprints();
+    Object_m::loadBlueprints();
     Object_m::loadLevel("test.json");
     Runes::init();
 }
@@ -38,11 +38,10 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    // auto rrr = camera_.getRect();
     auto to_render = RigidBody::query(camera_.getRect());
     for (auto body : to_render) {
         if (body) {
-            body->father_->draw(body->getCoord());
+            body->father_->draw();
             if(body->father_->id_ == 1)
                 camera_.to_follow_ = body;
         }
@@ -52,6 +51,6 @@ void Engine::render() {
 
 Engine::~Engine() {
     Texture_m::unload();
-    Object_m::unloadAll();
+    Object_m::unload();
     CloseWindow();
 }

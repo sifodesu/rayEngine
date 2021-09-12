@@ -1,6 +1,8 @@
 #include "character.h"
 #include "input.h"
 #include "runes.h"
+#include "object_m.h"
+#include "bullet.h"
 
 #define SPEED 300
 
@@ -42,12 +44,22 @@ void Character::routine() {
         else if (bodySpeed.x > 0)
             body_->setSpeed({ 0, bodySpeed.y });
     }
-    
+
     sprite_->routine();
     body_->routine();
-
+    while (Runes::getBullet()) {
+        shoot();
+    }
+    shoot();
 }
 
-void Character::draw(Vector2 pos) {
-    sprite_->draw(pos);
+void Character::draw() {
+    sprite_->draw(body_->getCoord());
+}
+
+void Character::shoot() {
+    Bullet* bullet = (Bullet*)Object_m::createObj("bullet");
+    bullet->body_->setCoord(body_->getCoord());
+    bullet->body_->setSpeed({ 0, -600 });
+
 }

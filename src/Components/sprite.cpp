@@ -11,7 +11,7 @@ Sprite::Sprite(std::string filename, int nb_frames, int speed)
     sprite_sheet_ = Texture_m::getTexture(filename);
 }
 
-Sprite::Sprite(json obj) : index_(0), ttl_frame_(0) {
+Sprite::Sprite(json obj) : index_(0), ttl_frame_(0), nb_frames_(1) {
     if (!obj.contains("sprite")) {
         cout << "ERROR: no sprite from json" << endl;
         return;
@@ -54,5 +54,5 @@ void Sprite::stop(int frame) {
 }
 
 Vector2 Sprite::getFrameDim() {
-    return { sprite_sheet_.width, sprite_sheet_.height };
+    return {(float) sprite_sheet_.width, (float)sprite_sheet_.height };
 }

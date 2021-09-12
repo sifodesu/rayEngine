@@ -1,3 +1,4 @@
+#pragma once
 #include <raylib.h>
 #include <nlohmann/json.hpp>
 #include "gObject.h"
@@ -9,10 +10,11 @@ class Character : public GObject {
 public:
     Character(nlohmann::json obj);
     void routine();
-    void draw(Vector2 pos);
+    void draw();
+    void shoot();
 
 private:
     RigidBody* body_;
     Sprite* sprite_;
-    // Runes* runes_;
+    
 };

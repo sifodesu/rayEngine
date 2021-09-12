@@ -4,15 +4,19 @@
 #include "gObject.h"
 #include "sprite.h"
 #include "rigidBody.h"
+#include "clock.h"
 
-class BasicEnt : public GObject {
+class Bullet : public GObject {
 public:
-    BasicEnt(nlohmann::json obj);
-    ~BasicEnt();
+    Bullet(nlohmann::json obj);
+    ~Bullet();
     void draw();
     void routine();
+    void trigger() {}
 
-private:
+
     Sprite* sprite_;
     RigidBody* body_;
+    Clock clock_;
+    double ttl_;
 };

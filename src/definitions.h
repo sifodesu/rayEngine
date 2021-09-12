@@ -1,3 +1,4 @@
+#pragma once
 #define LEVELS_PATH  "../Data/Levels/"
 #define TEXTURES_PATH "../Data/Textures/"
 #define POLICES_PATH  "../Data/Polices/"

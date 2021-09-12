@@ -9,10 +9,10 @@
 class GObject {
 public:
     GObject(const int id): id_(id) {}
-    
+    virtual ~GObject() {}
     virtual void routine() {}
     virtual void trigger() {}
-    virtual void draw(Vector2 pos) {}
+    virtual void draw() {}
     
     const int id_;
 };
