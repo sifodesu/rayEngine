@@ -29,6 +29,8 @@ void Engine::game_loop() {
         Object_m::routine();
         camera_.routine();
         Runes::routine();
+        DrawFPS(10, 10);
+        
         BeginMode2D(camera_.getCam());
         render();
         EndMode2D();

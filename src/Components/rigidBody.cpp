@@ -13,9 +13,7 @@ void RigidBody::updateQuad() {
 
 }
 
-//TODO: pool_id is completely wrong in case of delete
-//      handle case when out of box quad
-
+//TODO: handle case when out of box quad
 
 RigidBody::RigidBody(Rectangle surface, bool solid) : surface_(surface), solid_(solid) {
     if (pool.size())

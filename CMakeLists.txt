@@ -19,17 +19,19 @@ file(GLOB_RECURSE CPPS3 "src/*/*/*.cpp")
 
 add_executable(rayEngine ${CPPS} ${CPPS2} ${CPPS3} ${LIBS})
 
-include(FetchContent)
+set(JSON_BuildTests OFF CACHE INTERNAL "")
+add_subdirectory(libs/json-3.10.2)
+# include(FetchContent)
 
-FetchContent_Declare(json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.9.1)
+# FetchContent_Declare(json
+#   GIT_REPOSITORY https://github.com/nlohmann/json.git
+#   GIT_TAG v3.9.1)
 
-FetchContent_GetProperties(json)
-if(NOT json_POPULATED)
-  FetchContent_Populate(json)
-  add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
-endif()
+# FetchContent_GetProperties(json)
+# if(NOT json_POPULATED)
+#   FetchContent_Populate(json)
+#   add_subdirectory(${json_SOURCE_DIR} ${json_BINARY_DIR} EXCLUDE_FROM_ALL)
+# endif()
 
 target_link_libraries(rayEngine nlohmann_json::nlohmann_json)
 

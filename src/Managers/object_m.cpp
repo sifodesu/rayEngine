@@ -93,6 +93,7 @@ void Object_m::deleteObj(int id) {
 
 //TODO: add support for ttl
 void Object_m::routine() {
+    // cout << level_ents_.size() << endl;
     vector<int> toDelete;
     for (auto& [id, obj] : level_ents_) {
         obj->routine();

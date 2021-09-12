@@ -4,7 +4,7 @@
 using json = nlohmann::json;
 using namespace std;
 
-Bullet::Bullet(json obj) : GObject(obj["ID"]), ttl_(5) {
+Bullet::Bullet(json obj) : GObject(obj["ID"]), ttl_(2) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
     body_->setSolid(false);
