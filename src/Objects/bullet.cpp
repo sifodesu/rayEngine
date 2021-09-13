@@ -1,5 +1,7 @@
 #include <iostream>
+#include "definitions.h"
 #include "bullet.h"
+#include "character.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -7,8 +9,7 @@ using namespace std;
 Bullet::Bullet(json obj) : GObject(obj["ID"]) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
-    body_->setSolid(false);
-    if(obj.contains("ttl"))
+    if (obj.contains("ttl"))
         ttl_ = obj["ttl"];
     else
         ttl_ = 10;
@@ -26,11 +27,19 @@ void Bullet::draw() {
 }
 
 void Bullet::routine() {
+    auto vec = body_->getCollisions();
+    for (auto body : vec) {
+        if (body->isSolid() && t(*body->father_) != t(Character)) {
+            ttl_ = 0;
+            return;
+        }
+    }
+
     body_->routine();
     sprite_->routine();
     ttl_ -= clock_.getLap();
 }
 
-double Bullet::getTTL(){
+double Bullet::getTTL() {
     return ttl_;
 }

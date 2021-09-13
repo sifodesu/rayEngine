@@ -8,11 +8,11 @@
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
+    SetConfigFlags(FLAG_VSYNC_HINT); //FLAG_WINDOW_HIGHDPI |
     InitWindow(screenWidth, screenHeight, "rayEngine");
     // ToggleFullscreen();
     screenWidth_ = screenWidth;
-    screenHeight_ = screenHeight;
-    SetTargetFPS(120);
+    screenHeight_ = screenHeight;    
 
     Texture_m::load();
     InputMap::init();

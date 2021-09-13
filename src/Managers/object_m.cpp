@@ -93,12 +93,12 @@ void Object_m::deleteObj(int id) {
 
 //TODO: add support for ttl
 void Object_m::routine() {
-    DrawText(std::to_string(level_ents_.size()).c_str(), 100, 10, 20, BLACK);
+    DrawText(std::to_string(level_ents_.size()).c_str(), 200, 10, 20, BLACK);
     vector<int> toDelete;
     for (auto& [id, obj] : level_ents_) {
         obj->routine();
         if (t(*obj) == t(Bullet)) {
-            if (((Bullet*)obj)->getTTL() < 0) {
+            if (((Bullet*)obj)->getTTL() <= 0) {
                 toDelete.push_back(id);
             }
         }

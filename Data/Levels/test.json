@@ -22,5 +22,17 @@
                     "h": 20,
                     "solid": true
         }
+    },
+    {
+        "ID": 3,
+        "type": "bspawner",
+        "sprite": { "filename": "tile.png"
+        },
+        "body": {   "x": 100,
+                    "y": 0,
+                    "w": 20,
+                    "h": 20,
+                    "solid": false
+        }
     }
 ]

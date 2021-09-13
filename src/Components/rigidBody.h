@@ -21,11 +21,14 @@ public:
     void setSpeed(Vector2 speed);
     Vector2 getSpeed();
     void setSolid(bool solid);
+    bool isSolid();
     void routine();
+    std::vector<RigidBody*> getCollisions(bool with_solid = true);
+
 
     static Quadtree quad;
     static std::map<int, RigidBody*> pool;
-    static std::vector<RigidBody*> query(Rectangle rect);
+    static std::vector<RigidBody*> query(Rectangle rect, bool force_solid = false);
 
     GObject* father_;
 private:

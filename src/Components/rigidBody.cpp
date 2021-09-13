@@ -68,15 +68,19 @@ RigidBody::~RigidBody() {
     pool.erase(pool_id_);
     quad.remove(quadNode{ pool_id_, surface_ });
 }
+
 void RigidBody::setSolid(bool solid) {
     solid_ = solid;
 }
-std::vector<RigidBody*> RigidBody::query(Rectangle rect) {
+
+std::vector<RigidBody*> RigidBody::query(Rectangle rect, bool force_solid) {
     auto queryVec = quad.query(rect);
     std::vector<RigidBody*> ret;
 
     for (auto node : queryVec) {
-        ret.push_back(pool[node.id]);
+        if ((pool[node.id]->solid_ && force_solid) || !force_solid) {
+            ret.push_back(pool[node.id]);
+        }
     }
     return ret;
 }
@@ -156,4 +160,12 @@ void RigidBody::routine() {
     quad.add({ pool_id_, surface_ });
     speed_.x += acceleration_ * delta * speed_.x;
     speed_.y += acceleration_ * delta * speed_.y;
+}
+
+std::vector<RigidBody*> RigidBody::getCollisions(bool with_solid) {
+    return query(surface_, with_solid);
+}
+
+bool RigidBody::isSolid(){
+    return solid_;
 }

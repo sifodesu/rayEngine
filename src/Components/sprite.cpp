@@ -26,6 +26,8 @@ Sprite::Sprite(json obj) : index_(0), ttl_frame_(0), nb_frames_(1) {
     if (obj.contains("speed"))
         speed_ = obj["speed"];
 
+
+
     sprite_sheet_ = Texture_m::getTexture(filename_);
 }
 
@@ -35,7 +37,7 @@ void Sprite::routine() {
 }
 
 void Sprite::updateIndex() {
-    ttl_frame_ += clock_.getLap();
+    ttl_frame_ += clock_.getLap()*1000;
     if (ttl_frame_ > speed_) {
         ttl_frame_ -= speed_;
         index_ = (index_ + 1) % nb_frames_;
@@ -44,7 +46,7 @@ void Sprite::updateIndex() {
 
 void Sprite::draw(Vector2 pos) {
     Rectangle source{ (float)index_ * sprite_sheet_.width / nb_frames_, 0.0f,
-                        (float)sprite_sheet_.width, (float)sprite_sheet_.height };
+                        (float)sprite_sheet_.width / nb_frames_, (float)sprite_sheet_.height };
     DrawTextureRec(sprite_sheet_, source, pos, WHITE);
 }
 

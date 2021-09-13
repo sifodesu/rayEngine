@@ -2,13 +2,15 @@
     {
         "target": "bullet",
         "type": "bullet",
-        "sprite": { "filename": "tile.png"
+        "sprite": { "filename": "bullet.png",
+                    "nb_frames": 2,
+                    "speed": 100
         },
         "body": {   "x": 50,
                     "y": 50,
-                    "w": 20,
-                    "h": 20,
-                    "solid": true,
+                    "w": 7,
+                    "h": 7,
+                    "solid": false,
                     "acceleration": 0.5,
                     "curve": 4
         },
