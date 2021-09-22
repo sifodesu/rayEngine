@@ -3,6 +3,7 @@
 #include "runes.h"
 #include "object_m.h"
 #include "bullet.h"
+#include "pattern.h"
 
 #define SPEED 300
 
@@ -48,7 +49,8 @@ void Character::routine() {
     sprite_->routine();
     body_->routine();
     while (Runes::getBullet()) {
-        shoot();
+        // shoot();
+        Pattern::circle(body_->getCoord());
     }
     // shoot();
 }
@@ -58,8 +60,6 @@ void Character::draw() {
 }
 
 void Character::shoot() {
-    Bullet* bullet = (Bullet*)Object_m::createObj("bullet");
+    Bullet* bullet = (Bullet*)Object_m::createObj(BULLET);
     bullet->body_->setCoord(body_->getCoord());
-    bullet->body_->setSpeed({ 0, -200 });
-
 }

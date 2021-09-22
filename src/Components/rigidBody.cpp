@@ -2,6 +2,8 @@
 #include "rigidBody.h"
 #include "math.h"
 #include "float.h"
+#include "bullet.h"
+#include "definitions.h"
 
 Quadtree RigidBody::quad;
 std::map<int, RigidBody*> RigidBody::pool;
@@ -27,7 +29,7 @@ RigidBody::RigidBody(json obj, GObject* father) {
     acceleration_ = 0;
     curve_ = 0;
     father_ = father;
-    angle_ = 0;
+
     if (!obj.contains("body")) {
         cout << "ERROR: no rigidbody in json" << endl;
         return;
@@ -56,21 +58,38 @@ RigidBody::RigidBody(json obj, GObject* father) {
     if (obj.contains("curve"))
         curve_ = obj["curve"];
 
+    if (obj.contains("speed")) {
+        if (obj["speed"].contains("x")) {
+            speed_.x = obj["speed"]["x"];
+        }
+        if (obj["speed"].contains("y")) {
+            speed_.y = obj["speed"]["y"];
+        }
+    }
+
     if (pool.size())
         pool_id_ = (--pool.end())->first + 1;
     else
         pool_id_ = 0;
     pool[pool_id_] = this;
-    quad.add(quadNode{ pool_id_, surface_ });
+
+    if (t(*father_) != t(Bullet)) {
+        quad.add(quadNode{ pool_id_, surface_ });
+    }
 }
 
 RigidBody::~RigidBody() {
     pool.erase(pool_id_);
-    quad.remove(quadNode{ pool_id_, surface_ });
+    if (t(*father_) != t(Bullet)) {
+        quad.remove(quadNode{ pool_id_, surface_ });
+    }
 }
 
 void RigidBody::setSolid(bool solid) {
     solid_ = solid;
+}
+void RigidBody::setCurve(double curve) {
+    curve_ = curve;
 }
 
 std::vector<RigidBody*> RigidBody::query(Rectangle rect, bool force_solid) {
@@ -90,10 +109,15 @@ Vector2 RigidBody::getCoord() {
 }
 
 void RigidBody::setCoord(Vector2 pos) {
-    quad.remove({ pool_id_, surface_ });
+    if (t(*father_) != t(Bullet)) {
+        quad.remove({ pool_id_, surface_ });
+    }
     surface_.x = pos.x;
     surface_.y = pos.y;
-    quad.add({ pool_id_, surface_ });
+    if (t(*father_) != t(Bullet)) {
+        quad.add({ pool_id_, surface_ });
+    }
+    clock_.getLap();
 }
 
 void RigidBody::setSpeed(Vector2 speed) {
@@ -135,7 +159,9 @@ void RigidBody::routine() {
 
     fixSpeed();
 
-    quad.remove({ pool_id_, surface_ });
+    if (t(*father_) != t(Bullet)) {
+        quad.remove({ pool_id_, surface_ });
+    }
 
     float speedNorm = sqrt(pow(speed_.x * delta, 2) + pow(speed_.y * delta, 2));
     Vector2 unitSpeed = { speed_.x * delta / speedNorm, speed_.y * delta / speedNorm };
@@ -156,8 +182,9 @@ void RigidBody::routine() {
         else
             speedNorm -= 0.1;
     }
-
-    quad.add({ pool_id_, surface_ });
+    if (t(*father_) != t(Bullet)) {
+        quad.add({ pool_id_, surface_ });
+    }
     speed_.x += acceleration_ * delta * speed_.x;
     speed_.y += acceleration_ * delta * speed_.y;
 }
@@ -166,6 +193,6 @@ std::vector<RigidBody*> RigidBody::getCollisions(bool with_solid) {
     return query(surface_, with_solid);
 }
 
-bool RigidBody::isSolid(){
+bool RigidBody::isSolid() {
     return solid_;
 }

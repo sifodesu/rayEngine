@@ -19,6 +19,7 @@ public:
     Vector2 getCoord();
     void setCoord(Vector2 pos);
     void setSpeed(Vector2 speed);
+    void setCurve(double curve);
     Vector2 getSpeed();
     void setSolid(bool solid);
     bool isSolid();
@@ -26,12 +27,13 @@ public:
     std::vector<RigidBody*> getCollisions(bool with_solid = true);
 
 
-    static Quadtree quad;
-    static std::map<int, RigidBody*> pool;
     static std::vector<RigidBody*> query(Rectangle rect, bool force_solid = false);
 
     GObject* father_;
+
 private:
+    static Quadtree quad;
+    static std::map<int, RigidBody*> pool;
     Rectangle surface_;
     Vector2 speed_;
     bool solid_;
@@ -39,7 +41,6 @@ private:
     Clock clock_;
     double acceleration_;
     double curve_;
-    double angle_;
 
     void fixSpeed();    //set to 0 if collision
 };

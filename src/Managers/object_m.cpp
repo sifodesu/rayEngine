@@ -10,12 +10,12 @@
 using json = nlohmann::json;
 using namespace std;
 
-std::map<string, json> Object_m::blueprints_;	// ents which cannot be placed on a map
+std::map<BPE, json> Object_m::blueprints_;	// ents which cannot be placed on a map
 std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
 
 std::string Object_m::level_name_;
 
-GObject* Object_m::createObj(std::string target) {
+GObject* Object_m::createObj(BPE target) {
     if (blueprints_.contains(target))
         return createObjJson(blueprints_[target]);
     cout << "Error: no blueprint with target " << target << endl;
@@ -91,20 +91,19 @@ void Object_m::deleteObj(int id) {
     }
 }
 
-//TODO: add support for ttl
 void Object_m::routine() {
     DrawText(std::to_string(level_ents_.size()).c_str(), 200, 10, 20, BLACK);
     vector<int> toDelete;
     for (auto& [id, obj] : level_ents_) {
-        obj->routine();
-        if (t(*obj) == t(Bullet)) {
-            if (((Bullet*)obj)->getTTL() <= 0) {
-                toDelete.push_back(id);
-            }
+        obj->routine();    
+        if (obj->to_delete_) {
+            toDelete.push_back(id);
         }
     }
-    for(int id : toDelete)
+
+    for (int id : toDelete) {
         deleteObj(id);
+    }
 }
 
 

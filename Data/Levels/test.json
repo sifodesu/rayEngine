@@ -2,37 +2,43 @@
     {
         "ID": 1,
         "type": "basic",
-        "sprite": { "filename": "tile.png"
+        "sprite": {
+            "filename": "tile.png"
         },
-        "body": {   "x": 50,
-                    "y": 50,
-                    "w": 20,
-                    "h": 20,
-                    "solid": true
+        "body": {
+            "x": 50,
+            "y": 50,
+            "w": 20,
+            "h": 20,
+            "solid": true
         }
     },
     {
         "ID": 2,
         "type": "character",
-        "sprite": { "filename": "tile.png"
+        "sprite": {
+            "filename": "tile.png"
         },
-        "body": {   "x": 100,
-                    "y": 100,
-                    "w": 20,
-                    "h": 20,
-                    "solid": true
+        "body": {
+            "x": 100,
+            "y": 100,
+            "w": 20,
+            "h": 20,
+            "solid": true
         }
     },
     {
         "ID": 3,
         "type": "bspawner",
-        "sprite": { "filename": "tile.png"
+        "sprite": {
+            "filename": "tile.png"
         },
-        "body": {   "x": 100,
-                    "y": 0,
-                    "w": 20,
-                    "h": 20,
-                    "solid": false
+        "body": {
+            "x": 100,
+            "y": 0,
+            "w": 20,
+            "h": 20,
+            "solid": false
         }
     }
 ]

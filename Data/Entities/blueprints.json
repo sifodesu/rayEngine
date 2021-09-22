@@ -1,19 +1,23 @@
 [
     {
-        "target": "bullet",
+        "target": 0,
         "type": "bullet",
-        "sprite": { "filename": "bullet.png",
-                    "nb_frames": 2,
-                    "speed": 100
+        "sprite": {
+            "filename": "bullet.png",
+            "nb_frames": 2,
+            "speed": 100
         },
-        "body": {   "x": 50,
-                    "y": 50,
-                    "w": 7,
-                    "h": 7,
-                    "solid": false,
-                    "acceleration": 0.5,
-                    "curve": 4
+        "body": {
+            "w": 7,
+            "h": 7,
+            "solid": false,
+            "acceleration": 0,
+            "curve": 0,
+            "speed": {
+                "x": 0,
+                "y": -100
+            }
         },
-        "ttl": 2
+        "ttl": 10
     }
 ]

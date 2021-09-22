@@ -5,6 +5,7 @@
 #include "rigidBody.h"
 #include "input.h"
 #include "runes.h"
+#include "basicEnt.h"
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
@@ -40,13 +41,20 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    auto to_render = RigidBody::query(camera_.getRect());
-    for (auto body : to_render) {
-        if (body) {
-            body->father_->draw();
-            if(body->father_->id_ == 1)
-                camera_.to_follow_ = body;
-        }
+    // auto to_render = RigidBody::query(camera_.getRect());
+    // for (auto body : to_render) {
+    //     if (body) {
+    //         body->father_->draw();
+    //         if(body->father_->id_ == 1)
+    //             camera_.to_follow_ = body;
+    //     }
+    // }
+
+    //temp print everybody
+    for(auto [id, obj] : Object_m::level_ents_){
+        obj->draw();
+        if (obj->id_ == 1)
+            camera_.to_follow_ = ((BasicEnt*)obj)->body_;
     }
     Runes::draw({0, 0});
 }

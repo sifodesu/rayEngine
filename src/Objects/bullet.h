@@ -12,8 +12,6 @@ public:
     ~Bullet();
     void draw();
     void routine();
-    void trigger() {}
-    double getTTL();
 
     Sprite* sprite_;
     RigidBody* body_;
