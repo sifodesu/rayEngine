@@ -12,20 +12,11 @@ using json = nlohmann::json;
 using namespace std;
 
 //TODO: handle case when out of box quad
-
-RigidBody::RigidBody(Rectangle surface, bool solid) : surface_(surface), solid_(solid) {
-    if (pool.size())
-        pool_id_ = (--pool.end())->first + 1;
-    else
-        pool_id_ = 0;
-    pool[pool_id_] = this;
-    quad.add(quadNode{ pool_id_, surface_ });
-}
-
 RigidBody::RigidBody(json obj, GObject* father) {
     Rectangle rect{ 0.0f };
     speed_ = { 0 };
     solid_ = true;
+    in_quad_ = true;
     acceleration_ = 0;
     curve_ = 0;
     father_ = father;
@@ -57,6 +48,9 @@ RigidBody::RigidBody(json obj, GObject* father) {
 
     if (obj.contains("curve"))
         curve_ = obj["curve"];
+    
+    if (obj.contains("in_quad"))
+        in_quad_ = obj["in_quad"];
 
     if (obj.contains("speed")) {
         if (obj["speed"].contains("x")) {
@@ -73,14 +67,14 @@ RigidBody::RigidBody(json obj, GObject* father) {
         pool_id_ = 0;
     pool[pool_id_] = this;
 
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.add(quadNode{ pool_id_, surface_ });
     }
 }
 
 RigidBody::~RigidBody() {
     pool.erase(pool_id_);
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.remove(quadNode{ pool_id_, surface_ });
     }
 }
@@ -109,12 +103,12 @@ Vector2 RigidBody::getCoord() {
 }
 
 void RigidBody::setCoord(Vector2 pos) {
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.remove({ pool_id_, surface_ });
     }
     surface_.x = pos.x;
     surface_.y = pos.y;
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.add({ pool_id_, surface_ });
     }
     clock_.getLap();
@@ -159,7 +153,7 @@ void RigidBody::routine() {
 
     fixSpeed();
 
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.remove({ pool_id_, surface_ });
     }
 
@@ -182,7 +176,7 @@ void RigidBody::routine() {
         else
             speedNorm -= 0.1;
     }
-    if (t(*father_) != t(Bullet)) {
+    if (in_quad_) {
         quad.add({ pool_id_, surface_ });
     }
     speed_.x += acceleration_ * delta * speed_.x;

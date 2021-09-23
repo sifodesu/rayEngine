@@ -50,7 +50,8 @@ void Character::routine() {
     body_->routine();
     while (Runes::getBullet()) {
         // shoot();
-        Pattern::circle(body_->getCoord());
+        // Pattern::circle(body_->getCoord());
+        Pattern::line(body_->getCoord(), {100, 100});
     }
     // shoot();
 }

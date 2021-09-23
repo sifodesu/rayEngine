@@ -12,7 +12,7 @@
 
 class RigidBody : public ObjComponent {
 public:
-    RigidBody(Rectangle surface, bool solid = true);
+    // RigidBody(Rectangle surface, bool solid = true);
     ~RigidBody();
     RigidBody(nlohmann::json obj, GObject* father);
 
@@ -41,6 +41,7 @@ private:
     Clock clock_;
     double acceleration_;
     double curve_;
+    bool in_quad_;
 
     void fixSpeed();    //set to 0 if collision
 };
