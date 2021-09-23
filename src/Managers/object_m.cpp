@@ -6,6 +6,7 @@
 #include "basicEnt.h"
 #include "character.h"
 #include "bullet.h"
+#include "simpleBoss.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -44,6 +45,8 @@ GObject* Object_m::createObjJson(json ojs) {
         cur = new Bullet(ojs);
     if (ojs["type"] == "character")
         cur = new Character(ojs);
+    if (ojs["type"] == "simpleBoss")
+        cur = new SimpleBoss(ojs);
     if (cur)
         level_ents_[ojs["ID"]] = cur;
 

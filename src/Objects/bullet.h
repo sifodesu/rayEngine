@@ -1,6 +1,7 @@
 #pragma once
 #include <raylib.h>
 #include <nlohmann/json.hpp>
+#include <unordered_set>
 #include "gObject.h"
 #include "sprite.h"
 #include "rigidBody.h"
@@ -12,6 +13,7 @@ public:
     ~Bullet();
     void draw();
     void routine();
+    void setTargets(std::unordered_set<HObject*> targets);
 
     Sprite* sprite_;
     RigidBody* body_;
@@ -19,4 +21,6 @@ public:
 
 private:
     double ttl_;
+    std::unordered_set<HObject*> targets_;
+    double dmg_;
 };

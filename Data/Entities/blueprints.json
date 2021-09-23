@@ -7,18 +7,19 @@
             "nb_frames": 2,
             "speed": 100
         },
+        "dmg": 1,
         "in_quad": false,
         "body": {
             "w": 7,
             "h": 7,
             "solid": false,
-            "acceleration": 0,
-            "curve": 0,
+            "acceleration": 0.5,
+            "curve": 1,
             "speed": {
                 "x": 0,
                 "y": -100
             }
         },
-        "ttl": 10
+        "ttl": 2
     }
 ]

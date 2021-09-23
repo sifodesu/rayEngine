@@ -1,0 +1,28 @@
+#include "simpleBoss.h"
+#include "pattern.h"
+using namespace std;
+
+SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
+    sprite_ = new Sprite(obj);
+    body_ = new RigidBody(obj, this);
+}
+
+void SimpleBoss::routine() {
+    if (patterns_.empty()) {
+        clock_.getLap();
+        patterns_.push(make_tuple(0, std::bind(Pattern::circle, body_->getCoord(), 15, 100)));
+        patterns_.push(make_tuple(0.5, std::bind(Pattern::circle, body_->getCoord(), 30, 300)));
+    }
+
+    auto& [time, pat] = patterns_.front();
+    time -= clock_.getLap();
+    if (time <= 0) {
+        pat();
+        patterns_.pop();
+    }
+
+}
+
+void SimpleBoss::draw() {
+    sprite_->draw(body_->getCoord());
+}

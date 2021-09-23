@@ -56,7 +56,7 @@ void Engine::render() {
         if (obj->id_ == 1)
             camera_.to_follow_ = ((BasicEnt*)obj)->body_;
     }
-    Runes::draw({0, 0});
+    
 }
 
 Engine::~Engine() {

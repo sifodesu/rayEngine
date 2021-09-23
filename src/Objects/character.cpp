@@ -4,14 +4,13 @@
 #include "object_m.h"
 #include "bullet.h"
 #include "pattern.h"
-
+#include "functional"
 #define SPEED 300
 
 Character::Character(nlohmann::json obj) : GObject(obj["ID"]) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
 }
-
 
 void Character::routine() {
     Vector2 bodySpeed = body_->getSpeed();
@@ -49,15 +48,17 @@ void Character::routine() {
     sprite_->routine();
     body_->routine();
     while (Runes::getBullet()) {
-        // shoot();
+        shoot();
         // Pattern::circle(body_->getCoord());
-        Pattern::line(body_->getCoord(), {100, 100});
+        // Pattern::line(body_->getCoord(), { 100, 100 });
+        // titi();
     }
     // shoot();
 }
 
 void Character::draw() {
     sprite_->draw(body_->getCoord());
+    Runes::draw({ body_->getCoord().x - 50, body_->getCoord().y + 50 });
 }
 
 void Character::shoot() {
