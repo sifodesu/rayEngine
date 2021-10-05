@@ -37,10 +37,10 @@ void Bullet::setTargets(std::unordered_set<HObject*> targets) {
 void Bullet::routine() {
     auto vec = body_->getCollisions();
     for (auto body : vec) {
-        HObject* father = (HObject*)(body->father_);
-        if (body->isSolid() && targets_.contains(father)) {
+        // HObject* father = (HObject*)(body->father_);
+        if (body->isSolid()){// && targets_.contains(father)) {
             ttl_ = 0;
-            father->changeHP(-dmg_);
+            // father->changeHP(-dmg_);
         }
     }
 

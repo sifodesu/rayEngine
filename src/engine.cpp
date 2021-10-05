@@ -6,19 +6,23 @@
 #include "input.h"
 #include "runes.h"
 #include "basicEnt.h"
+#include "bullet_m.h"
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
-    SetConfigFlags(FLAG_VSYNC_HINT); //FLAG_WINDOW_HIGHDPI |
+    // SetConfigFlags(FLAG_VSYNC_HINT); //FLAG_WINDOW_HIGHDPI |
     InitWindow(screenWidth, screenHeight, "rayEngine");
+
     // ToggleFullscreen();
+    // SetTargetFPS(420);
     screenWidth_ = screenWidth;
-    screenHeight_ = screenHeight;    
+    screenHeight_ = screenHeight;
 
     Texture_m::load();
     InputMap::init();
     Object_m::loadBlueprints();
     Object_m::loadLevel("test.json");
+    Bullet_m::init();
     Runes::init();
 }
 
@@ -28,10 +32,11 @@ void Engine::game_loop() {
         ClearBackground(RAYWHITE);
 
         Object_m::routine();
+        Bullet_m::routine();
         camera_.routine();
         Runes::routine();
         DrawFPS(10, 10);
-        
+
         BeginMode2D(camera_.getCam());
         render();
         EndMode2D();
@@ -51,12 +56,12 @@ void Engine::render() {
     // }
 
     //temp print everybody
-    for(auto [id, obj] : Object_m::level_ents_){
+    for (auto [id, obj] : Object_m::level_ents_) {
         obj->draw();
-        if (obj->id_ == 1)
-            camera_.to_follow_ = ((BasicEnt*)obj)->body_;
+        // if (obj->id_ == 1)
+        //     camera_.to_follow_ = ((BasicEnt*)obj)->body_;
     }
-    
+    Bullet_m::draw();
 }
 
 Engine::~Engine() {

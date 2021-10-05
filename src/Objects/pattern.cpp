@@ -3,7 +3,7 @@
 #include "math.h"
 
 void Pattern::circle(Vector2 center, int nb_bullet, int speed) {
-    for (double curve = 0; curve < 360; curve += 360 / nb_bullet) {
+    for (double curve = 0; curve < 360; curve += 360.0 / nb_bullet) {
         float rad = PI * curve / 180;
         float tempX = -sin(rad) * speed;
         float tempY = cos(rad) * speed;

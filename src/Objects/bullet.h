@@ -19,8 +19,8 @@ public:
     RigidBody* body_;
     Clock clock_;
 
-private:
     double ttl_;
+private:
     std::unordered_set<HObject*> targets_;
     double dmg_;
 };

@@ -20,6 +20,7 @@ RigidBody::RigidBody(json obj, GObject* father) {
     acceleration_ = 0;
     curve_ = 0;
     father_ = father;
+    pool_id_ = -1;
 
     if (!obj.contains("body")) {
         cout << "ERROR: no rigidbody in json" << endl;
@@ -48,7 +49,7 @@ RigidBody::RigidBody(json obj, GObject* father) {
 
     if (obj.contains("curve"))
         curve_ = obj["curve"];
-    
+
     if (obj.contains("in_quad"))
         in_quad_ = obj["in_quad"];
 
@@ -61,20 +62,21 @@ RigidBody::RigidBody(json obj, GObject* father) {
         }
     }
 
-    if (pool.size())
-        pool_id_ = (--pool.end())->first + 1;
-    else
-        pool_id_ = 0;
-    pool[pool_id_] = this;
-
     if (in_quad_) {
+        if (pool.size()) {
+            pool_id_ = (--pool.end())->first + 1;
+        }
+        else {
+            pool_id_ = 0;
+        }
+        pool[pool_id_] = this;
         quad.add(quadNode{ pool_id_, surface_ });
     }
 }
 
 RigidBody::~RigidBody() {
-    pool.erase(pool_id_);
     if (in_quad_) {
+        pool.erase(pool_id_);
         quad.remove(quadNode{ pool_id_, surface_ });
     }
 }
@@ -165,16 +167,19 @@ void RigidBody::routine() {
         temp.x += unitSpeed.x * speedNorm;
         temp.y += unitSpeed.y * speedNorm;
         bool solid_collide = false;
-        for (RigidBody* body : query(temp))
-            if (body->solid_ && solid_ && (body->pool_id_ != pool_id_))
+        for (RigidBody* body : query(temp)) {
+            if (body->solid_ && solid_ && (body->pool_id_ != pool_id_)) {
                 solid_collide = true;
+            }
+        }
 
         if (!solid_collide) {
             surface_ = temp;
             break;
         }
-        else
+        else {
             speedNorm -= 0.1;
+        }
     }
     if (in_quad_) {
         quad.add({ pool_id_, surface_ });

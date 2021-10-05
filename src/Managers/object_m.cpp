@@ -7,6 +7,7 @@
 #include "character.h"
 #include "bullet.h"
 #include "simpleBoss.h"
+#include "bullet_m.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -17,8 +18,12 @@ std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
 std::string Object_m::level_name_;
 
 GObject* Object_m::createObj(BPE target) {
-    if (blueprints_.contains(target))
+    if (blueprints_.contains(target)){
+        if(target == BULLET){
+            return Bullet_m::createBullet();
+        }
         return createObjJson(blueprints_[target]);
+    }
     cout << "Error: no blueprint with target " << target << endl;
     return NULL;
 }
@@ -95,7 +100,7 @@ void Object_m::deleteObj(int id) {
 }
 
 void Object_m::routine() {
-    DrawText(std::to_string(level_ents_.size()).c_str(), 200, 10, 20, BLACK);
+    DrawText(std::to_string(level_ents_.size()+Bullet_m::active_bullets.size()).c_str(), 200, 10, 20, BLACK);
     vector<int> toDelete;
     for (auto& [id, obj] : level_ents_) {
         obj->routine();    
