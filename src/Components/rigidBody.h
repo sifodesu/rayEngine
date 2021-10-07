@@ -26,7 +26,6 @@ public:
     void routine();
     std::vector<RigidBody*> getCollisions(bool with_solid = true);
 
-
     static std::vector<RigidBody*> query(Rectangle rect, bool force_solid = false);
 
     GObject* father_;

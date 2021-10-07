@@ -8,7 +8,7 @@ using namespace std;
 
 Bullet::Bullet(json obj) : GObject(obj["ID"]), ttl_(2), dmg_(1) {
     sprite_ = new Sprite(obj);
-    
+
     if (obj.contains("ttl")) {
         ttl_ = obj["ttl"];
     }
@@ -27,13 +27,23 @@ void Bullet::draw() {
     sprite_->draw(pos_);
 }
 
-void Bullet::setTargets(std::unordered_set<HObject*> targets) {
-    targets_ = targets;
+void Bullet::setNoDmg(std::unordered_set<GObject*> no_dmg) {
+    no_dmg_ = no_dmg;
 }
 
 void Bullet::routine() {
-    ttl_ -= clock_.getLap();
+    Rectangle rect = { pos_.x, pos_.y, sprite_->getFrameDim().x, sprite_->getFrameDim().y };
+    auto vec = RigidBody::query(rect);
+    for (auto body : vec) {
+        if (!no_dmg_.contains(body->father_)) {
+            body->father_->onCollision(this);
+            if (body->isSolid()) {
+                ttl_ = 0;
+            }
+        }
+    }
 
+    ttl_ -= clock_.getLap();
     if (ttl_ <= 0) {
         to_delete_ = true;
         return;

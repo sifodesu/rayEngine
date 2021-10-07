@@ -13,21 +13,9 @@ public:
     virtual void routine() {}
     virtual void trigger() {}
     virtual void draw() {}
+    virtual void onCollision(GObject*) {}
 
     const int id_;
     bool to_delete_;
 };
 
-class HObject : public GObject {
-public:
-    HObject(nlohmann::json obj) : GObject(obj["ID"]), hp_(5) {
-        if (obj.contains("hp"))
-            hp_ = obj["hp"];
-    }
-    int getHP() { return hp_; };
-    void setHP(int hp) { hp_ = hp; }
-    void changeHP(int delta) { hp_ += delta; };
-
-private:
-    int hp_;
-};

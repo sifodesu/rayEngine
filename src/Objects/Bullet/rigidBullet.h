@@ -12,23 +12,15 @@ public:
         body_ = new RigidBody(obj, this);
     }
     ~RigidBullet() {
-        Bullet::~Bullet();
         if (body_) {
             delete body_;
         }
+        Bullet::~Bullet();
     }
     void routine() {
-        auto vec = body_->getCollisions();
-        for (auto body : vec) {
-            // HObject* father = (HObject*)(body->father_);
-            if (body->isSolid()) {// && targets_.contains(father)) {
-                ttl_ = 0;
-                // father->changeHP(-dmg_);
-            }
-        }
-        Bullet::routine();
         body_->routine();
         pos_ = body_->getCoord();
+        Bullet::routine();
     }
 
     RigidBody* body_;

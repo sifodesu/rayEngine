@@ -11,7 +11,7 @@
 
 #define SPEED 300
 
-Character::Character(nlohmann::json obj) : GObject(obj["ID"]) {
+Character::Character(nlohmann::json obj) : HObject(obj) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
 }
@@ -60,12 +60,13 @@ void Character::routine() {
     // shoot();
 }
 
+
 void Character::draw() {
     sprite_->draw(body_->getCoord());
     Runes::draw({ body_->getCoord().x - 50, body_->getCoord().y + 50 });
 }
 
 void Character::shoot() {
-    ZigzagBullet* bullet = (ZigzagBullet*)Bullet_m::createBullet(ZIGZAG);
+    ZigzagBullet* bullet = (ZigzagBullet*)Bullet_m::createBullet(ZIGZAG, { this });
     bullet->pos_ = body_->getCoord();
 }

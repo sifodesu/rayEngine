@@ -1,12 +1,13 @@
 #pragma once
 #include <raylib.h>
 #include <nlohmann/json.hpp>
-#include "gObject.h"
+
+#include "hObject.h"
 #include "rigidBody.h"
 #include "sprite.h"
 #include "runes.h"
 
-class Character : public GObject {
+class Character : public HObject {
 public:
     Character(nlohmann::json obj);
     void routine();
@@ -15,6 +16,5 @@ public:
 
 private:
     RigidBody* body_;
-    Sprite* sprite_;
-    
+    Sprite* sprite_;    
 };

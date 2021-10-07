@@ -1,10 +1,11 @@
 #pragma once
 #include <raylib.h>
 #include <nlohmann/json.hpp>
-#include "gObject.h"
-#include "bullet.h"
 #include <queue>
 #include <functional>
+
+#include "hObject.h"
+#include "bullet.h"
 #include "clock.h"
 
 class SimpleBoss : public HObject {

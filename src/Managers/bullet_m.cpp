@@ -1,3 +1,4 @@
+#include <iostream>
 #include "bullet_m.h"
 #include "object_m.h"
 #include "rigidBullet.h"
@@ -41,6 +42,7 @@ void Bullet_m::routine() {
         destroyBullet(bullet, type);
     }
 }
+
 void Bullet_m::draw() {
     for (auto [type, bullets] : active_bullets) {
         for (auto bullet : bullets) {
@@ -48,7 +50,8 @@ void Bullet_m::draw() {
         }
     }
 }
-Bullet* Bullet_m::createBullet(BulletType type) {
+
+Bullet* Bullet_m::createBullet(BulletType type, unordered_set<GObject*> no_dmg) {
     if (!pool[type].empty()) {
         Bullet* newBullet = *pool[type].begin();
         pool[type].erase(newBullet);
@@ -57,9 +60,10 @@ Bullet* Bullet_m::createBullet(BulletType type) {
         newBullet->ttl_ = 2;
         newBullet->to_delete_ = false;
         newBullet->clock_.getLap();
+        newBullet->no_dmg_ = no_dmg;
         return newBullet;
     }
-
+    
     return *active_bullets[type].begin();
 }
 

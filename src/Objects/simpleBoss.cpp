@@ -10,8 +10,8 @@ SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
 void SimpleBoss::routine() {
     if (patterns_.empty()) {
         clock_.getLap();
-        patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, body_->getCoord(), 15, 100)));
-        patterns_.push(make_tuple(0.5, std::bind(Pattern::circle, body_->getCoord(), 30, 300)));
+        patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, std::unordered_set<GObject*>{ this }, body_->getCoord(), 150, 100)));
+        patterns_.push(make_tuple(0.5, std::bind(Pattern::circle, std::unordered_set<GObject*>{ this }, body_->getCoord(), 300, 300)));
     }
 
     auto& [time, pat] = patterns_.front();

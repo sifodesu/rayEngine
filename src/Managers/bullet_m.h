@@ -16,7 +16,7 @@ public:
     static void init();
     static void routine();
     static void draw();
-    static Bullet* createBullet(BulletType type);
+    static Bullet* createBullet(BulletType type, std::unordered_set<GObject*> no_dmg);
     static void destroyBullet(Bullet* toDestroy, BulletType type);
 
     static std::unordered_map<BulletType, std::unordered_set<Bullet*>> pool;

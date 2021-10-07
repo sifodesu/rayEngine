@@ -7,8 +7,6 @@
 
 class Pattern {
 public:
-    // static void circle(std::unordered_set<HObject*>targets, Vector2 center, int nb_bullet = 15, int speed = 100);
-    // static void line(std::unordered_set<HObject*>targets, Vector2 origin, Vector2 direction, int nb_bullet = 15, int speed = 100);
-    static void circle(Vector2 center, int nb_bullet = 15, int speed = 100);
-    static void line(Vector2 origin, Vector2 direction, int nb_bullet = 15, int speed = 100);
+    static void circle(std::unordered_set<GObject*> no_dmg, Vector2 center, int nb_bullet = 15, int speed = 100);
+    static void line(std::unordered_set<GObject*> no_dmg, Vector2 origin, Vector2 direction, int nb_bullet = 15, int speed = 100);
 };
