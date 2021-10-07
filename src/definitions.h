@@ -7,3 +7,7 @@
 #define MUSICS_PATH "../Data/Music/"
 
 #define t(...) typeid(__VA_ARGS__).name()
+
+template <typename T> int sgn(T val) {
+    return (T(0) < val) - (val < T(0));
+}

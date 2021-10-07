@@ -29,7 +29,7 @@
     },
     {
         "ID": 4,
-        "type": "simpleBoss",
+        "type": "basic",
         "hp": 5,
         "sprite": {
             "filename": "tile.png"

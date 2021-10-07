@@ -5,6 +5,10 @@
 #include "bullet.h"
 #include "pattern.h"
 #include "functional"
+#include "bullet_m.h"
+#include "rigidBullet.h"
+#include "zigzagBullet.h"
+
 #define SPEED 300
 
 Character::Character(nlohmann::json obj) : GObject(obj["ID"]) {
@@ -62,6 +66,6 @@ void Character::draw() {
 }
 
 void Character::shoot() {
-    Bullet* bullet = (Bullet*)Object_m::createObj(BULLET);
-    bullet->body_->setCoord(body_->getCoord());
+    ZigzagBullet* bullet = (ZigzagBullet*)Bullet_m::createBullet(ZIGZAG);
+    bullet->pos_ = body_->getCoord();
 }

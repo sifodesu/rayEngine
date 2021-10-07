@@ -14,7 +14,7 @@ Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWi
     InitWindow(screenWidth, screenHeight, "rayEngine");
 
     // ToggleFullscreen();
-    // SetTargetFPS(420);
+    SetTargetFPS(420);
     screenWidth_ = screenWidth;
     screenHeight_ = screenHeight;
 

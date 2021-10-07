@@ -10,6 +10,7 @@ set(PROJECT_BINARY_DIR "src/")
 include_directories("src/")
 include_directories("src/Managers")
 include_directories("src/Objects")
+include_directories("src/Objects/Bullet")
 include_directories("src/Components")
 
 file(GLOB_RECURSE CPPS "src/*.cpp")

@@ -18,10 +18,7 @@ std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
 std::string Object_m::level_name_;
 
 GObject* Object_m::createObj(BPE target) {
-    if (blueprints_.contains(target)){
-        if(target == BULLET){
-            return Bullet_m::createBullet();
-        }
+    if (blueprints_.contains(target)) {
         return createObjJson(blueprints_[target]);
     }
     cout << "Error: no blueprint with target " << target << endl;
@@ -100,10 +97,14 @@ void Object_m::deleteObj(int id) {
 }
 
 void Object_m::routine() {
-    DrawText(std::to_string(level_ents_.size()+Bullet_m::active_bullets.size()).c_str(), 200, 10, 20, BLACK);
+    int nb_ents = level_ents_.size();
+    for (auto& [type, set] : Bullet_m::active_bullets)
+        nb_ents += set.size();
+    DrawText(std::to_string(nb_ents).c_str(), 200, 10, 20, BLACK);
+
     vector<int> toDelete;
     for (auto& [id, obj] : level_ents_) {
-        obj->routine();    
+        obj->routine();
         if (obj->to_delete_) {
             toDelete.push_back(id);
         }

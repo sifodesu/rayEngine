@@ -13,14 +13,15 @@ public:
     ~Bullet();
     void draw();
     void routine();
+    void setCoord(Vector2 pos);
     void setTargets(std::unordered_set<HObject*> targets);
 
     Sprite* sprite_;
-    RigidBody* body_;
+    
     Clock clock_;
 
     double ttl_;
-private:
+    Vector2 pos_;
     std::unordered_set<HObject*> targets_;
     double dmg_;
 };
