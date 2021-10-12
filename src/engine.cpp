@@ -1,3 +1,4 @@
+#include <set>
 #include <string>
 #include "engine.h" 
 #include "raylib.h"
@@ -7,6 +8,8 @@
 #include "runes.h"
 #include "basicEnt.h"
 #include "bullet_m.h"
+#include "character.h"
+
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
     SetTraceLogLevel(LOG_WARNING);
@@ -29,7 +32,7 @@ Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWi
 void Engine::game_loop() {
     while (!WindowShouldClose()) {
         BeginDrawing();
-        ClearBackground(RAYWHITE);
+        ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
 
         Object_m::routine();
         Bullet_m::routine();
@@ -46,21 +49,23 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    // auto to_render = RigidBody::query(camera_.getRect());
-    // for (auto body : to_render) {
-    //     if (body) {
-    //         body->father_->draw();
-    //         if(body->father_->id_ == 1)
-    //             camera_.to_follow_ = body;
-    //     }
-    // }
+    auto to_render = RigidBody::query(camera_.getRect());
+    auto comp = [](RigidBody* a, RigidBody* b) {
+        return a->getCoord().y < b->getCoord().y;
+    };
+    std::set < RigidBody*, decltype(comp)> sorted_bodies;
 
-    //temp print everybody
-    for (auto [id, obj] : Object_m::level_ents_) {
-        obj->draw();
-        // if (obj->id_ == 1)
-        //     camera_.to_follow_ = ((BasicEnt*)obj)->body_;
+    for (auto body : to_render) {
+        //temp
+        if (t(*body->father_) == t(Character))
+            camera_.to_follow_ = body;
+
+        sorted_bodies.emplace(body);
     }
+    for (auto body : sorted_bodies) {
+        body->father_->draw();
+    }
+
     Bullet_m::draw();
 }
 

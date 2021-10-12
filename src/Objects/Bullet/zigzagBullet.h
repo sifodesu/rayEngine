@@ -13,9 +13,9 @@ public:
         amplitude_ = 0.5;
         sin_arg_ = 0;
     }
-    ~ZigzagBullet() {
-        Bullet::~Bullet();
-    }
+    // ~ZigzagBullet() {
+        // Bullet::~Bullet();
+    // }
     void routine() {
         double t = clock_.getLap();
         Vector2 pos = pos_;

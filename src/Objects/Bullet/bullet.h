@@ -13,8 +13,17 @@ public:
     ~Bullet();
     void draw();
     void routine();
-    void setCoord(Vector2 pos);
+    virtual void setCoord(Vector2 pos);
     void setNoDmg(std::unordered_set<GObject*> no_dmg);
+
+    Bullet& operator=(const Bullet& other) {
+        *sprite_ = *other.sprite_;
+        ttl_ = other.ttl_;
+        pos_ = other.pos_;
+        no_dmg_ = other.no_dmg_;
+        dmg_ = other.dmg_;
+        return *this;
+    }
 
     Sprite* sprite_;
     Clock clock_;

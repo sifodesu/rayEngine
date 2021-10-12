@@ -5,7 +5,7 @@
 
 class Engine {
 public:
-    Engine(const int screenWidth = 1920, const int screenHeight = 1080);
+    Engine(const int screenWidth = 3840, const int screenHeight = 2160);
     void game_loop();
     ~Engine();
 

@@ -9,7 +9,7 @@
 #include "rigidBullet.h"
 #include "zigzagBullet.h"
 
-#define SPEED 300
+#define SPEED 200
 
 Character::Character(nlohmann::json obj) : HObject(obj) {
     sprite_ = new Sprite(obj);
@@ -53,20 +53,23 @@ void Character::routine() {
     body_->routine();
     while (Runes::getBullet()) {
         shoot();
-        // Pattern::circle(body_->getCoord());
-        // Pattern::line(body_->getCoord(), { 100, 100 });
-        // titi();
+
     }
-    // shoot();
 }
 
 
 void Character::draw() {
     sprite_->draw(body_->getCoord());
-    Runes::draw({ body_->getCoord().x - 50, body_->getCoord().y + 50 });
+    Runes::draw({ body_->getCoord().x - 20, body_->getCoord().y + 20 });
 }
 
 void Character::shoot() {
-    ZigzagBullet* bullet = (ZigzagBullet*)Bullet_m::createBullet(ZIGZAG, { this });
+    RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, { this });
     bullet->pos_ = body_->getCoord();
+    bullet->body_->setCoord(body_->getCoord());
+    bullet->setSpeed({0, -200});
+    bullet->ttl_ = 5;
+    bullet->sprite_->setTint(BLUE);
+    bullet->body_->setCurve(0);
+    bullet->body_->setAcceleration(0);
 }

@@ -14,7 +14,7 @@ public:
     void draw();
     void shoot();
 
-private:
     RigidBody* body_;
+private:
     Sprite* sprite_;    
 };

@@ -20,6 +20,7 @@ public:
     void setCoord(Vector2 pos);
     void setSpeed(Vector2 speed);
     void setCurve(double curve);
+    void setAcceleration(double acc);
     Vector2 getSpeed();
     void setSolid(bool solid);
     bool isSolid();
@@ -28,7 +29,10 @@ public:
 
     static std::vector<RigidBody*> query(Rectangle rect, bool force_solid = false);
 
+    Vector2 getCenterCoord();
+    Vector2 getDims();
     GObject* father_;
+
 
 private:
     static Quadtree quad;

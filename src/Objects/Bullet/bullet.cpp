@@ -35,6 +35,9 @@ void Bullet::routine() {
     Rectangle rect = { pos_.x, pos_.y, sprite_->getFrameDim().x, sprite_->getFrameDim().y };
     auto vec = RigidBody::query(rect);
     for (auto body : vec) {
+        if (no_dmg_.empty()) {
+            break;
+        }
         if (!no_dmg_.contains(body->father_)) {
             body->father_->onCollision(this);
             if (body->isSolid()) {
@@ -50,4 +53,8 @@ void Bullet::routine() {
     }
 
     sprite_->routine();
+}
+
+void Bullet::setCoord(Vector2 pos) {
+    pos_ = pos;
 }

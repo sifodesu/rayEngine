@@ -14,6 +14,7 @@ public:
     void routine();
     void stop(int frame = 0); //freeze the animation on a specific frame
     Vector2 getFrameDim();
+    void setTint(CLITERAL(Color) tint);
 
 private:
     void updateIndex();
@@ -24,4 +25,5 @@ private:
     int speed_;
     int index_;
     double ttl_frame_;
+    CLITERAL(Color) tint_;
 };

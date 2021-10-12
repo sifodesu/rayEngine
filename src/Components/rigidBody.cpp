@@ -87,6 +87,9 @@ void RigidBody::setSolid(bool solid) {
 void RigidBody::setCurve(double curve) {
     curve_ = curve;
 }
+void RigidBody::setAcceleration(double acc){
+    acceleration_ = acc;
+}
 
 std::vector<RigidBody*> RigidBody::query(Rectangle rect, bool force_solid) {
     auto queryVec = quad.query(rect);
@@ -190,6 +193,13 @@ void RigidBody::routine() {
 
 std::vector<RigidBody*> RigidBody::getCollisions(bool with_solid) {
     return query(surface_, with_solid);
+}
+
+Vector2 RigidBody::getCenterCoord() {
+    return { surface_.x + surface_.width / 2, surface_.y + surface_.height / 2 };
+}
+Vector2 RigidBody::getDims() {
+    return { surface_.width, surface_.height };
 }
 
 bool RigidBody::isSolid() {

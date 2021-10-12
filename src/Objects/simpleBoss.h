@@ -11,13 +11,18 @@
 class SimpleBoss : public HObject {
 public:
     SimpleBoss(nlohmann::json obj);
+    ~SimpleBoss();
     void routine();
     void draw();
-    void shoot();
+    
+    void die();
+    void youpi();
 
 private:
     RigidBody* body_;
     Sprite* sprite_;
     std::queue<std::tuple<double, std::function<void()>>> patterns_;
+    std::queue<Bullet*> bpq_;
     Clock clock_;
+    double time_;
 };
