@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(rayEngine)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED 20)
+set(CMAKE_CXX_FLAGS "-std=c++20")
 
 include_directories("libs/Quadtree-master/include")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../src/")
