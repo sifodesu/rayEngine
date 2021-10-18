@@ -116,7 +116,6 @@ void RigidBody::setCoord(Vector2 pos) {
     if (in_quad_) {
         quad.add({ pool_id_, surface_ });
     }
-    clock_.getLap();
 }
 
 void RigidBody::setSpeed(Vector2 speed) {
@@ -148,7 +147,7 @@ void RigidBody::fixSpeed() {
 }
 
 void RigidBody::routine() {
-    float delta = (float)clock_.getLap();
+    float delta = (float)Clock::getLap();
     if (abs(speed_.x) < FLT_EPSILON && abs(speed_.y) < FLT_EPSILON)
         return;
 

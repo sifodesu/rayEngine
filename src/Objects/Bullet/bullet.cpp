@@ -46,12 +46,7 @@ void Bullet::routine() {
         }
     }
 
-    ttl_ -= clock_.getLap();
-    if (ttl_ <= 0) {
-        to_delete_ = true;
-        return;
-    }
-
+    ttl_ -= Clock::getLap();
     sprite_->routine();
 }
 

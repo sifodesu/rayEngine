@@ -20,6 +20,7 @@ public:
     static void unload();
     static void routine();
     static GObject* createObj(BPE target);
+    static GObject* getObj(std::string type);
 
     static std::map<int, GObject*> level_ents_;	// ents of the current level
     static std::map<BPE, nlohmann::json> blueprints_;	// ents which cannot be placed on a map

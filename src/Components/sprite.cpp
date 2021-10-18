@@ -37,7 +37,7 @@ void Sprite::routine() {
 }
 
 void Sprite::updateIndex() {
-    ttl_frame_ += clock_.getLap() * 1000;
+    ttl_frame_ += Clock::getLap() * 1000;
     if (ttl_frame_ > speed_) {
         ttl_frame_ -= speed_;
         index_ = (index_ + 1) % nb_frames_;

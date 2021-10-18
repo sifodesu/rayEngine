@@ -1,13 +1,16 @@
 #include "clock.h"
 #include "raylib.h"
 
-Clock::Clock() {
-    lastTime = GetTime();
+double Clock::lastTime = GetTime();
+double Clock::delta = 0;
+
+double Clock::lap() {
+    double now = GetTime();
+    delta = now - lastTime;
+    lastTime = now;
+    return delta;
 }
 
 double Clock::getLap() {
-    double now = GetTime();
-    double ret = now - lastTime;
-    lastTime = now;
-    return ret;
+    return delta;
 }

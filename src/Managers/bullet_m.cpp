@@ -1,18 +1,21 @@
 #include <iostream>
+
 #include "bullet_m.h"
 #include "object_m.h"
 #include "rigidBullet.h"
 #include "zigzagBullet.h"
 #include "definitions.h"
+#include "explosiveBullet.h"
 #define POOL_SIZE 10000
 
 using namespace std;
 
 unordered_map<BulletType, unordered_set<Bullet*>> Bullet_m::pool;
 unordered_map<BulletType, unordered_set<Bullet*>> Bullet_m::active_bullets;
+std::queue<std::tuple<double, BulletType, Bullet*>> Bullet_m::waiting_bullets;
 
 void Bullet_m::init() {
-    for (BulletType type : { RIGID, ZIGZAG }) {
+    for (BulletType type : { RIGID, ZIGZAG, EXPLOSIVE }) {
         for (int i = 0; i < POOL_SIZE; i++) {
             if (type == RIGID) {
                 RigidBullet* b = new RigidBullet(Object_m::blueprints_[BULLET]);
@@ -23,12 +26,27 @@ void Bullet_m::init() {
                 ZigzagBullet* b = new ZigzagBullet(Object_m::blueprints_[BULLET]);
                 pool[type].insert(b);
             }
+
+            if (type == EXPLOSIVE) {
+                ExplosiveBullet* b = new ExplosiveBullet(Object_m::blueprints_[BULLET]);
+                pool[type].insert(b);
+            }
         }
 
     }
 }
 
 void Bullet_m::routine() {
+    double delta = Clock::getLap();
+    if (!waiting_bullets.empty()) {
+        auto& [delay, type, bullet] = waiting_bullets.front();
+        delay -= delta;
+        if (delay <= 0) {
+            waiting_bullets.pop();
+            active_bullets[type].insert(bullet);
+        }
+    }
+
     vector<std::tuple<Bullet*, BulletType>> toDestroy;
     for (auto [type, bullets] : active_bullets) {
         for (auto bullet : bullets) {
@@ -51,19 +69,24 @@ void Bullet_m::draw() {
     }
 }
 
-Bullet* Bullet_m::createBullet(BulletType type, unordered_set<GObject*> no_dmg) {
+Bullet* Bullet_m::createBullet(BulletType type, unordered_set<GObject*> no_dmg, double delay) {
     if (!pool[type].empty()) {
         Bullet* newBullet = *pool[type].begin();
         pool[type].erase(newBullet);
-        active_bullets[type].insert(newBullet);
-
         newBullet->ttl_ = 2;
-        newBullet->to_delete_ = false;
-        newBullet->clock_.getLap();
+        
         newBullet->no_dmg_ = no_dmg;
+
+        if (!delay) {
+            active_bullets[type].insert(newBullet);
+        }
+        else {
+            waiting_bullets.push(make_tuple(delay, type, newBullet));
+        }
+
         return newBullet;
     }
-    
+
     return *active_bullets[type].begin();
 }
 

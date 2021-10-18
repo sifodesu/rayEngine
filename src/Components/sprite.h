@@ -14,11 +14,11 @@ public:
     void routine();
     void stop(int frame = 0); //freeze the animation on a specific frame
     Vector2 getFrameDim();
-    void setTint(CLITERAL(Color) tint);
+    void setTint(Color tint);
+    Color getTint() { return tint_; };
 
 private:
     void updateIndex();
-    Clock clock_;
     Texture2D sprite_sheet_;
     std::string filename_;
     int nb_frames_;

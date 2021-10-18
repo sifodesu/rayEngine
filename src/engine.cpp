@@ -9,6 +9,7 @@
 #include "basicEnt.h"
 #include "bullet_m.h"
 #include "character.h"
+#include "clock.h"
 
 
 Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
@@ -34,6 +35,7 @@ void Engine::game_loop() {
         BeginDrawing();
         ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
 
+        Clock::lap();
         Object_m::routine();
         Bullet_m::routine();
         camera_.routine();
@@ -53,7 +55,7 @@ void Engine::render() {
     auto comp = [](RigidBody* a, RigidBody* b) {
         return a->getCoord().y < b->getCoord().y;
     };
-    std::set < RigidBody*, decltype(comp)> sorted_bodies;
+    std::set<RigidBody*, decltype(comp)> sorted_bodies;
 
     for (auto body : to_render) {
         //temp
@@ -64,6 +66,9 @@ void Engine::render() {
     }
     for (auto body : sorted_bodies) {
         body->father_->draw();
+
+        //debug blit hitboxes
+        DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
 
     Bullet_m::draw();

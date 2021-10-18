@@ -26,7 +26,6 @@ public:
     }
 
     Sprite* sprite_;
-    Clock clock_;
     double ttl_;
     Vector2 pos_;
     std::unordered_set<GObject*> no_dmg_;

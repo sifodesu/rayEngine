@@ -31,6 +31,15 @@ int Object_m::genID() {
     return 0;
 }
 
+GObject* Object_m::getObj(string type) {
+    for (auto [id, obj] : level_ents_) {
+        if (t(*obj) == type) {
+            return obj;
+        }
+    }
+    return nullptr;
+}
+
 GObject* Object_m::createObjJson(json ojs) {
     if (!ojs.contains("ID") || level_ents_.contains(ojs["ID"])) {
         ojs["ID"] = genID();

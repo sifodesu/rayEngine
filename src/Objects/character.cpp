@@ -8,6 +8,7 @@
 #include "bullet_m.h"
 #include "rigidBullet.h"
 #include "zigzagBullet.h"
+#include "explosiveBullet.h"
 
 #define SPEED 200
 
@@ -64,7 +65,7 @@ void Character::draw() {
 }
 
 void Character::shoot() {
-    RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, { this });
+    ExplosiveBullet* bullet = (ExplosiveBullet*)Bullet_m::createBullet(EXPLOSIVE, { this });
     bullet->pos_ = body_->getCoord();
     bullet->body_->setCoord(body_->getCoord());
     bullet->setSpeed({0, -200});

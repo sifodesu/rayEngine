@@ -17,7 +17,7 @@ public:
         // Bullet::~Bullet();
     // }
     void routine() {
-        double t = clock_.getLap();
+        double t = Clock::getLap();
         Vector2 pos = pos_;
         pos_.y += sin(sin_arg_ * sin_speed_.y) * amplitude_ + speed_.y * t;
         pos_.x += sin(sin_arg_ * sin_speed_.x) * amplitude_ + speed_.x * t;

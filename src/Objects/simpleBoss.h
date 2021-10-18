@@ -4,9 +4,11 @@
 #include <queue>
 #include <functional>
 
+#include "character.h"
 #include "hObject.h"
 #include "bullet.h"
 #include "clock.h"
+#include "rigidBullet.h"
 
 class SimpleBoss : public HObject {
 public:
@@ -14,7 +16,7 @@ public:
     ~SimpleBoss();
     void routine();
     void draw();
-    
+
     void die();
     void youpi();
 
@@ -25,4 +27,9 @@ private:
     std::queue<Bullet*> bpq_;
     Clock clock_;
     double time_;
+
+    Character* chara_;
+    Vector2 getDir();
+    Vector2 getRandomDir(double magnitude);
+    RigidBullet* createBasicRB();
 };

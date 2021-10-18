@@ -31,6 +31,8 @@ public:
 
     Vector2 getCenterCoord();
     Vector2 getDims();
+    Rectangle getSurface() { return surface_; }
+    
     GObject* father_;
 
 
@@ -41,7 +43,7 @@ private:
     Vector2 speed_;
     bool solid_;
     int pool_id_;
-    Clock clock_;
+    
     double acceleration_;
     double curve_;
     bool in_quad_;

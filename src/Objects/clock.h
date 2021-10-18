@@ -2,9 +2,10 @@
 
 class Clock {
 public:
-    Clock();
-    double getLap();
+    static double lap();
+    static double getLap();
     
 private:
-    double lastTime;
+    static double lastTime;
+    static double delta;
 };
