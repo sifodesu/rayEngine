@@ -4,7 +4,7 @@
 #define POLICES_PATH  "../Data/Polices/"
 #define BLUEPRINTS_PATH  "../Data/Entities/blueprints.json"
 #define SAVE_PATH "../Data/Saves/"
-#define MUSICS_PATH "../Data/Music/"
+#define MUSICS_PATH "../Data/Musics/"
 
 #define t(...) typeid(__VA_ARGS__).name()
 

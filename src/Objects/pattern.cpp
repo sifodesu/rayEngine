@@ -3,28 +3,31 @@
 #include "math.h"
 #include "rigidBullet.h"
 #include "bullet_m.h"
+#include "raymath.h"
 
-void Pattern::circle(RigidBullet* bp, int nb_bullets, double amplitude, Vector2 direction, double delay) {
+void Pattern::circle(RigidBullet* bp, int nb_bullets, double amplitude, Vector2 direction, double delay, float radius) {
     double angleStart = -90 + (atan(direction.y / direction.x) * 180 / PI) + (direction.x < 0 ? 180 : 0);
     for (double curve = 0; curve <= amplitude; curve += amplitude / (nb_bullets - 1)) {
         float rad = PI * (curve + angleStart - (amplitude / 2)) / 180;
         float tempX = -sin(rad) * bp->body_->getSpeed().x;
         float tempY = cos(rad) * bp->body_->getSpeed().y;
-        RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, bp->no_dmg_, delay);
+        RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, bp->no_dmg_, !curve ? 0 : delay);
         *bullet = *bp;
         bullet->body_->setSpeed({ tempX, tempY });
+
+        Vector2 pos = bp->body_->getCoord();
+        Vector2 unitDir = Vector2Normalize(bullet->body_->getSpeed());
+        bullet->body_->setCoord({ pos.x + (unitDir.x * radius), pos.y + (unitDir.y * radius) });
     }
 }
 
 void Pattern::line(RigidBullet* bp, Vector2 origin, Vector2 direction, double center_acc, int nb_bullet) {
-    float dirNorm = sqrt(pow(direction.x, 2) + pow(direction.y, 2));
-    Vector2 unitDir = { direction.x / dirNorm, direction.y / dirNorm };
-    float rad = PI * 0.5;
-    Vector2 vecSpeed = { cos(rad) * unitDir.x - sin(rad) * unitDir.y, sin(rad) * unitDir.x + cos(rad) * unitDir.y };
-    vecSpeed.x *= bp->body_->getSpeed().x;
-    vecSpeed.y *= bp->body_->getSpeed().y;
+    float dirNorm = Vector2Length(direction);
+    Vector2 unitDir = Vector2Normalize(direction);
+    Vector2 vecSpeed = Vector2Rotate(unitDir, 90);
+    vecSpeed = Vector2Multiply(vecSpeed, bp->body_->getSpeed());
 
-    for (float i = 0; i <= dirNorm; i += dirNorm / (nb_bullet-1)) {
+    for (float i = 0; i <= dirNorm; i += dirNorm / (nb_bullet - 1)) {
         Vector2 pos = { origin.x + (unitDir.x * i), origin.y + (unitDir.y * i) };
         RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, bp->no_dmg_);
         *bullet = *bp;

@@ -58,17 +58,14 @@ void Character::routine() {
     }
 }
 
-
 void Character::draw() {
     sprite_->draw(body_->getCoord());
-    Runes::draw({ body_->getCoord().x - 20, body_->getCoord().y + 20 });
 }
 
 void Character::shoot() {
     ExplosiveBullet* bullet = (ExplosiveBullet*)Bullet_m::createBullet(EXPLOSIVE, { this });
-    bullet->pos_ = body_->getCoord();
     bullet->body_->setCoord(body_->getCoord());
-    bullet->setSpeed({0, -200});
+    bullet->setSpeed({ 0, -200 });
     bullet->ttl_ = 5;
     bullet->sprite_->setTint(BLUE);
     bullet->body_->setCurve(0);

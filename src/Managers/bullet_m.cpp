@@ -69,12 +69,27 @@ void Bullet_m::draw() {
     }
 }
 
+void Bullet_m::purge() {
+    for (auto [type, bullets] : active_bullets) {
+        for (auto bullet : bullets) {
+            pool[type].insert(bullet);
+        }
+    }
+    active_bullets.clear();
+    
+    while (!waiting_bullets.empty()) {
+        auto& [delay, type, bullet] = waiting_bullets.front();
+        pool[type].insert(bullet);
+        waiting_bullets.pop();
+    }
+}
+
 Bullet* Bullet_m::createBullet(BulletType type, unordered_set<GObject*> no_dmg, double delay) {
     if (!pool[type].empty()) {
         Bullet* newBullet = *pool[type].begin();
         pool[type].erase(newBullet);
         newBullet->ttl_ = 2;
-        
+
         newBullet->no_dmg_ = no_dmg;
 
         if (!delay) {

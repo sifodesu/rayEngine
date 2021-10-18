@@ -14,20 +14,26 @@ SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
 
 void SimpleBoss::die() {
     to_delete_ = true;
+    Bullet_m::purge();
 
     RigidBullet* bp = createBasicRB();
     bp->ttl_ = 3;
+    bp->sprite_->setTint(VIOLET);
+    bp->no_dmg_.insert(chara_);
 
-    bp->setSpeed({ 300, 300 });
-    bp->setCurve(1);
-    Pattern::circle(bp, 300);
+    bp->setAcceleration(1.5);
+    bp->setCurve(1.5);
 
     bp->setSpeed({ 100, 200 });
-    bp->setCurve(1.5);
     Pattern::circle(bp, 300);
 
     bp->setSpeed({ 200, 100 });
-    bp->setCurve(1.5);
+    Pattern::circle(bp, 300);
+
+    bp->setSpeed({ 200, 50 });
+    Pattern::circle(bp, 300);
+
+    bp->setSpeed({ 50, 200 });
     Pattern::circle(bp, 300);
 
     delete bp;
@@ -59,7 +65,8 @@ Vector2 SimpleBoss::getDir() {
             return { 0,0 };
         }
     }
-    return { chara_->body_->getCoord().x - body_->getCoord().x, chara_->body_->getCoord().y - body_->getCoord().y };
+    return { chara_->body_->getCoord().x - body_->getCoord().x,
+                chara_->body_->getCoord().y - body_->getCoord().y };
 }
 
 RigidBullet* SimpleBoss::createBasicRB() {
@@ -67,7 +74,7 @@ RigidBullet* SimpleBoss::createBasicRB() {
     bp->body_->setCurve(0);
     bp->body_->setAcceleration(0);
     bp->no_dmg_ = { this };
-    bp->body_->setSpeed({ 200, 200 });
+    bp->body_->setSpeed({ 50, 50 });
     bp->body_->setCoord({ body_->getCenterCoord().x - bp->body_->getDims().x / 2,
                             body_->getCenterCoord().y - bp->body_->getDims().y / 2 });
     bp->sprite_->setTint(RED);
@@ -85,13 +92,13 @@ void SimpleBoss::routine() {
     if (patterns_.empty()) {
         if (Bullet_m::waiting_bullets.empty()) {
             auto bp = createBasicRB();
-            // if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
-                // bp->body_->setCurve(10);
-            patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 30, 360, getDir(), 0.05)));
-            // }
-            // else {
-                // patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 1, 0, getRandomDir(40))));
-            // }
+            if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
+                bp->body_->setCurve(10);
+                patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 20, 360, getDir(), 0, 30)));
+            }
+            else {
+                patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 10, 45, getDir(), 0.01, 40)));
+            }
             bpq_.push(bp);
         }
     }
