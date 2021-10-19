@@ -12,7 +12,7 @@ public:
     void draw();
     void routine();
 
-    RigidBody* body_;
+    CollisionRect* body_;
 private:
     Sprite* sprite_;
 };

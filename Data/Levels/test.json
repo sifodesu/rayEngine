@@ -40,6 +40,52 @@
         "collisionRect": {
             "x": -100,
             "y": -100,
+            "w": 10,
+            "h": 10,
+            "solid": true
+        }
+    },
+        {
+        "ID": 6,
+        "type": "basic",
+        "collisionRect": {
+            "x": -100,
+            "y": -100,
+            "w": 1000,
+            "h": 50,
+            "solid": true
+        }
+    },
+        {
+        "ID": 7,
+        "type": "basic",
+        "collisionRect": {
+            "x": -100,
+            "y": -100,
+            "w": 50,
+            "h": 1000,
+            "solid": true
+        }
+    },
+            {
+        "ID": 8,
+        "type": "basic",
+        "collisionRect": {
+            "x": 300,
+            "y": -100,
+            "w": 50,
+            "h": 1000,
+            "solid": true
+        }
+    },
+                {
+        "ID": 9,
+        "type": "basic",
+        "collisionRect": {
+            "x": -100,
+            "y": 300,
+            "w": 1000,
+            "h": 50,
             "solid": true
         }
     }

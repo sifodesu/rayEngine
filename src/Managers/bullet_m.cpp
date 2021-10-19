@@ -6,7 +6,7 @@
 #include "zigzagBullet.h"
 #include "definitions.h"
 #include "explosiveBullet.h"
-#define POOL_SIZE 10000
+#define POOL_SIZE 5000
 
 using namespace std;
 

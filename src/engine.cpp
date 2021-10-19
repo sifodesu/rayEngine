@@ -71,26 +71,27 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    auto to_render = CollisionRect::query(camera_.getRect());
+    std::vector<CollisionRect*> to_render = CollisionRect::query(camera_.getRect());
+
     auto comp = [](CollisionRect* a, CollisionRect* b) {
-        return a->getCoord().y < b->getCoord().y;
+        return a->getCoord().y <= b->getCoord().y;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
 
-    for (auto body : to_render) {
+    for (CollisionRect* body : to_render) {
         //temp
         if (t(*body->getFather()) == t(Character))
             camera_.to_follow_ = (RigidBody*)body;
 
-        sorted_bodies.emplace(body);
+        sorted_bodies.insert(body);
     }
-    for (auto body : sorted_bodies) {
+
+    for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
 
         //debug blit hitboxes
         DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
-
     Bullet_m::draw();
 }
 

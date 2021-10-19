@@ -96,6 +96,7 @@ void SimpleBoss::routine() {
             auto bp = createBasicRB();
             if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
                 bp->setCurve(10);
+                bp->ttl_ = 0.5;
                 p(0.1, circle, bp, 20, 360, getDir(), 0, 30);
             }
             else {

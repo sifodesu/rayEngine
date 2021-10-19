@@ -6,7 +6,7 @@ using namespace std;
 
 BasicEnt::BasicEnt(json obj) : GObject(obj["ID"]) {
     sprite_ = new Sprite(obj);
-    body_ = new RigidBody(obj, this);
+    body_ = new CollisionRect(obj, this);
 }
 
 BasicEnt::~BasicEnt() {
