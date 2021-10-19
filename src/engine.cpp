@@ -1,6 +1,6 @@
 #include <set>
 #include <string>
-#include "engine.h" 
+#include "engine.h"
 #include "raylib.h"
 #include "definitions.h"
 #include "rigidBody.h"
@@ -13,15 +13,19 @@
 #include "raymath.h"
 #include "sound_m.h"
 
-Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWidth, screenHeight) {
+Engine::Engine() {
+#ifdef NDEBUG
     SetTraceLogLevel(LOG_WARNING);
-    // SetConfigFlags(FLAG_VSYNC_HINT); //FLAG_WINDOW_HIGHDPI |
-    InitWindow(screenWidth, screenHeight, "rayEngine");
+#endif
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_UNDECORATED);
+    InitWindow(0, 0, "rayEngine");
+    camera_ = Raycam();
+    MaximizeWindow();
     InitAudioDevice();
     // ToggleFullscreen();
     SetTargetFPS(420);
-    screenWidth_ = screenWidth;
-    screenHeight_ = screenHeight;
+    screenWidth_ = GetScreenWidth();
+    screenHeight_ = GetScreenHeight();
 
     Texture_m::load();
     Sound_m::load();
@@ -31,7 +35,7 @@ Engine::Engine(const int screenWidth, const int screenHeight) : camera_(screenWi
     Bullet_m::init();
     Runes::init();
 
- 
+
 }
 
 void Engine::game_loop() {
@@ -42,7 +46,7 @@ void Engine::game_loop() {
         // UpdateMusicStream(neila);
 
         BeginDrawing();
-        ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
+        ClearBackground(CLITERAL(Color){50, 50, 50, 255});
 
         Clock::lap();
         Object_m::routine();
@@ -57,11 +61,10 @@ void Engine::game_loop() {
 
         //temp
         Vector2 pos = camera_.getCam().target;
-        pos.x -= 32;
-        pos.y += 40;
+        pos.x += 32;
         Runes::draw(pos);
         //
-        
+
         EndMode2D();
         EndDrawing();
     }
@@ -74,14 +77,14 @@ void Engine::render() {
     };
     std::set<RigidBody*, decltype(comp)> sorted_bodies;
 
-    for (auto body : to_render) {
+    for (auto body: to_render) {
         //temp
         if (t(*body->father_) == t(Character))
             camera_.to_follow_ = body;
 
         sorted_bodies.emplace(body);
     }
-    for (auto body : sorted_bodies) {
+    for (auto body: sorted_bodies) {
         body->father_->draw();
 
         //debug blit hitboxes

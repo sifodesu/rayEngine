@@ -1,11 +1,11 @@
 #include "raycam.h"
 #include "rigidBody.h"
 
-Raycam::Raycam(int resX, int resY, RigidBody* to_follow) : camera_({ 0 }), to_follow_(to_follow) {
-    camera_.offset = (Vector2){ resX / 2.0f, resY / 2.0f + 400};
+Raycam::Raycam(RigidBody* to_follow) : camera_({ 0 }), to_follow_(to_follow) {
+    camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f + 400};
     if (to_follow_)
         camera_.target = to_follow_->getCoord();
-    camera_.zoom = 8.0f;
+    camera_.zoom = (float) GetScreenWidth() / 480;
 }
 
 Camera2D Raycam::getCam() {

@@ -5,7 +5,7 @@
 
 class Raycam {
 public:
-    Raycam(int resX, int resY, RigidBody* to_follow = NULL);
+    Raycam(RigidBody* to_follow = NULL);
     void routine();
     Camera2D getCam();
     Rectangle getRect();
