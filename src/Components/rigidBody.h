@@ -11,7 +11,7 @@
 #include "clock.h"
 #include "collisionRect.h"
 
-class RigidBody : public collisionRect {
+class RigidBody : public CollisionRect {
 public:
     RigidBody(nlohmann::json obj, GObject* father);
 

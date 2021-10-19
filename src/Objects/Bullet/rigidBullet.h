@@ -8,39 +8,40 @@
 
 class RigidBullet : public Bullet {
 public:
-    RigidBullet(nlohmann::json obj) : Bullet(obj) {
-        body_ = new RigidBody(obj, this);
+    RigidBullet(nlohmann::json obj) : Bullet(obj, false) {
+        surface_ = new RigidBody(obj, this);
     }
     ~RigidBullet() {
-        if (body_) {
-            delete body_;
+        if (surface_) {
+            delete surface_;
         }
-        // Bullet::~Bullet();
     }
     void routine() {
-        body_->routine();
-        pos_ = body_->getCoord();
+        surface_->routine();
         Bullet::routine();
     }
     RigidBullet& operator=(const RigidBullet& other) {
         Bullet::operator=(other);
-        *body_ = *other.body_;
-        setCoord(other.body_->getCoord());
+        *((RigidBody*)surface_) = *((RigidBody*)other.surface_);
         return *this;
     }
     void setSpeed(Vector2 speed) {
-        body_->setSpeed(speed);
+        ((RigidBody*)surface_)->setSpeed(speed);
+    }
+    Vector2 getSpeed() {
+        return ((RigidBody*)surface_)->getSpeed();
     }
     void setCoord(Vector2 coord) {
         Bullet::setCoord(coord);
-        body_->setCoord(coord);
+        ((RigidBody*)surface_)->setCoord(coord);
     }
-    void setCurve(double curve){
-        body_->setCurve(curve);
+    Vector2 getCoord() {
+        return ((RigidBody*)surface_)->getCoord();
     }
-    void setAcceleration(double acc){
-        body_->setAcceleration(acc);
+    void setCurve(double curve) {
+        ((RigidBody*)surface_)->setCurve(curve);
     }
-    RigidBody* body_;
-private:
+    void setAcceleration(double acc) {
+        ((RigidBody*)surface_)->setAcceleration(acc);
+    }
 };

@@ -6,8 +6,14 @@
 using json = nlohmann::json;
 using namespace std;
 
-Bullet::Bullet(json obj) : GObject(obj["ID"]), ttl_(2), dmg_(1) {
+Bullet::Bullet(json obj, bool newSurface) : GObject(obj["ID"]), ttl_(2), dmg_(1) {
     sprite_ = new Sprite(obj);
+    if (newSurface) {
+        surface_ = new CollisionRect(obj, this);
+    }
+    else {
+        surface_ = nullptr;
+    }
 
     if (obj.contains("ttl")) {
         ttl_ = obj["ttl"];
@@ -24,7 +30,7 @@ Bullet::~Bullet() {
 }
 
 void Bullet::draw() {
-    sprite_->draw(pos_);
+    sprite_->draw(surface_->getCoord());
 }
 
 void Bullet::setNoDmg(std::unordered_set<GObject*> no_dmg) {
@@ -32,8 +38,7 @@ void Bullet::setNoDmg(std::unordered_set<GObject*> no_dmg) {
 }
 
 void Bullet::routine() {
-    Rectangle rect = { pos_.x, pos_.y, sprite_->getFrameDim().x, sprite_->getFrameDim().y };
-    auto vec = RigidBody::query(rect);
+    auto vec = RigidBody::query(surface_->getSurface());
     for (auto body : vec) {
         if (no_dmg_.empty()) {
             break;
@@ -51,5 +56,5 @@ void Bullet::routine() {
 }
 
 void Bullet::setCoord(Vector2 pos) {
-    pos_ = pos;
+    surface_->setCoord(pos);
 }

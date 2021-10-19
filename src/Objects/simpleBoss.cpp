@@ -49,7 +49,7 @@ void SimpleBoss::youpi() {
     bp->ttl_ = 5;
     bp->setAcceleration(-3.0);
 
-    p(0.5, line, bp, bp->body_->getCoord(), Vector2{ 0, 200 }, 0.5, 11);
+    p(0.5, line, bp, bp->getCoord(), Vector2{ 0, 200 }, 0.5, 11);
     bpq_.push(bp);
 }
 
@@ -73,12 +73,12 @@ Vector2 SimpleBoss::getDir() {
 
 RigidBullet* SimpleBoss::createBasicRB() {
     RigidBullet* bp = new RigidBullet(Object_m::blueprints_[BULLET]);
-    bp->body_->setCurve(0);
-    bp->body_->setAcceleration(0);
+    bp->setCurve(0);
+    bp->setAcceleration(0);
     bp->no_dmg_ = { this };
-    bp->body_->setSpeed({ 50, 50 });
-    bp->body_->setCoord({ body_->getCenterCoord().x - bp->body_->getDims().x / 2,
-                            body_->getCenterCoord().y - bp->body_->getDims().y / 2 });
+    bp->setSpeed({ 50, 50 });
+    bp->setCoord({ body_->getCenterCoord().x - bp->surface_->getDims().x / 2,
+                            body_->getCenterCoord().y - bp->surface_->getDims().y / 2 });
     bp->sprite_->setTint(RED);
     return bp;
 }
@@ -95,7 +95,7 @@ void SimpleBoss::routine() {
         if (Bullet_m::waiting_bullets.empty()) {
             auto bp = createBasicRB();
             if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
-                bp->body_->setCurve(10);
+                bp->setCurve(10);
                 p(0.1, circle, bp, 20, 360, getDir(), 0, 30);
             }
             else {

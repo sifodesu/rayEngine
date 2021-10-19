@@ -6,10 +6,11 @@
 #include "sprite.h"
 #include "rigidBody.h"
 #include "clock.h"
+#include "collisionRect.h"
 
 class Bullet : public GObject {
 public:
-    Bullet(nlohmann::json obj);
+    Bullet(nlohmann::json obj, bool newSurface = true);
     ~Bullet();
     void draw();
     void routine();
@@ -19,7 +20,8 @@ public:
     Bullet& operator=(const Bullet& other) {
         *sprite_ = *other.sprite_;
         ttl_ = other.ttl_;
-        pos_ = other.pos_;
+        surface_->setCoord(other.surface_->getCoord());
+        surface_->setDims(other.surface_->getDims());
         no_dmg_ = other.no_dmg_;
         dmg_ = other.dmg_;
         return *this;
@@ -27,7 +29,7 @@ public:
 
     Sprite* sprite_;
     double ttl_;
-    Vector2 pos_;
+    CollisionRect* surface_;
     std::unordered_set<GObject*> no_dmg_;
     double dmg_;
 };

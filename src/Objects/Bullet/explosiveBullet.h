@@ -10,12 +10,12 @@ public:
         RigidBullet::routine();
         if (ttl_ <= 0) {
             RigidBullet* bp = new RigidBullet(Object_m::blueprints_[BULLET]);
-            bp->body_->setCurve(0);
-            bp->body_->setAcceleration(0);
+            bp->setCurve(0);
+            bp->setAcceleration(0);
             bp->no_dmg_ = { no_dmg_ };
-            bp->body_->setSpeed({ 200, 200 });
-            bp->body_->setCoord({ body_->getCenterCoord().x - bp->body_->getDims().x / 2,
-                                    body_->getCenterCoord().y - bp->body_->getDims().y / 2 });
+            bp->setSpeed({ 200, 200 });
+            bp->setCoord({ surface_->getCenterCoord().x - bp->surface_->getDims().x / 2,
+                                    surface_->getCenterCoord().y - bp->surface_->getDims().y / 2 });
             bp->sprite_->setTint(sprite_->getTint());
             Pattern::circle(bp, nb_bullets);
             delete bp;

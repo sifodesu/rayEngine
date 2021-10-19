@@ -64,10 +64,10 @@ void Character::draw() {
 
 void Character::shoot() {
     ExplosiveBullet* bullet = (ExplosiveBullet*)Bullet_m::createBullet(EXPLOSIVE, { this });
-    bullet->body_->setCoord(body_->getCoord());
+    bullet->setCoord(body_->getCoord());
     bullet->setSpeed({ 0, -200 });
     bullet->ttl_ = 5;
     bullet->sprite_->setTint(BLUE);
-    bullet->body_->setCurve(0);
-    bullet->body_->setAcceleration(0);
+    bullet->setCurve(0);
+    bullet->setAcceleration(0);
 }

@@ -71,11 +71,11 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    auto to_render = collisionRect::query(camera_.getRect());
-    auto comp = [](collisionRect* a, collisionRect* b) {
+    auto to_render = CollisionRect::query(camera_.getRect());
+    auto comp = [](CollisionRect* a, CollisionRect* b) {
         return a->getCoord().y < b->getCoord().y;
     };
-    std::set<collisionRect*, decltype(comp)> sorted_bodies;
+    std::set<CollisionRect*, decltype(comp)> sorted_bodies;
 
     for (auto body : to_render) {
         //temp

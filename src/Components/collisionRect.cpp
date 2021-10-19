@@ -1,11 +1,11 @@
 #include "collisionRect.h"
 
-Quadtree collisionRect::quad;
-std::map<int, collisionRect*>  collisionRect::pool;
+Quadtree CollisionRect::quad;
+std::map<int, CollisionRect*>  CollisionRect::pool;
 
 using namespace std;
 
-collisionRect::collisionRect(nlohmann::json obj, GObject* father) {
+CollisionRect::CollisionRect(nlohmann::json obj, GObject* father) {
     Rectangle rect{ 0.0f };
     solid_ = true;
     in_quad_ = true;
@@ -50,16 +50,22 @@ collisionRect::collisionRect(nlohmann::json obj, GObject* father) {
     }
 }
 
-void collisionRect::setCoord(Vector2 pos) {
+void CollisionRect::setCoord(Vector2 pos) {
     remove();
     surface_.x = pos.x;
     surface_.y = pos.y;
     add();
 }
+void CollisionRect::setDims(Vector2 dims) {
+    remove();
+    surface_.width = dims.x;
+    surface_.height = dims.y;
+    add();
+}
 
-std::vector<collisionRect*> collisionRect::query(Rectangle rect, bool force_solid) {
+std::vector<CollisionRect*> CollisionRect::query(Rectangle rect, bool force_solid) {
     auto queryVec = quad.query(rect);
-    std::vector<collisionRect*> ret;
+    std::vector<CollisionRect*> ret;
 
     for (auto node : queryVec) {
         if ((pool[node.id]->solid_ && force_solid) || !force_solid) {

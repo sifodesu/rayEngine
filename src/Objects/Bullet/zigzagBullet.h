@@ -13,15 +13,15 @@ public:
         amplitude_ = 0.5;
         sin_arg_ = 0;
     }
-    // ~ZigzagBullet() {
-        // Bullet::~Bullet();
-    // }
+    
     void routine() {
         double t = Clock::getLap();
-        Vector2 pos = pos_;
-        pos_.y += sin(sin_arg_ * sin_speed_.y) * amplitude_ + speed_.y * t;
-        pos_.x += sin(sin_arg_ * sin_speed_.x) * amplitude_ + speed_.x * t;
         
+        Vector2 pos = surface_->getCoord();
+        pos.y += sin(sin_arg_ * sin_speed_.y) * amplitude_ + speed_.y * t;
+        pos.x += sin(sin_arg_ * sin_speed_.x) * amplitude_ + speed_.x * t;
+        surface_->setCoord(pos);
+
         Bullet::routine();
         sin_arg_ += t;
     }

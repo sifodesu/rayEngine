@@ -7,18 +7,19 @@
 #include "gObject.h"
 
 
-class collisionRect : public ObjComponent {
+class CollisionRect : public ObjComponent {
 public:
-    collisionRect(nlohmann::json obj, GObject* father);
+    CollisionRect(nlohmann::json obj, GObject* father);
     void setCoord(Vector2 pos);
+    void setDims(Vector2 dims);
     void setSurface(Rectangle surf) { surface_ = surf; }
     Vector2 getCoord() { return { surface_.x, surface_.y }; }
     Vector2 getCenterCoord() { return { surface_.x + surface_.width / 2, surface_.y + surface_.height / 2 }; }
     Rectangle getSurface() { return surface_; }
     Vector2 getDims() { return { surface_.width, surface_.height }; }
 
-    static std::vector<collisionRect*> query(Rectangle rect, bool force_solid = true);
-    std::vector<collisionRect*> getCollisions(bool with_solid = true) {
+    static std::vector<CollisionRect*> query(Rectangle rect, bool force_solid = true);
+    std::vector<CollisionRect*> getCollisions(bool with_solid = true) {
         return query(surface_, with_solid);
     }
     void setSolid(bool solid) { solid_ = solid; }
@@ -33,7 +34,7 @@ public:
             quad.remove({ pool_id_, surface_ });
         }
     };
-    ~collisionRect() {
+    ~CollisionRect() {
         remove();
         pool.erase(pool_id_);
     }
@@ -43,7 +44,7 @@ public:
 protected:
     bool in_quad_;
     static Quadtree quad;
-    static std::map<int, collisionRect*> pool;
+    static std::map<int, CollisionRect*> pool;
     Rectangle surface_;
     bool solid_;
     int pool_id_;

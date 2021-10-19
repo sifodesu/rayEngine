@@ -10,7 +10,7 @@ using json = nlohmann::json;
 using namespace std;
 
 //TODO: handle case when out of box quad
-RigidBody::RigidBody(json obj, GObject* father) : collisionRect(obj, father) {
+RigidBody::RigidBody(json obj, GObject* father) : CollisionRect(obj, father) {
     speed_ = { 0 };
     acceleration_ = 0;
     curve_ = 0;
@@ -61,7 +61,7 @@ void RigidBody::fixSpeed() {
             fixSpeed.width += 1;
         if (speed_.x < 0)
             fixSpeed.x -= 1;
-        for (collisionRect* body : query(fixSpeed))
+        for (CollisionRect* body : query(fixSpeed))
             if (body->isSolid() && (body->getId() != pool_id_))
                 speed_.x = 0;
 
@@ -70,7 +70,7 @@ void RigidBody::fixSpeed() {
             fixSpeed.height += 1;
         if (speed_.y < 0)
             fixSpeed.y -= 1;
-        for (collisionRect* body : query(fixSpeed))
+        for (CollisionRect* body : query(fixSpeed))
             if (body->isSolid() && (body->getId() != pool_id_))
                 speed_.y = 0;
     }
@@ -97,7 +97,7 @@ void RigidBody::routine() {
         temp.x += unitSpeed.x * speedNorm;
         temp.y += unitSpeed.y * speedNorm;
         bool solid_collide = false;
-        for (collisionRect* body : query(temp)) {
+        for (CollisionRect* body : query(temp)) {
             if (body->isSolid() && solid_ && (body->getId() != pool_id_)) {
                 solid_collide = true;
             }
