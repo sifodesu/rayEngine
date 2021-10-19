@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define p(delay, func, ...) patterns_.push(make_tuple(delay, bind(Pattern::func, __VA_ARGS__)))
+
 SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
@@ -47,7 +49,7 @@ void SimpleBoss::youpi() {
     bp->ttl_ = 5;
     bp->setAcceleration(-3.0);
 
-    patterns_.push(make_tuple(0.5, std::bind(Pattern::line, bp, bp->body_->getCoord(), Vector2{ 0, 200 }, 0.5, 11)));
+    p(0.5, line, bp, bp->body_->getCoord(), Vector2{ 0, 200 }, 0.5, 11);
     bpq_.push(bp);
 }
 
@@ -94,10 +96,10 @@ void SimpleBoss::routine() {
             auto bp = createBasicRB();
             if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
                 bp->body_->setCurve(10);
-                patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 20, 360, getDir(), 0, 30)));
+                p(0.1, circle, bp, 20, 360, getDir(), 0, 30);
             }
             else {
-                patterns_.push(make_tuple(0.1, std::bind(Pattern::circle, bp, 10, 45, getDir(), 0.01, 40)));
+                p(0.1, circle, bp, 10, 45, getDir(), 0.01, 40);
             }
             bpq_.push(bp);
         }

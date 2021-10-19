@@ -24,6 +24,7 @@ public:
 
     static std::map<int, GObject*> level_ents_;	// ents of the current level
     static std::map<BPE, nlohmann::json> blueprints_;	// ents which cannot be placed on a map
+
 private:
     static GObject* createObjJson(nlohmann::json ojs);
     static int genID();

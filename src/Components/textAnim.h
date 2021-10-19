@@ -6,7 +6,7 @@
 
 class TextAnim : public ObjComponent {
 public:
-    TextAnim(std::string text, std::string font = "");;
+    TextAnim(std::string text, std::string font = "");
 
     void routine();
     void trigger();

@@ -46,7 +46,7 @@ void Engine::game_loop() {
         // UpdateMusicStream(neila);
 
         BeginDrawing();
-        ClearBackground(CLITERAL(Color){50, 50, 50, 255});
+        ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
 
         Clock::lap();
         Object_m::routine();
@@ -71,21 +71,21 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    auto to_render = RigidBody::query(camera_.getRect());
-    auto comp = [](RigidBody* a, RigidBody* b) {
+    auto to_render = collisionRect::query(camera_.getRect());
+    auto comp = [](collisionRect* a, collisionRect* b) {
         return a->getCoord().y < b->getCoord().y;
     };
-    std::set<RigidBody*, decltype(comp)> sorted_bodies;
+    std::set<collisionRect*, decltype(comp)> sorted_bodies;
 
-    for (auto body: to_render) {
+    for (auto body : to_render) {
         //temp
-        if (t(*body->father_) == t(Character))
-            camera_.to_follow_ = body;
+        if (t(*body->getFather()) == t(Character))
+            camera_.to_follow_ = (RigidBody*)body;
 
         sorted_bodies.emplace(body);
     }
-    for (auto body: sorted_bodies) {
-        body->father_->draw();
+    for (auto body : sorted_bodies) {
+        body->getFather()->draw();
 
         //debug blit hitboxes
         DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));

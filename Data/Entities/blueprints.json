@@ -9,16 +9,18 @@
             "speed": 100
         },
         "dmg": 1,
-        "body": {
+        "collisionRect":{
             "in_quad": false,
             "w": 7,
             "h": 7,
             "solid": false,
-            "acceleration": 0.5,
-            "curve": 1,
-            "speed": {
-                "x": 0,
-                "y": -100
+            "rigid": {
+                "acceleration": 0.5,
+                "curve": 1,
+                "speed": {
+                    "x": 0,
+                    "y": -100
+                }
             }
         },
         "ttl": 2

@@ -6,7 +6,7 @@
         "sprite": {
             "filename": "tile.png"
         },
-        "body": {
+        "collisionRect": {
             "x": 100,
             "y": 100,
             "w": 15,
@@ -23,7 +23,7 @@
             "nb_frames": 2,
             "speed": 300
         },
-        "body": {
+        "collisionRect": {
             "x": 100,
             "y": 10,
             "w": 23,
@@ -37,10 +37,10 @@
         "sprite": {
             "filename": "NONE"
         },
-        "body": {
+        "collisionRect": {
             "x": -100,
             "y": -100,
-            "solid": false
+            "solid": true
         }
     }
 ]

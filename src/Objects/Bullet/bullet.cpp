@@ -38,8 +38,8 @@ void Bullet::routine() {
         if (no_dmg_.empty()) {
             break;
         }
-        if (!no_dmg_.contains(body->father_)) {
-            body->father_->onCollision(this);
+        if (!no_dmg_.contains(body->getFather())) {
+            body->getFather()->onCollision(this);
             if (body->isSolid()) {
                 ttl_ = 0;
             }
