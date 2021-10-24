@@ -11,6 +11,7 @@ SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
     time_ = 0;
+    patDelay_ = 0;
     chara_ = (Character*)Object_m::getObj(t(Character));
 }
 
@@ -76,45 +77,143 @@ RigidBullet* SimpleBoss::createBasicRB() {
     bp->setCurve(0);
     bp->setAcceleration(0);
     bp->no_dmg_ = { this };
-    bp->setSpeed({ 50, 50 });
+    bp->setSpeed({ 75, 75 });
     bp->setCoord({ body_->getCenterCoord().x - bp->surface_->getDims().x / 2,
                             body_->getCenterCoord().y - bp->surface_->getDims().y / 2 });
     bp->sprite_->setTint(RED);
+    bp->ttl_ = 10;
     return bp;
+}
+
+void SimpleBoss::execPat() {
+    double delta = Clock::getLap();
+    auto& [delay, pat] = patterns_.front();
+    delay -= delta;
+    if (delay <= 0) {
+        pat();
+        patterns_.pop();
+        delete bpq_.front();
+        bpq_.pop();
+    }
+}
+
+void SimpleBoss::genSelfDefense() {
+    auto bp = createBasicRB();
+    bp->setCurve(10);
+    bp->ttl_ = 0.5;
+    p(0.1, circle, bp, 20, 360, getDir(), 0, 30);
+    bpq_.push(bp);
+}
+
+void SimpleBoss::patternDelay(double delay) {
+    auto bp = createBasicRB();
+    p(delay, nullPattern, bp);
+    bpq_.push(bp);
+}
+
+void SimpleBoss::phase1() {
+    double delta = Clock::getLap();
+    if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
+        genSelfDefense();
+    }
+    else if (time_ > 0) {
+        auto bp = createBasicRB();
+        bp->setSpeed({ 100, 100 });
+        p(0.05, circle, bp, 1, 0, getRandomDir(50), 0, 30);
+        bpq_.push(bp);
+        time_ -= delta + 0.1;
+        if (time_ <= 0) {
+            patternDelay(0.5);
+        }
+    }
+    else {
+        for (int i = 0; i < 3; i++) {
+            auto bp = createBasicRB();
+            p(0.2, circle, bp, 5, 90, getDir(), 0, 30);
+            bpq_.push(bp);
+        }
+        time_ = 2;
+        patternDelay(1);
+    }
+}
+
+void SimpleBoss::phase2() {
+    double delta = Clock::getLap();
+    if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
+        genSelfDefense();
+    }
+    else if (time_ > 0) {
+        auto bp = createBasicRB();
+        bp->sprite_->setTint(GREEN);
+        bp->setSpeed({ 100, 100 });
+        p(0.05, circle, bp, 1, 0, getRandomDir(50), 0, 30);
+        bpq_.push(bp);
+        time_ -= delta + 0.1;
+        if (time_ <= 0) {
+            patternDelay(0.5);
+        }
+    }
+    else {
+        for (int i = 0; i < 3; i++) {
+            auto bp = createBasicRB();
+            bp->sprite_->setTint(GREEN);
+            p(0.2, circle, bp, 5, 90, getDir(), 0, 30);
+            bpq_.push(bp);
+        }
+        time_ = 2;
+        patternDelay(1);
+    }
+}
+
+void SimpleBoss::phase3() {
+    double delta = Clock::getLap();
+    if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
+        genSelfDefense();
+    }
+    else if (time_ > 0) {
+        auto bp = createBasicRB();
+        bp->sprite_->setTint(BLACK);
+        bp->setSpeed({ 100, 100 });
+        p(0.05, circle, bp, 1, 0, getRandomDir(50), 0, 30);
+        bpq_.push(bp);
+        time_ -= delta + 0.1;
+        if (time_ <= 0) {
+            patternDelay(0.5);
+        }
+    }
+    else {
+        for (int i = 0; i < 3; i++) {
+            auto bp = createBasicRB();
+            bp->sprite_->setTint(BLACK);
+            p(0.2, circle, bp, 5, 90, getDir(), 0, 30);
+            bpq_.push(bp);
+        }
+        time_ = 2;
+        patternDelay(1);
+    }
 }
 
 void SimpleBoss::routine() {
     double delta = Clock::getLap();
-    time_ += delta;
-    if (getHP() <= 0) {
+    if (hp_ <= 0) {
         die();
         return;
     }
-
     if (patterns_.empty()) {
-        if (Bullet_m::waiting_bullets.empty()) {
-            auto bp = createBasicRB();
-            if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
-                bp->setCurve(10);
-                bp->ttl_ = 0.5;
-                p(0.1, circle, bp, 20, 360, getDir(), 0, 30);
-            }
-            else {
-                p(0.1, circle, bp, 10, 45, getDir(), 0.01, 40);
-            }
-            bpq_.push(bp);
+        if (hp_ > 40) {
+            phase1();
+        }
+        else if (hp_ > 20) {
+            phase2();
+        }
+        else {
+            phase3();
         }
     }
     else {
-        auto& [time, pat] = patterns_.front();
-        time -= delta;
-        if (time <= 0) {
-            pat();
-            patterns_.pop();
-            delete bpq_.front();
-            bpq_.pop();
-        }
+        execPat();
     }
+
     sprite_->routine();
 }
 

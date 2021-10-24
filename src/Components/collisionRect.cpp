@@ -13,7 +13,7 @@ CollisionRect::CollisionRect(nlohmann::json obj, GObject* father) {
     pool_id_ = -1;
 
     if (!obj.contains("collisionRect")) {
-        std::cout << "ERROR: no collision mask in json" << std::endl;
+        // std::cout << "ERROR: no collision mask in json" << std::endl;
         return;
     }
 

@@ -17,7 +17,7 @@ RigidBody::RigidBody(json obj, GObject* father) : CollisionRect(obj, father) {
     
     obj = obj["collisionRect"];
     if (!obj.contains("body")) {
-        cout << "ERROR: no rigidbody in json" << endl;
+        // cout << "ERROR: no rigidbody in json" << endl;
         return;
     }
 

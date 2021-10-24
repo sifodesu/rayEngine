@@ -24,6 +24,6 @@ public:
         }
     }
 
-private:
+protected:
     int hp_;
 };

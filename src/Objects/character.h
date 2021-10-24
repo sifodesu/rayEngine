@@ -17,4 +17,6 @@ public:
     RigidBody* body_;
 private:
     Sprite* sprite_;    
+    double dashing_;
+    
 };

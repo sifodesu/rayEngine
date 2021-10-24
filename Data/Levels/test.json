@@ -3,21 +3,19 @@
     {
         "ID": 2,
         "type": "character",
-        "sprite": {
-            "filename": "tile.png"
-        },
+
         "collisionRect": {
             "x": 100,
             "y": 100,
-            "w": 15,
-            "h": 15,
+            "w": 5,
+            "h": 5,
             "solid": true
         }
     },
     {
         "ID": 4,
         "type": "simpleBoss",
-        "hp": 5,
+        "hp": 50,
         "sprite": {
             "filename": "sans.png",
             "nb_frames": 2,

@@ -17,19 +17,29 @@ public:
     void routine();
     void draw();
 
-    void die();
-    void youpi();
 
 private:
+    Vector2 getDir();
+    Vector2 getRandomDir(double magnitude);
+    void execPat();
+
+    RigidBullet* createBasicRB();
+    void die();
+    void youpi();
+    void genSelfDefense();
+    void patternDelay(double delay);
+
+    void phase1();
+    void phase2();
+    void phase3();
+
     RigidBody* body_;
     Sprite* sprite_;
     std::queue<std::tuple<double, std::function<void()>>> patterns_;
     std::queue<Bullet*> bpq_;
     Clock clock_;
     double time_;
+    double patDelay_;
 
     Character* chara_;
-    Vector2 getDir();
-    Vector2 getRandomDir(double magnitude);
-    RigidBullet* createBasicRB();
 };
