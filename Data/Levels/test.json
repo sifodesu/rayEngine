@@ -15,7 +15,7 @@
     {
         "ID": 4,
         "type": "simpleBoss",
-        "hp": 50,
+        "hp": 60,
         "sprite": {
             "filename": "sans.png",
             "nb_frames": 2,

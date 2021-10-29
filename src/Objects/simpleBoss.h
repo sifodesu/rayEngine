@@ -21,7 +21,9 @@ public:
 private:
     Vector2 getDir();
     Vector2 getRandomDir(double magnitude);
-    void execPat();
+    Vector2 getCenterForBullet(RigidBullet* bp);
+    void execPat(bool update_pos = true);
+    void clearPatQueue();
 
     RigidBullet* createBasicRB();
     void die();
@@ -39,6 +41,8 @@ private:
     std::queue<Bullet*> bpq_;
     Clock clock_;
     double time_;
+    int subphase_;
+    int phase_;
     double patDelay_;
 
     Character* chara_;

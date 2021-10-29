@@ -60,7 +60,7 @@ void Character::routine() {
     bodySpeed = body_->getSpeed();
     if (InputMap::checkPressed("dash")) {
         if (dashing_ <= 0 && (bodySpeed.x != 0 || bodySpeed.y != 0)) {
-            dashing_ = 0.2;
+            dashing_ = 0.1;
             body_->setSpeed(Vector2Multiply(bodySpeed, { DASHFACTOR, DASHFACTOR }));
         }
     }
@@ -83,7 +83,7 @@ void Character::draw() {
 }
 
 void Character::shoot() {
-    ExplosiveBullet* bullet = (ExplosiveBullet*)Bullet_m::createBullet(EXPLOSIVE, { this });
+    RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, { this });
     bullet->setCoord(body_->getCoord());
     bullet->setSpeed({ 0, -200 });
     bullet->ttl_ = 5;

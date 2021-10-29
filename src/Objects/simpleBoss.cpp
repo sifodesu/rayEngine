@@ -2,6 +2,7 @@
 #include "pattern.h"
 #include "object_m.h"
 #include "bullet_m.h"
+#include "raymath.h"
 
 using namespace std;
 
@@ -12,6 +13,8 @@ SimpleBoss::SimpleBoss(nlohmann::json obj) : HObject(obj) {
     body_ = new RigidBody(obj, this);
     time_ = 0;
     patDelay_ = 0;
+    subphase_ = 0;
+    phase_ = 0;
     chara_ = (Character*)Object_m::getObj(t(Character));
 }
 
@@ -72,24 +75,31 @@ Vector2 SimpleBoss::getDir() {
                 chara_->body_->getCoord().y - body_->getCoord().y };
 }
 
+Vector2 SimpleBoss::getCenterForBullet(RigidBullet* bp) {
+    return { body_->getCenterCoord().x - bp->surface_->getDims().x / 2,
+                                body_->getCenterCoord().y - bp->surface_->getDims().y / 2 };
+}
+
 RigidBullet* SimpleBoss::createBasicRB() {
     RigidBullet* bp = new RigidBullet(Object_m::blueprints_[BULLET]);
     bp->setCurve(0);
     bp->setAcceleration(0);
     bp->no_dmg_ = { this };
     bp->setSpeed({ 75, 75 });
-    bp->setCoord({ body_->getCenterCoord().x - bp->surface_->getDims().x / 2,
-                            body_->getCenterCoord().y - bp->surface_->getDims().y / 2 });
+    bp->setCoord(getCenterForBullet(bp));
     bp->sprite_->setTint(RED);
     bp->ttl_ = 10;
     return bp;
 }
 
-void SimpleBoss::execPat() {
+void SimpleBoss::execPat(bool update_pos) {
     double delta = Clock::getLap();
     auto& [delay, pat] = patterns_.front();
     delay -= delta;
     if (delay <= 0) {
+        if (update_pos) {
+            bpq_.front()->setCoord(getCenterForBullet((RigidBullet*)bpq_.front()));
+        }
         pat();
         patterns_.pop();
         delete bpq_.front();
@@ -113,27 +123,43 @@ void SimpleBoss::patternDelay(double delay) {
 
 void SimpleBoss::phase1() {
     double delta = Clock::getLap();
-    if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 100) {
+    if (sqrt(pow(getDir().x, 2) + pow(getDir().y, 2)) < 80) {
         genSelfDefense();
     }
-    else if (time_ > 0) {
+    else if (subphase_ == 0) {
         auto bp = createBasicRB();
+        bp->sprite_->setTint(GREEN);
         bp->setSpeed({ 100, 100 });
-        p(0.05, circle, bp, 1, 0, getRandomDir(50), 0, 30);
+        p(0.05, circle, bp, 1, 0, getRandomDir(80), 0, 20);
         bpq_.push(bp);
+
         time_ -= delta + 0.1;
         if (time_ <= 0) {
             patternDelay(0.5);
+            subphase_ = 1;
+            // body_->setCoord({ body_->getCoord().x - 50, body_->getCoord().y });
+            time_ = 2;
         }
     }
-    else {
-        for (int i = 0; i < 3; i++) {
-            auto bp = createBasicRB();
-            p(0.2, circle, bp, 5, 90, getDir(), 0, 30);
-            bpq_.push(bp);
+    else if (subphase_ == 1) {
+        if (time_ <= 2) {
+            Vector2 dir = getDir();
+            int angle = 15;
+            for (int i = 0; i < 20; i++, dir = Vector2Rotate(dir, angle)) {
+                auto bp = createBasicRB();
+                bp->sprite_->setTint(GREEN);
+                bp->setSpeed({ 60, 60 });
+                p(0.2, circle, bp, 6, 360, dir, 0, 15);
+                bpq_.push(bp);
+            }
         }
-        time_ = 2;
-        patternDelay(1);
+        time_ -= delta + 0.1;
+        if (time_ <= 0) {
+            time_ = 2;
+            patternDelay(1);
+            subphase_ = 0;
+            // body_->setCoord({ body_->getCoord().x + 50, body_->getCoord().y });
+        }
     }
 }
 
@@ -144,7 +170,7 @@ void SimpleBoss::phase2() {
     }
     else if (time_ > 0) {
         auto bp = createBasicRB();
-        bp->sprite_->setTint(GREEN);
+        bp->sprite_->setTint(RED);
         bp->setSpeed({ 100, 100 });
         p(0.05, circle, bp, 1, 0, getRandomDir(50), 0, 30);
         bpq_.push(bp);
@@ -156,7 +182,7 @@ void SimpleBoss::phase2() {
     else {
         for (int i = 0; i < 3; i++) {
             auto bp = createBasicRB();
-            bp->sprite_->setTint(GREEN);
+            bp->sprite_->setTint(RED);
             p(0.2, circle, bp, 5, 90, getDir(), 0, 30);
             bpq_.push(bp);
         }
@@ -193,6 +219,14 @@ void SimpleBoss::phase3() {
     }
 }
 
+void SimpleBoss::clearPatQueue() {
+    while (!patterns_.empty()) {
+        patterns_.pop();
+        delete bpq_.front();
+        bpq_.pop();
+    }
+}
+
 void SimpleBoss::routine() {
     double delta = Clock::getLap();
     if (hp_ <= 0) {
@@ -204,9 +238,17 @@ void SimpleBoss::routine() {
             phase1();
         }
         else if (hp_ > 20) {
+            if (phase_ == 0) {
+                phase_++;
+                clearPatQueue();
+            }
             phase2();
         }
         else {
+            if (phase_ == 1) {
+                phase_++;
+                clearPatQueue();
+            }
             phase3();
         }
     }
@@ -219,6 +261,10 @@ void SimpleBoss::routine() {
 
 void SimpleBoss::draw() {
     sprite_->draw(body_->getCoord());
+    Vector2 lifePos = { body_->getCoord().x - 25 + body_->getDims().x / 2, body_->getCoord().y - 10 };
+    DrawRectangle(lifePos.x, lifePos.y, 50, 5, BLACK);
+    DrawRectangle(lifePos.x, lifePos.y, ceil(50 * ((double)hp_ / 60)), 5, PURPLE);
+    DrawRectangleLines(lifePos.x-1, lifePos.y, 52, 5, GRAY);
 }
 
 SimpleBoss::~SimpleBoss() {

@@ -89,7 +89,6 @@ Bullet* Bullet_m::createBullet(BulletType type, unordered_set<GObject*> no_dmg, 
         Bullet* newBullet = *pool[type].begin();
         pool[type].erase(newBullet);
         newBullet->ttl_ = 2;
-
         newBullet->no_dmg_ = no_dmg;
 
         if (!delay) {
