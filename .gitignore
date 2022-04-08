@@ -39,3 +39,11 @@ src/rayEngine.exe
 .idea/
 cmake-build-debug/
 cmake-build-release/
+
+CMakeFiles/
+cmake_install.cmake
+CMakeCache.txt
+
+CPack*.cmake
+Makefile
+rayEngine

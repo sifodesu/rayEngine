@@ -39,12 +39,7 @@ Engine::Engine() {
 }
 
 void Engine::game_loop() {
-    // Music neila = Sound_m::getSound("NEILA2.mp3");
-    // PlayMusicStream(neila);
-
     while (!WindowShouldClose()) {
-        // UpdateMusicStream(neila);
-
         BeginDrawing();
         ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
 
