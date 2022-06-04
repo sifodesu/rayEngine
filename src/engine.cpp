@@ -18,11 +18,12 @@ Engine::Engine() {
     SetTraceLogLevel(LOG_WARNING);
 #endif
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_UNDECORATED);
+    SetTraceLogLevel(LOG_NONE);
     InitWindow(0, 0, "rayEngine");
     camera_ = Raycam();
     MaximizeWindow();
     InitAudioDevice();
-    // ToggleFullscreen();
+    ToggleFullscreen();
     SetTargetFPS(420);
     screenWidth_ = GetScreenWidth();
     screenHeight_ = GetScreenHeight();
@@ -31,7 +32,7 @@ Engine::Engine() {
     Sound_m::load();
     InputMap::init();
     Object_m::loadBlueprints();
-    Object_m::loadLevel("test.json");
+    Object_m::loadLevel("hello/level_0.ldtkl");
     Bullet_m::init();
     Runes::init();
 
@@ -66,7 +67,7 @@ void Engine::game_loop() {
 }
 
 void Engine::render() {
-    std::vector<CollisionRect*> to_render = CollisionRect::query(camera_.getRect());
+    std::vector<CollisionRect*> to_render = CollisionRect::query(camera_.getRect(), false);
 
     auto comp = [](CollisionRect* a, CollisionRect* b) {
         return a->getCoord().y <= b->getCoord().y;

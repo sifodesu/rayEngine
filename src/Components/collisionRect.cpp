@@ -12,31 +12,49 @@ CollisionRect::CollisionRect(nlohmann::json obj, GObject* father) {
     father_ = father;
     pool_id_ = -1;
 
-    if (!obj.contains("collisionRect")) {
+    if (obj.contains("fieldInstances")) {
+        rect.x = obj["px"][0];
+        rect.y = obj["px"][1];
+        rect.width = obj["width"];
+        rect.height = obj["height"];
+        surface_ = rect;
+        
+        obj = obj["fieldInstances"];
+        for (auto& field : obj) {
+            if (field["__identifier"] == "solid") {
+                solid_ = field["__value"];
+            }
+            if (field["__identifier"] == "in_quad") {
+                in_quad_ = field["__value"];
+            }
+        }
+    }
+    else if (obj.contains("collisionRect")) {
+        obj = obj["collisionRect"];
+        if (obj.contains("x"))
+            rect.x = obj["x"];
+
+        if (obj.contains("y"))
+            rect.y = obj["y"];
+
+        if (obj.contains("w"))
+            rect.width = obj["w"];
+
+        if (obj.contains("h"))
+            rect.height = obj["h"];
+
+        surface_ = rect;
+
+        if (obj.contains("solid"))
+            solid_ = obj["solid"];
+
+        if (obj.contains("in_quad"))
+            in_quad_ = obj["in_quad"];
+    }
+    else {
         // std::cout << "ERROR: no collision mask in json" << std::endl;
         return;
     }
-
-    obj = obj["collisionRect"];
-    if (obj.contains("x"))
-        rect.x = obj["x"];
-
-    if (obj.contains("y"))
-        rect.y = obj["y"];
-
-    if (obj.contains("w"))
-        rect.width = obj["w"];
-
-    if (obj.contains("h"))
-        rect.height = obj["h"];
-
-    surface_ = rect;
-
-    if (obj.contains("solid"))
-        solid_ = obj["solid"];
-
-    if (obj.contains("in_quad"))
-        in_quad_ = obj["in_quad"];
 
     if (in_quad_) {
         if (pool.size()) {

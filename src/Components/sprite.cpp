@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "sprite.h"
 #include "texture_m.h"
 using json = nlohmann::json;
@@ -12,24 +13,56 @@ Sprite::Sprite(std::string filename, int nb_frames, int speed)
 }
 
 Sprite::Sprite(json obj) : index_(0), ttl_frame_(0), speed_(0), nb_frames_(1), tint_(WHITE) {
-    if (!obj.contains("sprite")) {
-        cout << "ERROR: no sprite from json" << endl;
+    if (obj.contains("fieldInstances")) {
+        obj = obj["fieldInstances"];
+        for (auto& field : obj) {
+            if (field["__identifier"] == "sprite_filename") {
+                filename_ = (field["__value"]);
+                std::stringstream ss(filename_);
+                std::string s;
+                while (std::getline(ss, s, '/')) {
+                    if (s.empty())
+                        break;
+                    filename_ = s;
+                }
+            }
+            if (field["__identifier"] == "sprite_nb_frames") {
+                nb_frames_ = field["__value"];
+            }
+            if (field["__identifier"] == "sprite_speed") {
+                speed_ = field["__value"];
+            }
+        }
+    }
+    //legacy
+    else if (obj.contains("sprite")) {
+        obj = obj["sprite"];
+        if (obj.contains("filename")) {
+            filename_ = obj["filename"];
+            std::stringstream ss(filename_);
+            std::string s;
+            while (std::getline(ss, s, '/')) {
+                if (s.empty())
+                    break;
+                filename_ = s;
+            }
+        }
+
+        if (obj.contains("nb_frames"))
+            nb_frames_ = obj["nb_frames"];
+
+        if (obj.contains("speed"))
+            speed_ = obj["speed"];
+    }
+    else {
+        // cout << "ERROR: no sprite from json" << endl;
         return;
     }
-    obj = obj["sprite"];
-    if (obj.contains("filename"))
-        filename_ = obj["filename"];
-
-    if (obj.contains("nb_frames"))
-        nb_frames_ = obj["nb_frames"];
-
-    if (obj.contains("speed"))
-        speed_ = obj["speed"];
-
 
 
     sprite_sheet_ = Texture_m::getTexture(filename_);
 }
+
 
 void Sprite::routine() {
     if (speed_)

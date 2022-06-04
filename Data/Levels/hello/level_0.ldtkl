@@ -1,0 +1,154 @@
+{
+	"__header__": {
+		"fileType": "LDtk Project JSON",
+		"app": "LDtk",
+		"doc": "https://ldtk.io/json",
+		"schema": "https://ldtk.io/files/JSON_SCHEMA.json",
+		"appAuthor": "Sebastien 'deepnight' Benard",
+		"appVersion": "1.1.3",
+		"url": "https://ldtk.io"
+	},
+	"identifier": "level_0",
+	"iid": "4eb580e1-dbe0-11ec-8b0c-bd9ee9a7642e",
+	"uid": 0,
+	"worldX": 0,
+	"worldY": 0,
+	"worldDepth": 0,
+	"pxWid": 680,
+	"pxHei": 296,
+	"__bgColor": "#000000",
+	"bgColor": null,
+	"useAutoIdentifier": true,
+	"bgRelPath": "../Textures/entry.png",
+	"bgPos": "Unscaled",
+	"bgPivotX": 0.5,
+	"bgPivotY": 0.5,
+	"__smartColor": "#737373",
+	"__bgPos": { "topLeftPx": [0,18], "scale": [1,1], "cropRect": [0,0,680,260] },
+	"externalRelPath": null,
+	"fieldInstances": [],
+	"layerInstances": [
+		{
+			"__identifier": "entities",
+			"__type": "Entities",
+			"__cWid": 34,
+			"__cHei": 15,
+			"__gridSize": 20,
+			"__opacity": 1,
+			"__pxTotalOffsetX": 0,
+			"__pxTotalOffsetY": 0,
+			"__tilesetDefUid": null,
+			"__tilesetRelPath": null,
+			"iid": "cd47bd50-dbe0-11ec-b5ff-c5e3cf8478aa",
+			"levelId": 0,
+			"layerDefUid": 16,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"visible": true,
+			"optionalRules": [],
+			"intGridCsv": [],
+			"autoLayerTiles": [],
+			"seed": 6238565,
+			"overrideTilesetUid": null,
+			"gridTiles": [],
+			"entityInstances": [
+				{
+					"__identifier": "sans",
+					"__grid": [8,5],
+					"__pivot": [0,0],
+					"__tags": [],
+					"__tile": { "tilesetUid": 1, "x": 0, "y": 0, "w": 20, "h": 20 },
+					"__smartColor": "#94D9B3",
+					"iid": "d00dbb20-dbe0-11ec-b5ff-e9ad7dbe1344",
+					"width": 16,
+					"height": 16,
+					"defUid": 11,
+					"px": [160,100],
+					"fieldInstances": [
+						{ "__identifier": "type", "__value": "simpleBoss", "__type": "String", "__tile": null, "defUid": 12, "realEditorValues": [] },
+						{ "__identifier": "hp", "__value": 60, "__type": "Int", "__tile": null, "defUid": 13, "realEditorValues": [] },
+						{ "__identifier": "sprite_filename", "__value": "../Textures/sans.png", "__type": "FilePath", "__tile": null, "defUid": 18, "realEditorValues": [{
+							"id": "V_String",
+							"params": ["../Textures/sans.png"]
+						}] },
+						{ "__identifier": "sprite_speed", "__value": 200, "__type": "Int", "__tile": null, "defUid": 20, "realEditorValues": [] },
+						{ "__identifier": "sprite_nb_frames", "__value": 2, "__type": "Int", "__tile": null, "defUid": 21, "realEditorValues": [] },
+						{ "__identifier": "solid", "__value": true, "__type": "Bool", "__tile": null, "defUid": 22, "realEditorValues": [{
+							"id": "V_Bool",
+							"params": [ true ]
+						}] }
+					]
+				},
+				{
+					"__identifier": "sans",
+					"__grid": [15,4],
+					"__pivot": [0,0],
+					"__tags": [],
+					"__tile": { "tilesetUid": 1, "x": 0, "y": 0, "w": 20, "h": 20 },
+					"__smartColor": "#94D9B3",
+					"iid": "906e8870-dbe0-11ec-b5ff-dfa40ebcd89c",
+					"width": 16,
+					"height": 16,
+					"defUid": 11,
+					"px": [300,80],
+					"fieldInstances": [
+						{ "__identifier": "type", "__value": "simpleBoss", "__type": "String", "__tile": null, "defUid": 12, "realEditorValues": [] },
+						{ "__identifier": "hp", "__value": 60, "__type": "Int", "__tile": null, "defUid": 13, "realEditorValues": [] },
+						{ "__identifier": "sprite_filename", "__value": "../Textures/sans.png", "__type": "FilePath", "__tile": null, "defUid": 18, "realEditorValues": [{
+							"id": "V_String",
+							"params": ["../Textures/sans.png"]
+						}] },
+						{ "__identifier": "sprite_speed", "__value": 500, "__type": "Int", "__tile": null, "defUid": 20, "realEditorValues": [{ "id": "V_Int", "params": [500] }] },
+						{ "__identifier": "sprite_nb_frames", "__value": 2, "__type": "Int", "__tile": null, "defUid": 21, "realEditorValues": [] },
+						{ "__identifier": "solid", "__value": true, "__type": "Bool", "__tile": null, "defUid": 22, "realEditorValues": [{
+							"id": "V_Bool",
+							"params": [ true ]
+						}] }
+					]
+				}
+			]
+		},
+		{
+			"__identifier": "intgrid",
+			"__type": "IntGrid",
+			"__cWid": 34,
+			"__cHei": 15,
+			"__gridSize": 20,
+			"__opacity": 1,
+			"__pxTotalOffsetX": 0,
+			"__pxTotalOffsetY": 0,
+			"__tilesetDefUid": 1,
+			"__tilesetRelPath": "../Textures/inv.png",
+			"iid": "6b902bc0-dbe0-11ec-b5ff-15efc7a964b2",
+			"levelId": 0,
+			"layerDefUid": 2,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"visible": true,
+			"optionalRules": [],
+			"intGridCsv": [
+				1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,
+				1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,
+				0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,1,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1,1,1,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,
+				0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,1,1,1,1,1,1,1,1,1,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0,
+				0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,
+				1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+			],
+			"autoLayerTiles": [],
+			"seed": 7832742,
+			"overrideTilesetUid": null,
+			"gridTiles": [],
+			"entityInstances": []
+		}
+	],
+	"__neighbours": []
+}

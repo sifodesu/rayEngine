@@ -6,4 +6,4 @@ private:
     //runes
     //chara
     
-}
+};

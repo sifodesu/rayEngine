@@ -12,8 +12,8 @@
 using json = nlohmann::json;
 using namespace std;
 
-std::map<BPE, json> Object_m::blueprints_;	// ents which cannot be placed on a map
-std::map<int, GObject*> Object_m::level_ents_;	// ents of the current level
+std::map<BPE, json> Object_m::blueprints_;      // ents which cannot be placed on a map
+std::map<int, GObject*> Object_m::level_ents_; // ents of the current level
 
 std::string Object_m::level_name_;
 
@@ -91,16 +91,75 @@ void Object_m::loadLevel(string level_name) {
 
     json objArray;
     file >> objArray;
-
-    for (auto& ojs : objArray) {
-        createObjJson(ojs);
+    if (objArray.contains("bgRelPath")) {
+        json newBasic;
+        newBasic["ID"] = genID();
+        newBasic["type"] = "basic";
+        newBasic["collisionRect"] = { {"x", objArray["__bgPos"]["topLeftPx"][0]},
+                                        {"y", objArray["__bgPos"]["topLeftPx"][1]}
+        };
+        newBasic["sprite"] = { {"filename", objArray["bgRelPath"]} };
+        createObjJson(newBasic);
     }
+    objArray = objArray["layerInstances"];
+    for (auto& ojs : objArray) {
+        if (ojs["__type"] == "IntGrid") {
+            int gridSize = ojs["__gridSize"];
+            int width = ojs["__cWid"];
+            int height = ojs["__cHei"];
+            for (int h = 0; h < height; h++) {
+                for (int w = 0; w < width; w++) {
+                    int content = ojs["intGridCsv"][w + width * h];
+                    if (!content)
+                        continue;
+                    json newBasic;
+                    newBasic["ID"] = genID();
+                    newBasic["type"] = "basic";
+                    newBasic["collisionRect"] = { {"x", w * gridSize},
+                                                    {"y", h * gridSize},
+                                                    {"w", gridSize},
+                                                    {"h", gridSize},
+                                                    {"solid", content == 1}
+                    };
+                    createObjJson(newBasic);
+                }
+            }
+        }
+        if (ojs["__type"] == "Entities") {
+            ojs = ojs["entityInstances"];
+            for (auto& obj : ojs) {
+                obj["ID"] = genID();
+                for (auto& field : obj["fieldInstances"]) {
+                    if (field["__identifier"] == "type") {
+                        obj["type"] = field["__value"];
+                        break;
+                    }
+                }
+                if (obj.contains("type")) {
+                    createObjJson(obj);
+                }
+                else
+                    std::cout << "ERROR: Ent with no type" << std::endl;
+            }
+        }
+    }
+    json newBasic;
+    newBasic["ID"] = genID();
+    newBasic["type"] = "character";
+    newBasic["collisionRect"] = { {"x", 100},
+                                    {"y", 100},
+                                    {"w", 5},
+                                    {"h", 5},
+                                    {"solid", true}
+    };
+    createObjJson(newBasic);
+
     file.close();
 }
 
 void Object_m::deleteObj(int id) {
     if (level_ents_.contains(id)) {
-        delete(level_ents_[id]);
+        delete (level_ents_[id]);
         level_ents_.erase(id);
     }
 }
@@ -123,7 +182,6 @@ void Object_m::routine() {
         deleteObj(id);
     }
 }
-
 
 void Object_m::unload() {
     for (auto& [id, obj] : level_ents_)

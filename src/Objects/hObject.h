@@ -10,10 +10,18 @@
 class HObject : public GObject {
 public:
     HObject(nlohmann::json obj) : GObject(obj["ID"]), hp_(5) {
-        if (obj.contains("hp")){
+        if (obj.contains("fieldInstances")) {
+            obj = obj["fieldInstances"];
+            for (auto& field : obj) {
+                if (field["__identifier"] == "hp") {
+                    hp_ = field["__value"];
+                }
+            }
+        }
+        else if (obj.contains("hp")) {
             hp_ = obj["hp"];
         }
-    }
+    };
     int getHP() { return hp_; };
     void setHP(int hp) { hp_ = hp; }
     void changeHP(int delta) { hp_ += delta; };

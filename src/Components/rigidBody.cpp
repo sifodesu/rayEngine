@@ -23,7 +23,6 @@ RigidBody::RigidBody(json obj, GObject* father) : CollisionRect(obj, father) {
 
     obj = obj["body"];
 
-
     if (obj.contains("acceleration"))
         acceleration_ = obj["acceleration"];
 

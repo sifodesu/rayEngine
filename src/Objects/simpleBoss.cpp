@@ -264,7 +264,7 @@ void SimpleBoss::draw() {
     Vector2 lifePos = { body_->getCoord().x - 25 + body_->getDims().x / 2, body_->getCoord().y - 10 };
     DrawRectangle(lifePos.x, lifePos.y, 50, 5, BLACK);
     DrawRectangle(lifePos.x, lifePos.y, ceil(50 * ((double)hp_ / 60)), 5, PURPLE);
-    DrawRectangleLines(lifePos.x-1, lifePos.y, 52, 5, GRAY);
+    DrawRectangleLines(lifePos.x - 1, lifePos.y, 52, 5, GRAY);
 }
 
 SimpleBoss::~SimpleBoss() {
