@@ -9,25 +9,19 @@
 #include "gObject.h"
 #include "definitions.h"
 
-enum BPE {
-    BULLET
-};
-
 class Object_m {
 public:
-    static void loadBlueprints();
     static void loadLevel(std::string level_name);
     static void unload();
     static void routine();
-    static GObject* createObj(BPE target);
-    static GObject* getObj(std::string type);
-
+    static int genID();
     static std::map<int, GObject*> level_ents_;	// ents of the current level
-    static std::map<BPE, nlohmann::json> blueprints_;	// ents which cannot be placed on a map
+    static std::map<int, GObject*> level_tiles_;
+
+    static GObject* createObjJson(nlohmann::json ojs);
 
 private:
-    static GObject* createObjJson(nlohmann::json ojs);
-    static int genID();
     static void deleteObj(int id);
     static std::string level_name_;
+    static int idCounter;
 };

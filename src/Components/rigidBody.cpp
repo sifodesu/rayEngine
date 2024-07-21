@@ -2,7 +2,6 @@
 #include "rigidBody.h"
 #include "math.h"
 #include "float.h"
-#include "bullet.h"
 #include "definitions.h"
 
 
@@ -22,7 +21,6 @@ RigidBody::RigidBody(json obj, GObject* father) : CollisionRect(obj, father) {
     }
 
     obj = obj["body"];
-
 
     if (obj.contains("acceleration"))
         acceleration_ = obj["acceleration"];
@@ -58,19 +56,19 @@ void RigidBody::fixSpeed() {
     if (solid_) {
         Rectangle fixSpeed = getSurface();
         if (speed_.x > 0)
-            fixSpeed.width += 1;
+            fixSpeed.width += 0.1;
         if (speed_.x < 0)
-            fixSpeed.x -= 1;
-        for (CollisionRect* body : query(fixSpeed))
+            fixSpeed.x -= 0.1;
+        for (CollisionRect* body : query(fixSpeed, true, true))
             if (body->isSolid() && (body->getId() != pool_id_))
                 speed_.x = 0;
 
         fixSpeed = getSurface();
         if (speed_.y > 0)
-            fixSpeed.height += 1;
+            fixSpeed.height += 0.1;
         if (speed_.y < 0)
-            fixSpeed.y -= 1;
-        for (CollisionRect* body : query(fixSpeed))
+            fixSpeed.y -= 0.1;
+        for (CollisionRect* body : query(fixSpeed, true, true))
             if (body->isSolid() && (body->getId() != pool_id_))
                 speed_.y = 0;
     }
@@ -97,7 +95,12 @@ void RigidBody::routine() {
         temp.x += unitSpeed.x * speedNorm;
         temp.y += unitSpeed.y * speedNorm;
         bool solid_collide = false;
-        for (CollisionRect* body : query(temp)) {
+        for (CollisionRect* body : query(temp, true, true)) {
+            if (body->isSolid() && solid_ && (body->getId() != pool_id_)) {
+                solid_collide = true;
+            }
+        }
+        for (CollisionRect* body : query(temp, false, true)) {
             if (body->isSolid() && solid_ && (body->getId() != pool_id_)) {
                 solid_collide = true;
             }

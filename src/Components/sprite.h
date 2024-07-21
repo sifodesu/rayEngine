@@ -1,29 +1,24 @@
 #pragma once
 #include <string>
-#include "objComponent.h"
 #include "clock.h"
 #include "raylib.h"
 #include "nlohmann/json.hpp"
 
-//Arbitrary design: each Sprite is ONE animation.
-class Sprite : public ObjComponent {
+// Json fields:
+// filename
+class Sprite {
 public:
-    Sprite(std::string filename, int nb_frames = 1, int speed = 0);
+    Sprite(std::string filename, Rectangle rect = {0, 0, 32, 32});
     Sprite(nlohmann::json obj);
     void draw(Vector2 pos);
     void routine();
-    void stop(int frame = 0); //freeze the animation on a specific frame
-    Vector2 getFrameDim();
-    void setTint(Color tint);
+    void setTint(Color tint) { tint_ = tint; };
     Color getTint() { return tint_; };
 
 private:
     void updateIndex();
     Texture2D sprite_sheet_;
     std::string filename_;
-    int nb_frames_;
-    int speed_;
-    int index_;
-    double ttl_frame_;
     CLITERAL(Color) tint_;
+    Rectangle source_; // portion of the spritesheet
 };

@@ -9,7 +9,6 @@ void Texture_m::load(std::string path) {
         if (!std::filesystem::is_regular_file(entry) || entry.path().extension() != ".png") {
             if (std::filesystem::is_directory(entry))
                 load(entry.path().string());
-
             continue;
         }
         textures[entry.path().filename().string()] = LoadTexture(entry.path().string().c_str());

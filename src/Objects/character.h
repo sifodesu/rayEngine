@@ -2,21 +2,21 @@
 #include <raylib.h>
 #include <nlohmann/json.hpp>
 
-#include "hObject.h"
+#include "gObject.h"
 #include "rigidBody.h"
 #include "sprite.h"
-#include "runes.h"
 
-class Character : public HObject {
+class Character : public GObject
+{
 public:
     Character(nlohmann::json obj);
     void routine();
     void draw();
-    void shoot();
+    Rectangle getRect() { return body_->getSurface(); }
 
-    RigidBody* body_;
+    RigidBody *body_;
+
 private:
-    Sprite* sprite_;    
+    Sprite *sprite_;
     double dashing_;
-    
 };

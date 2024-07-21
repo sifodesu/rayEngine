@@ -1,0 +1,14 @@
+{ "columns":2,
+ "image":"..\/Textures\/youpi.png",
+ "imageheight":32,
+ "imagewidth":64,
+ "margin":0,
+ "name":"youhou",
+ "spacing":0,
+ "tilecount":2,
+ "tiledversion":"1.11.0",
+ "tileheight":32,
+ "tilewidth":32,
+ "type":"tileset",
+ "version":"1.10"
+}

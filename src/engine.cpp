@@ -5,79 +5,69 @@
 #include "definitions.h"
 #include "rigidBody.h"
 #include "input.h"
-#include "runes.h"
 #include "basicEnt.h"
-#include "bullet_m.h"
 #include "character.h"
 #include "clock.h"
 #include "raymath.h"
 #include "sound_m.h"
+#include "raycam_m.h"
+#include "tiled_m.h"
 
-Engine::Engine() {
-#ifdef NDEBUG
+Engine::Engine()
+{
     SetTraceLogLevel(LOG_WARNING);
-#endif
-    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_UNDECORATED);
-    InitWindow(0, 0, "rayEngine");
-    camera_ = Raycam();
+    SetConfigFlags(FLAG_VSYNC_HINT);
+    InitWindow(1920, 1080, "rayEngine");
     MaximizeWindow();
     InitAudioDevice();
-    // ToggleFullscreen();
-    SetTargetFPS(420);
-    screenWidth_ = GetScreenWidth();
-    screenHeight_ = GetScreenHeight();
 
+    SetTargetFPS(120);
+
+    Raycam_m::init();
     Texture_m::load();
     Sound_m::load();
     InputMap::init();
-    Object_m::loadBlueprints();
+    Tiled_m::loadLevel("untitled.tmj");
     Object_m::loadLevel("test.json");
-    Bullet_m::init();
-    Runes::init();
-
-
 }
 
-void Engine::game_loop() {
-    while (!WindowShouldClose()) {
+void Engine::game_loop()
+{
+
+    while (!WindowShouldClose())
+    {
         BeginDrawing();
-        ClearBackground(CLITERAL(Color) { 50, 50, 50, 255 });
+        ClearBackground(CLITERAL(Color){50, 50, 50, 255});
 
         Clock::lap();
         Object_m::routine();
-        Bullet_m::routine();
-        camera_.routine();
-        Runes::routine();
+        Raycam_m::getRayCam().routine();
+
         DrawFPS(10, 10);
 
-        BeginMode2D(camera_.getCam());
+        BeginMode2D(Raycam_m::getCam());
 
         render();
-
-        //temp
-        Vector2 pos = camera_.getCam().target;
-        pos.x += 32;
-        Runes::draw(pos);
-        //
 
         EndMode2D();
         EndDrawing();
     }
 }
 
-void Engine::render() {
-    std::vector<CollisionRect*> to_render = CollisionRect::query(camera_.getRect());
+void Engine::render()
+{
 
     auto comp = [](CollisionRect* a, CollisionRect* b) {
-        return a->getCoord().y <= b->getCoord().y;
+        return a->getFather()->layer_ <= b->getFather()->layer_;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
 
+    std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), true, false);
     for (CollisionRect* body : to_render) {
-        //temp
-        if (t(*body->getFather()) == t(Character))
-            camera_.to_follow_ = (RigidBody*)body;
-
+        sorted_bodies.insert(body);
+    }
+    to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false, false);
+    for (CollisionRect* body : to_render) {
         sorted_bodies.insert(body);
     }
 
@@ -85,12 +75,13 @@ void Engine::render() {
         body->getFather()->draw();
 
         //debug blit hitboxes
-        DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
+        if (!body->is_static)
+            DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
-    Bullet_m::draw();
 }
 
-Engine::~Engine() {
+Engine::~Engine()
+{
     Texture_m::unload();
     Object_m::unload();
     CloseWindow();

@@ -2,13 +2,13 @@
 #include "rigidBody.h"
 
 Raycam::Raycam(RigidBody* to_follow) : camera_({ 0 }), to_follow_(to_follow) {
-    camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f + 400};
+    camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f };
     if (to_follow_)
         camera_.target = to_follow_->getCoord();
     camera_.zoom = (float) GetScreenWidth() / 480;
 }
 
-Camera2D Raycam::getCam() {
+Camera2D& Raycam::getCam() {
     return camera_;
 }
 
@@ -24,7 +24,7 @@ Rectangle Raycam::getRect() {
 
 void Raycam::routine() {
     if (to_follow_) {
-        auto coords = to_follow_->getCoord();
+        auto coords = to_follow_->getCenterCoord();
         camera_.target = coords;
     }
     else {

@@ -5,14 +5,21 @@
 #include "sprite.h"
 #include "rigidBody.h"
 
-class BasicEnt : public GObject {
+// Json fields:
+// sprite
+// collisionRect
+
+class BasicEnt : public GObject
+{
 public:
     BasicEnt(nlohmann::json obj);
     ~BasicEnt();
     void draw();
     void routine();
+    Rectangle getRect() { return body_->getSurface(); }
+    
+    CollisionRect *body_;
 
-    CollisionRect* body_;
 private:
-    Sprite* sprite_;
+    Sprite *sprite_;
 };

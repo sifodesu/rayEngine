@@ -1,23 +1,19 @@
 #include "character.h"
-#include "input.h"
-#include "runes.h"
 #include "object_m.h"
-#include "bullet.h"
-#include "pattern.h"
 #include "functional"
-#include "bullet_m.h"
-#include "rigidBullet.h"
-#include "zigzagBullet.h"
-#include "explosiveBullet.h"
 #include "raymath.h"
+#include "input.h"
+#include "raycam_m.h"
 
 #define SPEED 100
 #define DASHFACTOR 4
 
-Character::Character(nlohmann::json obj) : HObject(obj) {
+Character::Character(nlohmann::json obj) : GObject(Object_m::genID()) {
     sprite_ = new Sprite(obj);
     body_ = new RigidBody(obj, this);
     dashing_ = 0;
+
+    Raycam_m::setTarget(body_);
 }
 
 void Character::routine() {
@@ -72,22 +68,8 @@ void Character::routine() {
     if (bodySpeed.x == 0 && bodySpeed.y == 0) {
         dashing_ = 0;
     }
-
-    while (Runes::getBullet()) {
-        shoot();
-    }
 }
 
 void Character::draw() {
     sprite_->draw(body_->getCoord());
-}
-
-void Character::shoot() {
-    RigidBullet* bullet = (RigidBullet*)Bullet_m::createBullet(RIGID, { this });
-    bullet->setCoord(body_->getCoord());
-    bullet->setSpeed({ 0, -200 });
-    bullet->ttl_ = 5;
-    bullet->sprite_->setTint(BLUE);
-    bullet->setCurve(0);
-    bullet->setAcceleration(0);
 }

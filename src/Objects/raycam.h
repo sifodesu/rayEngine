@@ -7,7 +7,7 @@ class Raycam {
 public:
     Raycam(RigidBody* to_follow = NULL);
     void routine();
-    Camera2D getCam();
+    Camera2D& getCam();
     Rectangle getRect();
 
     RigidBody* to_follow_;

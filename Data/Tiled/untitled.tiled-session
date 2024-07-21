@@ -1,0 +1,40 @@
+{
+    "activeFile": "untitled.tmj",
+    "expandedProjectPaths": [
+        "."
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+        "untitled.tmj": {
+            "scale": 1,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 328,
+                "y": 161
+            }
+        },
+        "yayayaaaa.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        },
+        "youhou.tsj": {
+            "scaleInDock": 1,
+            "scaleInEditor": 1
+        }
+    },
+    "last.imagePath": "C:/Users/Sifodesu/Documents/rayEngine/Data/Textures",
+    "last.objectTemplatePath": "C:/Users/Sifodesu/Documents/rayEngine/Data/Tiled",
+    "openFiles": [
+        "untitled.tmj",
+        "youhou.tsj",
+        "yayayaaaa.tsj"
+    ],
+    "project": "untitled.tiled-project",
+    "property.type": "file",
+    "recentFiles": [
+        "yayayaaaa.tsj",
+        "youhou.tsj",
+        "untitled.tmj"
+    ],
+    "tileset.lastUsedFormat": "json"
+}
