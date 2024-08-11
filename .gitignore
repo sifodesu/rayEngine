@@ -47,3 +47,4 @@ CMakeCache.txt
 CPack*.cmake
 Makefile
 rayEngine
+*.tiled-session
