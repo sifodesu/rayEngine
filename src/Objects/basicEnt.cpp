@@ -1,14 +1,21 @@
 #include <iostream>
 #include "basicEnt.h"
-#include "object_m.h"
 
-using json = nlohmann::json;
 using namespace std;
 
-BasicEnt::BasicEnt(json obj) : GObject(Object_m::genID())
-{
-    sprite_ = new Sprite(obj);
-    body_ = new CollisionRect(obj, this);
+BasicEnt::BasicEnt(const SpawnData& data) : GObject(data.id) {
+    if (data.sprite) {
+        sprite_ = new Sprite(data.sprite->filename, data.sprite->source);
+        sprite_->setTint(data.sprite->tint);
+    } else {
+        std::string fallback2 = "inv.png";
+        sprite_ = new Sprite(fallback2, Rectangle{0, 0, 32, 32});
+    }
+    if (data.collision) {
+        body_ = new CollisionRect(*data.collision, this);
+    } else {
+        body_ = new CollisionRect(CollisionDesc{}, this);
+    }
 }
 
 BasicEnt::~BasicEnt()

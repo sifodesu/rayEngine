@@ -1,15 +1,16 @@
 #pragma once
 #include <string>
 #include <raylib.h>
-#include <nlohmann/json.hpp>
 #include "Quadtree.h"
 #include "gObject.h"
+#include "spawn.h"
 
 // Json fields:
 // int(x y w h) bool(solid)
 class CollisionRect {
 public:
-    CollisionRect(nlohmann::json obj, GObject* father);
+    CollisionRect(const CollisionDesc& desc, GObject* father);
+    virtual ~CollisionRect();
     void setCoord(Vector2 pos);
     void setDims(Vector2 dims);
     void setSurface(Rectangle surf) { surface_ = surf; }

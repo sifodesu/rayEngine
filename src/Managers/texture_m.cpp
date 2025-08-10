@@ -21,7 +21,10 @@ void Texture_m::unload() {
 }
 
 Texture2D Texture_m::getTexture(std::string filename) {
-    if (!textures.contains(filename))
-        return textures["inv.png"];
-    return textures[filename];
+    auto it = textures.find(filename);
+    if (it != textures.end()) return it->second;
+    auto fallback = textures.find("inv.png");
+    if (fallback != textures.end()) return fallback->second;
+    // Return empty texture if nothing else is available
+    return Texture2D{};
 }

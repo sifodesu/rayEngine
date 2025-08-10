@@ -14,18 +14,21 @@ void InputMap::init() {
     mapping["dash"] = KEY_LEFT_SHIFT;
 }
 
+static inline int getKeyFor(const std::string& action) {
+    auto it = InputMap::mapping.find(action);
+    if (it == InputMap::mapping.end()) return 0;
+    return it->second;
+}
+
 bool InputMap::checkDown(std::string action) {
-    if (IsKeyDown(mapping[action]))
-        return true;
-    return false;
+    int key = getKeyFor(action);
+    return key != 0 && IsKeyDown(key);
 }
 bool InputMap::checkPressed(std::string action) {
-    if (IsKeyPressed(mapping[action]))
-        return true;
-    return false;
+    int key = getKeyFor(action);
+    return key != 0 && IsKeyPressed(key);
 }
 bool InputMap::checkUp(std::string action) {
-    if (IsKeyUp(mapping[action]))
-        return true;
-    return false;
+    int key = getKeyFor(action);
+    return key != 0 && IsKeyUp(key);
 }

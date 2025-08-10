@@ -1,6 +1,6 @@
 #pragma once
 #include <raylib.h>
-#include <nlohmann/json.hpp>
+#include "spawn.h"
 
 #include "gObject.h"
 #include "rigidBody.h"
@@ -9,7 +9,7 @@
 class Character : public GObject
 {
 public:
-    Character(nlohmann::json obj);
+    explicit Character(const SpawnData& data);
     void routine();
     void draw();
     Rectangle getRect() { return body_->getSurface(); }

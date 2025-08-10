@@ -1,15 +1,11 @@
 #pragma once
 #include <string>
-#include "clock.h"
 #include "raylib.h"
-#include "nlohmann/json.hpp"
+#include "clock.h"
 
-// Json fields:
-// filename
 class Sprite {
 public:
-    Sprite(std::string filename, Rectangle rect = {0, 0, 32, 32});
-    Sprite(nlohmann::json obj);
+    Sprite(const std::string& filename, Rectangle rect = Rectangle{0, 0, 32, 32});
     void draw(Vector2 pos);
     void routine();
     void setTint(Color tint) { tint_ = tint; };
@@ -19,6 +15,6 @@ private:
     void updateIndex();
     Texture2D sprite_sheet_;
     std::string filename_;
-    CLITERAL(Color) tint_;
     Rectangle source_; // portion of the spritesheet
+    CLITERAL(Color) tint_;
 };

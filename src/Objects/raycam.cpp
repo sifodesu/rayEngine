@@ -1,7 +1,7 @@
 #include "raycam.h"
 #include "rigidBody.h"
 
-Raycam::Raycam(RigidBody* to_follow) : camera_({ 0 }), to_follow_(to_follow) {
+Raycam::Raycam(RigidBody* to_follow) : to_follow_(to_follow), camera_{} {
     camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f };
     if (to_follow_)
         camera_.target = to_follow_->getCoord();

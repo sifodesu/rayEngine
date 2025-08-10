@@ -1,16 +1,13 @@
-#include <fstream>
-#include "definitions.h"
 #include "object_m.h"
 #include "sprite.h"
 #include "rigidBody.h"
 #include "basicEnt.h"
 #include "character.h"
 
-using json = nlohmann::json;
 using namespace std;
 
-std::map<int, GObject *> Object_m::level_ents_;  // ents of the current level
-std::map<int, GObject *> Object_m::level_tiles_; // won't call routines on them
+std::map<int, std::unique_ptr<GObject>> Object_m::level_ents_;  // ents of the current level
+std::map<int, std::unique_ptr<GObject>> Object_m::level_tiles_; // won't call routines on them
 int Object_m::idCounter = 0;
 
 std::string Object_m::level_name_;
@@ -20,61 +17,30 @@ int Object_m::genID()
     return ++idCounter;
 }
 
-GObject *Object_m::createObjJson(json ojs)
+GObject* Object_m::createFromSpawn(const SpawnData& data)
 {
-    ojs["ID"] = genID();
-
-    if (!ojs.contains("type"))
-    {
-        cout << "Error: object with no type" << endl;
-        return NULL;
+    std::unique_ptr<GObject> obj;
+    if (data.type == "tile" || data.type == "basic") {
+        obj = std::make_unique<BasicEnt>(data);
+    } else if (data.type == "character") {
+        obj = std::make_unique<Character>(data);
+    } else {
+        return nullptr;
     }
-    GObject *cur = NULL;
-    if (ojs["type"] == "basic")
-        cur = new BasicEnt(ojs);
-    if (ojs["type"] == "tile")
-        cur = new BasicEnt(ojs);
-    if (ojs["type"] == "character")
-        cur = new Character(ojs);
-    if (cur)
-    {
-        if (ojs.contains("layer"))
-            cur->layer_ = ojs["layer"];
-        if (ojs["type"] == "tile")
-            level_tiles_[ojs["ID"]] = cur;
-        else
-            level_ents_[ojs["ID"]] = cur;
-    }
-    return cur;
+    obj->layer_ = data.layer;
+    GObject* raw = obj.get();
+    if (data.type == "tile")
+        level_tiles_.emplace(data.id, std::move(obj));
+    else
+        level_ents_.emplace(data.id, std::move(obj));
+    return raw;
 }
 
-void Object_m::loadLevel(string level_name)
-{
-    std::ifstream file((LEVELS_PATH + level_name).c_str());
-    if (!file)
-    {
-        cout << "Error: Couldn't load the level " << level_name << endl;
-        return;
-    }
-    // level_ents_.clear();
-
-    json objArray;
-    file >> objArray;
-
-    for (auto &ojs : objArray)
-    {
-        createObjJson(ojs);
-    }
-    file.close();
-}
+ 
 
 void Object_m::deleteObj(int id)
 {
-    if (level_ents_.contains(id))
-    {
-        delete (level_ents_[id]);
-        level_ents_.erase(id);
-    }
+    level_ents_.erase(id);
 }
 
 void Object_m::routine()
@@ -101,7 +67,12 @@ void Object_m::routine()
 
 void Object_m::unload()
 {
-    for (auto &[id, obj] : level_ents_)
-        delete (obj);
     level_ents_.clear();
+    level_tiles_.clear();
+}
+
+void Object_m::clearTiles()
+{
+    // Safely destroy tiles and let CollisionRect dtor remove from quadtree
+    level_tiles_.clear();
 }

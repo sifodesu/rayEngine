@@ -10,22 +10,23 @@
 #include "Quadtree.h"
 #include "clock.h"
 #include "collisionRect.h"
+#include "spawn.h"
 
 class RigidBody : public CollisionRect {
 public:
-    RigidBody(nlohmann::json obj, GObject* father);
+    RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* father);
 
     void setSpeed(Vector2 speed);
     void setCurve(double curve);
     void setAcceleration(double acc);
     Vector2 getSpeed();
-    bool isSolid();
     void routine();
 
 private:
     Vector2 speed_;
     double acceleration_;
     double curve_;
+    double mass_;
 
-    void fixSpeed();    //set to 0 if collision
+    void fixSpeed();    // set to 0 if collision ahead
 };

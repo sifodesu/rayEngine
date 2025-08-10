@@ -6,48 +6,25 @@ std::map<int, CollisionRect*>  CollisionRect::pool;
 
 using namespace std;
 
-CollisionRect::CollisionRect(nlohmann::json obj, GObject* father) {
-    Rectangle rect{ 0.0f };
-    solid_ = true;
+CollisionRect::CollisionRect(const CollisionDesc& desc, GObject* father) {
     father_ = father;
-    is_static = true;
+    surface_ = desc.rect;
+    solid_ = desc.solid;
+    is_static = desc.isStatic;
     pool_id_ = -1;
 
-    if (!obj.contains("collisionRect")) {
-        // std::cout << "ERROR: no collision mask in json" << std::endl;
-        return;
-    }
-
-    obj = obj["collisionRect"];
-    if (obj.contains("x"))
-        rect.x = obj["x"];
-
-    if (obj.contains("y"))
-        rect.y = obj["y"];
-
-    if (obj.contains("w"))
-        rect.width = obj["w"];
-
-    if (obj.contains("h"))
-        rect.height = obj["h"];
-
-    surface_ = rect;
-
-    if (obj.contains("solid"))
-        solid_ = obj["solid"];
-    
-    if (obj.contains("static"))
-        is_static = obj["static"];
-
-    
     if (pool.size()) {
         pool_id_ = (--pool.end())->first + 1;
-    }
-    else {
+    } else {
         pool_id_ = 0;
     }
     pool[pool_id_] = this;
-    add();   
+    add();
+}
+
+CollisionRect::~CollisionRect() {
+    remove();
+    pool.erase(pool_id_);
 }
 
 void CollisionRect::setCoord(Vector2 pos) {

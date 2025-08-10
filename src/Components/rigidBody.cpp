@@ -1,41 +1,15 @@
-#include <iostream>
 #include "rigidBody.h"
-#include "math.h"
-#include "float.h"
-#include "definitions.h"
-
-
-using json = nlohmann::json;
-using namespace std;
+#include <algorithm>
+#include <cmath>
+#include <cfloat>
 
 //TODO: handle case when out of box quad
-RigidBody::RigidBody(json obj, GObject* father) : CollisionRect(obj, father) {
-    speed_ = { 0 };
-    acceleration_ = 0;
-    curve_ = 0;
-    
-    obj = obj["collisionRect"];
-    if (!obj.contains("body")) {
-        // cout << "ERROR: no rigidbody in json" << endl;
-        return;
-    }
-
-    obj = obj["body"];
-
-    if (obj.contains("acceleration"))
-        acceleration_ = obj["acceleration"];
-
-    if (obj.contains("curve"))
-        curve_ = obj["curve"];
-
-    if (obj.contains("speed")) {
-        if (obj["speed"].contains("x")) {
-            speed_.x = obj["speed"]["x"];
-        }
-        if (obj["speed"].contains("y")) {
-            speed_.y = obj["speed"]["y"];
-        }
-    }
+RigidBody::RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* father)
+    : CollisionRect(col, father) {
+    speed_ = body.speed;
+    acceleration_ = body.acceleration;
+    curve_ = body.curve;
+    mass_ = body.gravityAcceleration;
 }
 
 
@@ -53,66 +27,104 @@ Vector2 RigidBody::getSpeed() {
     return speed_;
 }
 void RigidBody::fixSpeed() {
-    if (solid_) {
-        Rectangle fixSpeed = getSurface();
-        if (speed_.x > 0)
-            fixSpeed.width += 0.1;
-        if (speed_.x < 0)
-            fixSpeed.x -= 0.1;
-        for (CollisionRect* body : query(fixSpeed, true, true))
-            if (body->isSolid() && (body->getId() != pool_id_))
-                speed_.x = 0;
+    if (!solid_) return;
 
-        fixSpeed = getSurface();
-        if (speed_.y > 0)
-            fixSpeed.height += 0.1;
-        if (speed_.y < 0)
-            fixSpeed.y -= 0.1;
-        for (CollisionRect* body : query(fixSpeed, true, true))
-            if (body->isSolid() && (body->getId() != pool_id_))
-                speed_.y = 0;
+    // Probe slightly ahead in X
+    Rectangle probeRect = getSurface();
+    if (speed_.x > 0.0f) {
+        probeRect.width += 0.1f;
+    } else if (speed_.x < 0.0f) {
+        probeRect.x -= 0.1f;
+        probeRect.width += 0.1f;
+    }
+    if (speed_.x != 0.0f) {
+        for (CollisionRect* body : query(probeRect, true, true)) {
+            if (body->isSolid() && (body->getId() != pool_id_)) { speed_.x = 0.0f; break; }
+        }
+        if (speed_.x != 0.0f) {
+            for (CollisionRect* body : query(probeRect, false, true)) {
+                if (body->isSolid() && (body->getId() != pool_id_)) { speed_.x = 0.0f; break; }
+            }
+        }
+    }
+
+    // Probe slightly ahead in Y
+    probeRect = getSurface();
+    if (speed_.y > 0.0f) {
+        probeRect.height += 0.1f;
+    } else if (speed_.y < 0.0f) {
+        probeRect.y -= 0.1f;
+        probeRect.height += 0.1f;
+    }
+    if (speed_.y != 0.0f) {
+        for (CollisionRect* body : query(probeRect, true, true)) {
+            if (body->isSolid() && (body->getId() != pool_id_)) { speed_.y = 0.0f; break; }
+        }
+        if (speed_.y != 0.0f) {
+            for (CollisionRect* body : query(probeRect, false, true)) {
+                if (body->isSolid() && (body->getId() != pool_id_)) { speed_.y = 0.0f; break; }
+            }
+        }
     }
 }
 
 void RigidBody::routine() {
     float delta = (float)Clock::getLap();
-    if (abs(speed_.x) < FLT_EPSILON && abs(speed_.y) < FLT_EPSILON)
+    
+    if (delta > 0.2)
         return;
 
-    float tempX = cos(curve_ * delta) * speed_.x - sin(curve_ * delta) * speed_.y;
-    float tempY = sin(curve_ * delta) * speed_.x + cos(curve_ * delta) * speed_.y;
+    if (mass_)
+        speed_.y += mass_ * delta;
+
+    if (std::fabs(speed_.x) < FLT_EPSILON && std::fabs(speed_.y) < FLT_EPSILON)
+        return;
+
+    float tempX = std::cos(curve_ * delta) * speed_.x - std::sin(curve_ * delta) * speed_.y;
+    float tempY = std::sin(curve_ * delta) * speed_.x + std::cos(curve_ * delta) * speed_.y;
     speed_ = { tempX, tempY };
 
     fixSpeed();
 
     remove();
 
-    float speedNorm = sqrt(pow(speed_.x * delta, 2) + pow(speed_.y * delta, 2));
-    Vector2 unitSpeed = { speed_.x * delta / speedNorm, speed_.y * delta / speedNorm };
+    // Move forward incrementally until a collision would occur, then stop at last free position
+    const float maxDistance = static_cast<float>(std::hypot(speed_.x * delta, speed_.y * delta));
+    if (maxDistance > 0.0f) {
+        Vector2 unitDir = { (speed_.x * delta) / maxDistance, (speed_.y * delta) / maxDistance };
+        const float stepSize = 0.1f; // world units per step
+        const Rectangle startRect = getSurface();
+        Rectangle lastFree = startRect;
 
-    while (speedNorm > 0) {
-        Rectangle temp = getSurface();
-        temp.x += unitSpeed.x * speedNorm;
-        temp.y += unitSpeed.y * speedNorm;
-        bool solid_collide = false;
-        for (CollisionRect* body : query(temp, true, true)) {
-            if (body->isSolid() && solid_ && (body->getId() != pool_id_)) {
-                solid_collide = true;
+        auto collides = [&](const Rectangle &rect) -> bool {
+            // Check against static
+            for (CollisionRect* body : query(rect, true, true)) {
+                if (body->isSolid() && solid_ && (body->getId() != pool_id_))
+                    return true;
             }
-        }
-        for (CollisionRect* body : query(temp, false, true)) {
-            if (body->isSolid() && solid_ && (body->getId() != pool_id_)) {
-                solid_collide = true;
+            // And dynamic
+            for (CollisionRect* body : query(rect, false, true)) {
+                if (body->isSolid() && solid_ && (body->getId() != pool_id_))
+                    return true;
             }
+            return false;
+        };
+
+        float travelled = 0.0f;
+        while (travelled < maxDistance) {
+            float advance = std::min(stepSize, maxDistance - travelled);
+            Rectangle next = lastFree;
+            next.x += unitDir.x * advance;
+            next.y += unitDir.y * advance;
+
+            if (collides(next)) {
+                break; // stop right before collision
+            }
+            lastFree = next;
+            travelled += advance;
         }
 
-        if (!solid_collide) {
-            setSurface(temp);
-            break;
-        }
-        else {
-            speedNorm -= 0.1;
-        }
+        setSurface(lastFree);
     }
 
     add();

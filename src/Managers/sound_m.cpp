@@ -22,7 +22,9 @@ void Sound_m::unload() {
 }
 
 Music Sound_m::getSound(std::string filename) {
-    if (!sounds.contains(filename))
-        return sounds.begin()->second;
-    return sounds[filename];
+    auto it = sounds.find(filename);
+    if (it != sounds.end()) return it->second;
+    // Return a zero-initialized Music if missing to avoid UB
+    Music empty{};
+    return empty;
 }

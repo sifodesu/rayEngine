@@ -1,9 +1,9 @@
 #pragma once
 #include <raylib.h>
-#include <nlohmann/json.hpp>
 #include "gObject.h"
 #include "sprite.h"
 #include "rigidBody.h"
+#include "spawn.h"
 
 // Json fields:
 // sprite
@@ -12,7 +12,7 @@
 class BasicEnt : public GObject
 {
 public:
-    BasicEnt(nlohmann::json obj);
+    explicit BasicEnt(const SpawnData& data);
     ~BasicEnt();
     void draw();
     void routine();

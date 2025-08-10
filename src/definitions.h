@@ -1,6 +1,7 @@
 #pragma once
 #define LEVELS_PATH  "./Data/Levels/"
-#define TILED_PATH   "./Data/Tiled/"
+#undef TILED_PATH
+#define LDTK_PATH    "./Data/Ldtk/"
 #define TEXTURES_PATH "./Data/Textures/"
 #define POLICES_PATH  "./Data/Polices/"
 #define BLUEPRINTS_PATH  "./Data/Entities/blueprints.json"

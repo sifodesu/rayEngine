@@ -10,7 +10,7 @@ public:
     T x;
     T y;
 
-    constexpr Vector2<T>(T X = 0, T Y = 0) noexcept : x(X), y(Y)
+    constexpr Vector2(T X = 0, T Y = 0) noexcept : x(X), y(Y)
     {
 
     }
