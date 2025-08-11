@@ -1,18 +1,16 @@
 #include <set>
-#include <string>
 #include "engine.h"
 #include "raylib.h"
-#include "definitions.h"
-#include "rigidBody.h"
-#include "input.h"
-#include "basicEnt.h"
-#include "character.h"
 #include "clock.h"
-#include "raymath.h"
 #include "sound_m.h"
+#include "input.h"
 #include "raycam_m.h"
+#include "texture_m.h"
+#include "object_m.h"
+#include "definitions.h"
 #include "ldtk_m.h"
-#include <filesystem>
+#include "shader_m.h"
+#include "collisionRect.h"
 
 Engine::Engine()
 {
@@ -25,34 +23,36 @@ Engine::Engine()
     SetTargetFPS(120);
 
     Raycam_m::init();
-    Texture_m::load(); // Ensure inv.png exists as a fallback
+    Texture_m::load();
     Sound_m::load();
     InputMap::init();
     // Load LDtk project
     Ldtk_m::loadLevel("ldtk_test.ldtk");
+
+    // Shader_m::load();
 }
 
 void Engine::game_loop()
 {
+    while (!WindowShouldClose()) {
+        // Shader_m::routine();
 
-    while (!WindowShouldClose())
-    {
-        // Tick game time before rendering
         Clock::lap();
+        Ldtk_m::routine();
+
+        Shader_m::beginScenePass();
+            ClearBackground(CLITERAL(Color){50, 50, 50, 255});
+            Object_m::routine();
+            Raycam_m::getRayCam().routine();
+            BeginMode2D(Raycam_m::getCam());
+                render();
+            EndMode2D();
+        Shader_m::endScenePass();
 
         BeginDrawing();
-        ClearBackground(CLITERAL(Color){50, 50, 50, 255});
-        hotReloadLevelIfChanged();
-        Object_m::routine();
-        Raycam_m::getRayCam().routine();
-
-        DrawFPS(10, 10);
-
-        BeginMode2D(Raycam_m::getCam());
-
-        render();
-
-        EndMode2D();
+            ClearBackground(BLACK);
+            Shader_m::blit();
+            DrawFPS(10, 10);
         EndDrawing();
     }
 }
@@ -67,48 +67,19 @@ void Engine::render()
     std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), true, false);
     for (CollisionRect* body : to_render) {
         sorted_bodies.insert(body);
-    }
+}
     to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false, false);
-    for (CollisionRect* body : to_render) {
-        sorted_bodies.insert(body);
-    }
+    for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-
-        //debug blit hitboxes
-        if (!body->is_static)
-            DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
-    }
-}
-
-static std::filesystem::file_time_type s_lastLevelWriteTime{};
-
-void Engine::hotReloadLevelIfChanged()
-{
-    const std::string levelPath = std::string(LDTK_PATH) + "ldtk_test.ldtk";
-    std::error_code ec;
-    auto cur = std::filesystem::last_write_time(levelPath, ec);
-    if (ec) return;
-    if (s_lastLevelWriteTime.time_since_epoch().count() == 0) {
-        s_lastLevelWriteTime = cur;
-        return;
-    }
-    if (cur != s_lastLevelWriteTime) {
-        s_lastLevelWriteTime = cur;
-        // Keep character position: clear only tiles and reload level without characters
-        // Reload tiles only; avoid realloc storms in same frame
-        try {
-            Object_m::clearTiles();
-            Ldtk_m::loadLevel("ldtk_test.ldtk", /*skipCharacters=*/true);
-        } catch (...) {
-            // Swallow to keep program running
-        }
+        if (!body->is_static) DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
 }
 
 Engine::~Engine()
 {
+    // Shader_m::unload();
     Texture_m::unload();
     Object_m::unload();
     CloseWindow();

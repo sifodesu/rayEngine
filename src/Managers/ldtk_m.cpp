@@ -143,4 +143,23 @@ void Ldtk_m::loadLevel(std::string filename, bool skipCharacters) {
     }
 }
 
+void Ldtk_m::checkHotReload() {
+    if (!hotReloadEnabled) return;
+    const std::string filename = "ldtk_test.ldtk"; // TODO: track current
+    std::error_code ec;
+    auto path = std::filesystem::path(LDTK_PATH) / filename;
+    auto cur = std::filesystem::last_write_time(path, ec);
+    if (ec) return;
+    if (lastWrite.time_since_epoch().count() == 0) { lastWrite = cur; return; }
+    if (cur != lastWrite) {
+        lastWrite = cur;
+        try {
+            Object_m::clearTiles();
+            loadLevel(filename, true);
+        } catch (...) {}
+    }
+}
+
+void Ldtk_m::routine() { checkHotReload(); }
+
 

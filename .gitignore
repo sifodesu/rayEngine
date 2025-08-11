@@ -48,3 +48,4 @@ CPack*.cmake
 Makefile
 rayEngine
 *.tiled-session
+toolchain.cmake

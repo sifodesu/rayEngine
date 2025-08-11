@@ -10,5 +10,4 @@ public:
 
 private:
     void render();
-    void hotReloadLevelIfChanged();
 };
