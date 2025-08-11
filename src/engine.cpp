@@ -20,13 +20,10 @@ Engine::Engine()
     MaximizeWindow();
     InitAudioDevice();
 
-    SetTargetFPS(120);
-
     Raycam_m::init();
     Texture_m::load();
     Sound_m::load();
     InputMap::init();
-    // Load LDtk project
     Ldtk_m::loadLevel("ldtk_test.ldtk");
 
     // Shader_m::load();
@@ -35,7 +32,7 @@ Engine::Engine()
 void Engine::game_loop()
 {
     while (!WindowShouldClose()) {
-        // Shader_m::routine();
+        Shader_m::routine();
 
         Clock::lap();
         Ldtk_m::routine();
@@ -65,9 +62,8 @@ void Engine::render()
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
     
     std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), true, false);
-    for (CollisionRect* body : to_render) {
-        sorted_bodies.insert(body);
-}
+    for (CollisionRect* body : to_render) sorted_bodies.insert(body);
+    
     to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false, false);
     for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 
@@ -79,7 +75,7 @@ void Engine::render()
 
 Engine::~Engine()
 {
-    // Shader_m::unload();
+    Shader_m::unload();
     Texture_m::unload();
     Object_m::unload();
     CloseWindow();

@@ -5,7 +5,7 @@ Raycam::Raycam(RigidBody* to_follow) : to_follow_(to_follow), camera_{} {
     camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f };
     if (to_follow_)
         camera_.target = to_follow_->getCoord();
-    camera_.zoom = (float) GetScreenWidth() / 480;
+    camera_.zoom = (float) GetScreenWidth() / (480.0f);
 }
 
 Camera2D& Raycam::getCam() {
