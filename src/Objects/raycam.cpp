@@ -1,7 +1,8 @@
 #include "raycam.h"
 #include "rigidBody.h"
-
-Raycam::Raycam(RigidBody* to_follow) : to_follow_(to_follow), camera_{} {
+#include "raymath.h"
+#include <cmath>
+Raycam::Raycam(RigidBody* to_follow, bool level_bound) : to_follow_(to_follow), camera_{}, level_bound_(level_bound) {
     camera_.offset = { (float) GetScreenWidth() / 2.0f, (float) GetScreenHeight() / 2.0f };
     if (to_follow_)
         camera_.target = to_follow_->getCoord();
@@ -25,7 +26,22 @@ Rectangle Raycam::getRect() {
 void Raycam::routine() {
     if (to_follow_) {
         auto coords = to_follow_->getCenterCoord();
-        camera_.target = coords;
+        if (level_bound_) {
+            // Snap camera to the logical 480x360 grid so the view's top-left is the grid's top-left
+            const float cellW = 480.0f;
+            const float cellH = 360.0f;
+            float gx = floorf(coords.x / cellW);
+            float gy = floorf(coords.y / cellH);
+            // Camera2D.target is the world-space point at screen 'offset' (center). To align top-left to grid,
+            // set target to the center of the grid cell: topLeft + half cell size.
+            camera_.target = {
+                gx * cellW + cellW * 0.5f,
+                gy * cellH + cellH * 0.5f
+            };
+        }
+        else {
+            camera_.target = coords;
+        }
     }
     else {
         // camera_.target = camera_.offset;

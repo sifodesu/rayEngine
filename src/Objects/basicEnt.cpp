@@ -4,18 +4,11 @@
 using namespace std;
 
 BasicEnt::BasicEnt(const SpawnData& data) : GObject(data.id) {
-    if (data.sprite) {
-        sprite_ = new Sprite(data.sprite->filename, data.sprite->source);
-        sprite_->setTint(data.sprite->tint);
-    } else {
-        std::string fallback2 = "inv.png";
-        sprite_ = new Sprite(fallback2, Rectangle{0, 0, 32, 32});
-    }
-    if (data.collision) {
-        body_ = new CollisionRect(*data.collision, this);
-    } else {
-        body_ = new CollisionRect(CollisionDesc{}, this);
-    }
+    SpriteDesc sprite = data.sprite.value_or(SpriteDesc{});
+    sprite_ = new Sprite(sprite);
+
+    CollisionDesc col = data.collision.value_or(CollisionDesc{});
+    body_ = new CollisionRect(col, this);
 }
 
 BasicEnt::~BasicEnt()

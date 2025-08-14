@@ -1,0 +1,33 @@
+{
+    "chara_walk":
+    {
+        "filename": "chara_walk.png",
+        "nb_frames": 6,
+        "frame_padding": 0,
+        "animation_speed": 8.0,
+        "flipX": false,
+        "flipY": false,
+        "source": {
+            "x": 0,
+            "y": 0,
+            "w": 22,
+            "h": 28
+        },
+        "tint": [255, 255, 255, 255]
+    },
+    "chara_idle": {
+        "filename": "chara_idle.png",
+        "nb_frames": 2,
+        "frame_padding": 1,
+        "animation_speed": 1.5,
+        "flipX": false,
+        "flipY": false,
+        "source": {
+            "x": 0,
+            "y": 0,
+            "w": 22,
+            "h": 28
+        },
+        "tint": [255, 255, 255, 255]
+    }
+}

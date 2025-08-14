@@ -19,42 +19,26 @@ public:
     Rectangle& getSurface() { return surface_; }
     Vector2 getDims() { return { surface_.width, surface_.height }; }
 
-    static std::vector<CollisionRect*> query(Rectangle rect, bool _is_static, bool with_solid);
-    std::vector<CollisionRect*> getCollisions(bool with_static, bool with_solid) {
-        return query(surface_, with_static, with_solid);
+    // Single quadtree query: returns all rects intersecting rect; filter by solidity if requested
+    static std::vector<CollisionRect*> query(Rectangle rect, bool with_solid);
+    std::vector<CollisionRect*> getCollisions(bool with_solid) {
+        return query(surface_, with_solid);
     }
     void setSolid(bool solid) { solid_ = solid; }
     bool isSolid() { return solid_; }
     void add()
     {
-        if (is_static)
-        {
-            quad_static.add({pool_id_, surface_});
-        }
-        else
-        {
-            quad_dynamic.add({pool_id_, surface_});
-        }
+        quad_.add({pool_id_, surface_});
     }
     void remove()
     {
-        if (is_static)
-        {
-            quad_static.remove({pool_id_, surface_});
-        }
-        else
-        {
-            quad_dynamic.remove({pool_id_, surface_});
-        }
+        quad_.remove({pool_id_, surface_});
     }
 
     GObject* getFather() { return father_; }
     int getId() { return pool_id_; }
-
-    bool is_static;
 protected:
-    static Quadtree quad_static;
-    static Quadtree quad_dynamic;
+    static Quadtree quad_;
     static std::map<int, CollisionRect*> pool;
     Rectangle surface_;
     bool solid_;

@@ -13,10 +13,19 @@ public:
     void routine();
     void draw();
     Rectangle getRect() { return body_->getSurface(); }
+    void addSpeedBoost(float factor) { speedMultiplier_ += factor; }
+    void addDashBoost(float factor) { dashMultiplier_ += factor; }
+    // Respawn API
+    void setRespawn(Vector2 p) { respawnPos_ = p; }
+    void respawn();
 
     RigidBody *body_;
 
 private:
-    Sprite *sprite_;
+    std::unordered_map<std::string, Sprite *> anims_;
     double dashing_;
+    float speedMultiplier_ = 1.0f; // movement speed multiplier
+    float dashMultiplier_ = 1.0f;   // dash distance/speed multiplier
+    Sprite* current_anim_ = nullptr;
+    Vector2 respawnPos_{0,0};
 };

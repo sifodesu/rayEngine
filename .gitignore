@@ -49,3 +49,5 @@ Makefile
 rayEngine
 *.tiled-session
 toolchain.cmake
+/Data/Ldtk/*/simplified
+/Data/Shaders

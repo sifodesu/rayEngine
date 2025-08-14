@@ -11,7 +11,10 @@ void Texture_m::load(std::string path) {
                 load(entry.path().string());
             continue;
         }
-        textures[entry.path().filename().string()] = LoadTexture(entry.path().string().c_str());
+    Texture2D tex = LoadTexture(entry.path().string().c_str());
+    // Use nearest-neighbor filtering to avoid texture bleeding when moving/animating
+    SetTextureFilter(tex, TEXTURE_FILTER_POINT);
+    textures[entry.path().filename().string()] = tex;
     }
 }
 

@@ -5,12 +5,13 @@
 
 class Raycam {
 public:
-    Raycam(RigidBody* to_follow = NULL);
+    Raycam(RigidBody* to_follow = NULL, bool level_bound = false);
     void routine();
     Camera2D& getCam();
     Rectangle getRect();
 
     RigidBody* to_follow_;
+    bool level_bound_;
 private:
     Camera2D camera_;
 };

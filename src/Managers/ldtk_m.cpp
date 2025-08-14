@@ -6,6 +6,8 @@
 #include <algorithm>
 #include "object_m.h"
 #include "spawn.h"
+#include "definitions.h"
+#include "sprite_m.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -67,7 +69,7 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, int px, 
     d.type = "tile";
     d.layer = layer;
     d.sprite = SpriteDesc{tilesetFile, Rectangle{(float)sx,(float)sy,(float)tileSize,(float)tileSize}, WHITE};
-    d.collision = CollisionDesc{Rectangle{(float)px,(float)py,(float)tileSize,(float)tileSize}, solid, true};
+    d.collision = CollisionDesc{Rectangle{(float)px,(float)py,(float)tileSize,(float)tileSize}, solid};
     Object_m::createFromSpawn(d);
 }
 
@@ -76,10 +78,25 @@ void fillEntityFields(const json& inst, SpawnData& d) {
     if (!inst.contains("fieldInstances")) return;
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
-        if (fid == "type") d.type = f["__value"].get<string>();
+        if (fid == "Type") d.type = f["__value"].get<string>();
         else if (fid == "solid") {
             if (!d.collision) d.collision = CollisionDesc{};
             d.collision->solid = f["__value"].get<bool>();
+        }
+        else if (fid == "sprite") {
+            string key = f["__value"].get<string>();
+            if (!d.sprite) d.sprite = SpriteDesc{};
+            if (auto meta = Sprite_m::get(key)) {
+                *d.sprite = *meta;
+            } else {
+                // Treat value as a direct filename fallback
+                d.sprite->filename = key;
+            }
+        }
+        else if (fid == "Dialog") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.dialog = f["__value"].get<string>();
+            }
         }
     }
 }
@@ -98,11 +115,10 @@ void fillEntityTile(const json& e, const map<int,string>& tilesetNames, SpawnDat
 void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int,string>& tilesetNames) {
     SpawnData d; // default empty
     fillEntityFields(e, d);
+    if (!d.sprite.has_value()) fillEntityTile(e, tilesetNames, d);
     if (d.type.empty()) d.type = "basic";
-    fillEntityTile(e, tilesetNames, d);
     if (!d.collision) d.collision = CollisionDesc{};
     d.collision->rect = Rectangle{(float)(e["px"][0].get<int>() + worldX), (float)(e["px"][1].get<int>() + worldY), (float)e["width"].get<int>(), (float)e["height"].get<int>()};
-    d.collision->isStatic = false;
     d.id = Object_m::genID();
     d.layer = layer;
     Object_m::createFromSpawn(d);

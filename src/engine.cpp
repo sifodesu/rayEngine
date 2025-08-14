@@ -9,21 +9,30 @@
 #include "object_m.h"
 #include "definitions.h"
 #include "ldtk_m.h"
+#include "upgradeRegistry.h"
 #include "shader_m.h"
 #include "collisionRect.h"
+#include "sprite_m.h"
+
+//480x360
+//240x180
+
+// 256 × 240
 
 Engine::Engine()
 {
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(1920, 1080, "rayEngine");
+    InitWindow(480*4, 360*4, "rayEngine");
     MaximizeWindow();
     InitAudioDevice();
 
     Raycam_m::init();
     Texture_m::load();
+    Sprite_m::load();
     Sound_m::load();
     InputMap::init();
+    UpgradeRegistry::initDefaults();
     Ldtk_m::loadLevel("ldtk_test.ldtk");
 
     // Shader_m::load();
@@ -37,18 +46,19 @@ void Engine::game_loop()
         Clock::lap();
         Ldtk_m::routine();
 
-        Shader_m::beginScenePass();
-            ClearBackground(CLITERAL(Color){50, 50, 50, 255});
+    Shader_m::begin();
+            ClearBackground(CLITERAL(Color){0, 0, 0, 255});
             Object_m::routine();
             Raycam_m::getRayCam().routine();
             BeginMode2D(Raycam_m::getCam());
                 render();
             EndMode2D();
-        Shader_m::endScenePass();
+    Shader_m::end();
 
         BeginDrawing();
             ClearBackground(BLACK);
-            Shader_m::blit();
+            if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
+            Shader_m::present();
             DrawFPS(10, 10);
         EndDrawing();
     }
@@ -60,16 +70,12 @@ void Engine::render()
         return a->getFather()->layer_ <= b->getFather()->layer_;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
-    
-    std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), true, false);
-    for (CollisionRect* body : to_render) sorted_bodies.insert(body);
-    
-    to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false, false);
+    std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false);
     for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-        if (!body->is_static) DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
+        // if (!body->is_static) DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
 }
 

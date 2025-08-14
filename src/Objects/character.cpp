@@ -2,23 +2,22 @@
 #include "raymath.h"
 #include "input.h"
 #include "raycam_m.h"
+#include "sprite_m.h"
 
-static constexpr float CHARACTER_SPEED = 300.0f;
-static constexpr float CHARACTER_DASH_FACTOR = 4.0f;
+static constexpr float CHARACTER_BASE_SPEED = 200.0f;
+static constexpr float JUMP_SPEED = 300.0f;
+static constexpr float CHARACTER_DASH_FACTOR = 4.0f; // scaled by dashMultiplier_
 
 Character::Character(const SpawnData& data) : GObject(data.id) {
-    if (data.sprite) {
-        sprite_ = new Sprite(data.sprite->filename, data.sprite->source);
-        sprite_->setTint(data.sprite->tint);
-    } else {
-        std::string fallback = "inv.png";
-        sprite_ = new Sprite(fallback, Rectangle{0, 0, 32, 32});
-    }
+    SpriteDesc sprite = data.sprite.value_or(SpriteDesc{});
     CollisionDesc col = data.collision.value_or(CollisionDesc{});
     BodyDesc body = data.body.value_or(BodyDesc{});
     body_ = new RigidBody(col, body, this);
     dashing_ = 0;
-    Raycam_m::setTarget(body_);
+    Raycam_m::setTarget(body_, true);
+    if (auto s = Sprite_m::get("chara_idle")) anims_["idle"] = new Sprite(*s); else anims_["idle"] = new Sprite("inv.png", Rectangle{0,0,20,20});
+    if (auto s = Sprite_m::get("chara_walk")) anims_["walk"] = new Sprite(*s); else anims_["walk"] = new Sprite("inv.png", Rectangle{0,0,20,20});
+    current_anim_ = anims_["idle"];
 }
 
 void Character::routine() {
@@ -32,7 +31,7 @@ void Character::routine() {
         }
         else {
             if (InputMap::checkPressed("up"))
-                body_->setSpeed({ bodySpeed.x, -CHARACTER_SPEED });
+                body_->setSpeed({ bodySpeed.x, -JUMP_SPEED});
             // else if (bodySpeed.y < 0)
                 // body_->setSpeed({ bodySpeed.x, 0 });
 
@@ -47,13 +46,14 @@ void Character::routine() {
             body_->setSpeed({ 0, bodySpeed.y });
         }
         else {
+            float moveSpeed = CHARACTER_BASE_SPEED * speedMultiplier_;
             if (InputMap::checkDown("left"))
-                body_->setSpeed({ -CHARACTER_SPEED, bodySpeed.y });
+                body_->setSpeed({ -moveSpeed, bodySpeed.y });
             else if (bodySpeed.x < 0)
                 body_->setSpeed({ 0, bodySpeed.y });
 
             if (InputMap::checkDown("right"))
-                body_->setSpeed({ CHARACTER_SPEED, bodySpeed.y });
+                body_->setSpeed({ moveSpeed, bodySpeed.y });
             else if (bodySpeed.x > 0)
                 body_->setSpeed({ 0, bodySpeed.y });
         }
@@ -62,19 +62,39 @@ void Character::routine() {
     if (InputMap::checkPressed("dash")) {
         if (dashing_ <= 0 && (bodySpeed.x != 0 || bodySpeed.y != 0)) {
             dashing_ = 0.1;
-            body_->setSpeed(Vector2Multiply(bodySpeed, { CHARACTER_DASH_FACTOR, 1 }));
+            body_->setSpeed(Vector2Multiply(bodySpeed, { CHARACTER_DASH_FACTOR * dashMultiplier_, 1 }));
         }
     }
 
-    sprite_->routine();
+    current_anim_->routine();
     body_->routine();
 
     bodySpeed = body_->getSpeed();
+
     if (bodySpeed.x == 0 && bodySpeed.y == 0) {
         dashing_ = 0;
+    }
+    if (bodySpeed.x < 0) {
+        current_anim_ = anims_["walk"];
+        current_anim_->setFlipX(true);
+    } else if (bodySpeed.x > 0) {
+        current_anim_ = anims_["walk"];
+        current_anim_->setFlipX(false);
+    }
+    else {
+        bool was_flipped = current_anim_->getFlipX();
+        current_anim_ = anims_["idle"];
+        current_anim_->setFlipX(was_flipped);
     }
 }
 
 void Character::draw() {
-    sprite_->draw(body_->getCoord());
+    current_anim_->draw(body_->getCoord());
+}
+
+void Character::respawn() {
+    if (body_) {
+        body_->setCoord(respawnPos_);
+        body_->setSpeed({0,0});
+    }
 }

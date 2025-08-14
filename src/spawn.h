@@ -4,15 +4,19 @@
 #include <raylib.h>
 
 struct SpriteDesc {
-    std::string filename;
-    Rectangle source{0, 0, 32, 32};
+    std::string filename{"inv.png"};    
+    Rectangle source{0, 0, 20, 20};
     Color tint{WHITE};
+    int nb_frames{1};
+    int frame_padding{0};
+    float animation_speed{5.0f}; // Frames per second
+    bool flipX{false};
+    bool flipY{false};
 };
 
 struct CollisionDesc {
     Rectangle rect{0, 0, 0, 0};
-    bool solid{true};
-    bool isStatic{true};
+    bool solid{false};
 };
 
 struct BodyDesc {
@@ -29,6 +33,7 @@ struct SpawnData {
     std::optional<SpriteDesc> sprite;
     std::optional<CollisionDesc> collision;
     std::optional<BodyDesc> body;
+    std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
 };
 
 

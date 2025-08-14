@@ -1,6 +1,7 @@
 #pragma once
 #include <map>
 #include "raylib.h"
+#include "definitions.h"
 
 class Sound_m {
 public:

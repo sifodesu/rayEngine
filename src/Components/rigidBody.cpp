@@ -38,13 +38,8 @@ void RigidBody::fixSpeed() {
         probeRect.width += 0.1f;
     }
     if (speed_.x != 0.0f) {
-        for (CollisionRect* body : query(probeRect, true, true)) {
+        for (CollisionRect* body : CollisionRect::query(probeRect, true)) {
             if (body->isSolid() && (body->getId() != pool_id_)) { speed_.x = 0.0f; break; }
-        }
-        if (speed_.x != 0.0f) {
-            for (CollisionRect* body : query(probeRect, false, true)) {
-                if (body->isSolid() && (body->getId() != pool_id_)) { speed_.x = 0.0f; break; }
-            }
         }
     }
 
@@ -57,13 +52,8 @@ void RigidBody::fixSpeed() {
         probeRect.height += 0.1f;
     }
     if (speed_.y != 0.0f) {
-        for (CollisionRect* body : query(probeRect, true, true)) {
+        for (CollisionRect* body : CollisionRect::query(probeRect, true)) {
             if (body->isSolid() && (body->getId() != pool_id_)) { speed_.y = 0.0f; break; }
-        }
-        if (speed_.y != 0.0f) {
-            for (CollisionRect* body : query(probeRect, false, true)) {
-                if (body->isSolid() && (body->getId() != pool_id_)) { speed_.y = 0.0f; break; }
-            }
         }
     }
 }
@@ -97,13 +87,7 @@ void RigidBody::routine() {
         Rectangle lastFree = startRect;
 
         auto collides = [&](const Rectangle &rect) -> bool {
-            // Check against static
-            for (CollisionRect* body : query(rect, true, true)) {
-                if (body->isSolid() && solid_ && (body->getId() != pool_id_))
-                    return true;
-            }
-            // And dynamic
-            for (CollisionRect* body : query(rect, false, true)) {
+            for (CollisionRect* body : CollisionRect::query(rect, true)) {
                 if (body->isSolid() && solid_ && (body->getId() != pool_id_))
                     return true;
             }

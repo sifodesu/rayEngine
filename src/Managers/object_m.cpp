@@ -3,6 +3,13 @@
 #include "rigidBody.h"
 #include "basicEnt.h"
 #include "character.h"
+#include "upgradePickup.h"
+#include "collisionRect.h"
+#include "raycam_m.h"
+#include <raylib.h>
+#include "kill.h"
+#include "checkpoint.h"
+#include "pano.h"
 
 using namespace std;
 
@@ -22,8 +29,16 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
     std::unique_ptr<GObject> obj;
     if (data.type == "tile" || data.type == "basic") {
         obj = std::make_unique<BasicEnt>(data);
-    } else if (data.type == "character") {
+    } else if (data.type == "Character") {
         obj = std::make_unique<Character>(data);
+    } else if (data.type.rfind("upgrade_", 0) == 0) { // any upgrade_* type
+        obj = std::make_unique<UpgradePickup>(data);
+    } else if (data.type == "Checkpoint") {
+        obj = std::make_unique<Checkpoint>(data);
+    } else if (data.type == "Kill") {
+        obj = std::make_unique<Kill>(data);
+    } else if (data.type == "Pano") {
+        obj = std::make_unique<Pano>(data);
     } else {
         return nullptr;
     }
@@ -56,6 +71,29 @@ void Object_m::routine()
         if (obj->to_delete_)
         {
             toDelete.push_back(id);
+        }
+    }
+
+    // Dispatch collisions for objects within camera view
+    {
+        auto camRect = Raycam_m::getRayCam().getRect();
+        std::vector<CollisionRect*> bodies = CollisionRect::query(camRect, false); // include non-solid
+        const size_t n = bodies.size();
+        for (size_t i = 0; i < n; ++i) {
+            CollisionRect* aBody = bodies[i];
+            if (!aBody) continue;
+            Rectangle aRect = aBody->getSurface();
+            for (size_t j = i + 1; j < n; ++j) {
+                CollisionRect* bBody = bodies[j];
+                if (!bBody) continue;
+                Rectangle bRect = bBody->getSurface();
+                if (!CheckCollisionRecs(aRect, bRect)) continue;
+                GObject* a = aBody->getFather();
+                GObject* b = bBody->getFather();
+                if (!a || !b || a == b) continue;
+                a->onCollision(b);
+                b->onCollision(a);
+            }
         }
     }
 
