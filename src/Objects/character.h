@@ -22,10 +22,15 @@ public:
     RigidBody *body_;
 
 private:
+    // Helpers
+    bool isOnGround() const;
+
     std::unordered_map<std::string, Sprite *> anims_;
     double dashing_;
     float speedMultiplier_ = 1.0f; // movement speed multiplier
     float dashMultiplier_ = 1.0f;   // dash distance/speed multiplier
     Sprite* current_anim_ = nullptr;
     Vector2 respawnPos_{0,0};
+    int jumps_ = 0;
+    int dashCount_ = 0;
 };

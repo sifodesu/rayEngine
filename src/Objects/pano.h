@@ -17,6 +17,7 @@ public:
 private:
     std::string text_;
     bool active_{false};
+    bool ended_{false};
     size_t shown_{0};
     // Pagination state
     size_t pageStart_{0};      // Index of first char in current page

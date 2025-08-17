@@ -7,13 +7,14 @@
 #include <vector>
 #include <cstdlib>
 #include <cmath>
+#include "input.h"
 
 // Internal helpers to avoid code duplication and keep logic consistent
 namespace {
     struct UiBox {
         Rectangle box{};            // World-space rectangle where dialog renders
         int pad = 12;
-        int fontSize = 24;
+        int fontSize = 18;
         int x = 0;
         int y = 0;
         int maxW = 0;
@@ -180,27 +181,31 @@ Pano::Pano(const SpawnData& data) : BasicEnt(data) {
 Pano::~Pano() = default;
 
 void Pano::onCollision(GObject* other) {
-    if (active_) return;
+    if (active_ || ended_) return;
     if (dynamic_cast<Character*>(other)) {
-        active_ = true;
-        shown_ = 0;
-        pageStart_ = 0;
-        pageEnd_ = 0;
-        charAccumulator_ = 0.0f; // Reset character accumulator
-        speedCps_ = defaultSpeedCps_;
+        if (InputMap::checkPressed("r2")) {
+            // Activate dialog on interaction
+            if (text_.empty()) return; // No text to show
+            active_ = true;
+            shown_ = 0;
+            pageStart_ = 0;
+            pageEnd_ = 0;
+            charAccumulator_ = 0.0f; // Reset character accumulator
+            speedCps_ = defaultSpeedCps_;
+        }
     }
 }
 
 void Pano::routine() {
     BasicEnt::routine();
+    ended_ = false;
     if (!active_ || text_.empty()) return;
 
     // Always compute page end for current layout (handles resizes)
     pageEnd_ = computePageEnd(pageStart_);
     if (pageEnd_ <= pageStart_) pageEnd_ = std::min(pageStart_ + 1, text_.size());
 
-    // Input: SPACE/ENTER/CLICK reveals page fully, then advances page; closes only after last page
-    const bool advanceInput = IsKeyPressed(KEY_SPACE) || IsKeyPressed(KEY_ENTER) || IsMouseButtonPressed(MOUSE_LEFT_BUTTON);
+    const bool advanceInput = InputMap::checkPressed("r2");
     if (advanceInput) {
         if (shown_ < pageEnd_) {
             // If user skips mid-effect, apply effects from the skipped region to the next text
@@ -211,7 +216,7 @@ void Pano::routine() {
             if (hasWait) { waitTimer_ = newWait; /* next frame will wait before revealing */ }
             return;
         }
-        if (pageEnd_ >= text_.size()) { active_ = false; return; }
+        if (pageEnd_ >= text_.size()) { active_ = false; ended_ = true; return; }
         // Next page: skip page-break tags so we start on content (but keep waits/speed tags)
         const size_t prevEnd = pageEnd_;
         pageStart_ = skipPageBreaksFrom(text_, pageEnd_);
