@@ -1,6 +1,7 @@
 #include "shader_m.h"
 #include "raycam_m.h"
 #include <algorithm>
+#include "definitions.h"
 
 std::unordered_map<std::string, Shader> Shader_m::shaders_;
 std::filesystem::path Shader_m::dir_;
@@ -36,8 +37,8 @@ std::vector<std::pair<std::string, Shader_m::ShaderPair>> Shader_m::collect() {
 void Shader_m::load(const std::filesystem::path& dir) {
     dir_ = dir;
     unload();
-    lastW_ = GetScreenWidth();
-    lastH_ = GetScreenHeight();
+    lastW_ = NATIVE_RES_WIDTH;
+    lastH_ = NATIVE_RES_HEIGHT;
     sceneRT_ = LoadRenderTexture(lastW_, lastH_);
     prevSceneRT_ = LoadRenderTexture(lastW_, lastH_);
     ping_[0] = LoadRenderTexture(lastW_, lastH_);
@@ -67,8 +68,8 @@ bool Shader_m::has(const std::string& name) { return shaders_.count(name)!=0; }
 Shader Shader_m::get(const std::string& name) { auto it = shaders_.find(name); return it==shaders_.end()? Shader{0} : it->second; }
 
 void Shader_m::ensureTargets() {
-    int w = GetScreenWidth();
-    int h = GetScreenHeight();
+    int w = NATIVE_RES_WIDTH;
+    int h = NATIVE_RES_HEIGHT;
     if (w==lastW_ && h==lastH_) return;
     if (sceneRT_.id) UnloadRenderTexture(sceneRT_);
     if (prevSceneRT_.id) UnloadRenderTexture(prevSceneRT_);
@@ -102,9 +103,32 @@ static void drawFullscreenTexture(Texture2D tex) {
     DrawTextureRec(tex, {0,0,(float)tex.width, -(float)tex.height}, {0,0}, WHITE);
 }
 
+// Draw the given texture scaled to the window with integer, centered letterboxing
+// Keeps pixel-perfect scaling from native render size to current window size
+static void drawToScreenLetterboxed(Texture2D tex) {
+    int sw = GetScreenWidth();
+    int sh = GetScreenHeight();
+    int nw = tex.width;
+    int nh = tex.height;
+    if (nw <= 0 || nh <= 0 || sw <= 0 || sh <= 0) return;
+
+    int scaleX = sw / nw;
+    int scaleY = sh / nh;
+    int scale = std::max(1, std::min(scaleX, scaleY));
+
+    int dw = nw * scale;
+    int dh = nh * scale;
+    int dx = (sw - dw) / 2;
+    int dy = (sh - dh) / 2;
+
+    Rectangle src{0, 0, (float)nw, -(float)nh}; // flip vertically
+    Rectangle dst{(float)dx, (float)dy, (float)dw, (float)dh};
+    DrawTexturePro(tex, src, dst, {0,0}, 0.0f, WHITE);
+}
+
 static bool clampToScreen(Rectangle &r) {
-    int W = GetScreenWidth();
-    int H = GetScreenHeight();
+    int W = NATIVE_RES_WIDTH;
+    int H = NATIVE_RES_HEIGHT;
     float x2 = r.x + r.width;
     float y2 = r.y + r.height;
     if (r.x < 0) r.x = 0;
@@ -195,10 +219,12 @@ Texture2D Shader_m::applyQueue() {
 
 void Shader_m::present() {
     Texture2D outTex = queue_.empty()? sceneRT_.texture : applyQueue();
-    drawFullscreenTexture(outTex);
+    // Draw to backbuffer, scaled to window with letterboxing
+    drawToScreenLetterboxed(outTex);
     // After presenting, keep copy as prev for persistence
     if (prevSceneRT_.id) {
         BeginTextureMode(prevSceneRT_);
+            // Copy 1:1 into prev texture (same native resolution)
             drawFullscreenTexture(outTex);
         EndTextureMode();
     }

@@ -8,13 +8,14 @@
 #include <cstdlib>
 #include <cmath>
 #include "input.h"
+#include "definitions.h"
 
 // Internal helpers to avoid code duplication and keep logic consistent
 namespace {
     struct UiBox {
         Rectangle box{};            // World-space rectangle where dialog renders
-        int pad = 12;
-        int fontSize = 18;
+        int pad = 6;
+        int fontSize = 9;
         int x = 0;
         int y = 0;
         int maxW = 0;
@@ -28,8 +29,8 @@ namespace {
         float zoom = (fabsf(cam.zoom) < 1e-6f) ? 1.0f : cam.zoom; // avoid div by zero
         Vector2 worldTL{ cam.target.x - cam.offset.x / zoom, cam.target.y - cam.offset.y / zoom };
 
-        const int sw = GetScreenWidth();
-        const int sh = GetScreenHeight();
+        const int sw = NATIVE_RES_WIDTH;
+        const int sh = NATIVE_RES_HEIGHT;
         const int margin = 20;
         const int boxH = sh / 4; // quarter screen height
 
@@ -314,7 +315,7 @@ void Pano::draw() {
     const bool moreToReveal = shown_ < pageEnd_;
     const bool morePages = pageEnd_ < text_.size();
     if (moreToReveal || morePages) {
-        Vector2 hintPos = { ui.box.x + ui.box.width - 90, ui.box.y + ui.box.height - 28 };
+        Vector2 hintPos = { ui.box.x + ui.box.width - 30, ui.box.y + ui.box.height - 24 };
         DrawText("...", (int)hintPos.x, (int)hintPos.y, 20, LIGHTGRAY);
     }
 }

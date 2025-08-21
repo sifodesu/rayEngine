@@ -13,18 +13,13 @@
 #include "shader_m.h"
 #include "collisionRect.h"
 #include "sprite_m.h"
-
-//480x360
-//240x180
-
-// 256 × 240
+#include <string>
 
 Engine::Engine()
 {
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT);
-    InitWindow(480*4, 360*4, "rayEngine");
-    MaximizeWindow();
+    InitWindow(NATIVE_RES_WIDTH*6, NATIVE_RES_HEIGHT*6, "rayEngine");
     InitAudioDevice();
 
     Raycam_m::init();
@@ -57,7 +52,7 @@ void Engine::game_loop()
 
         BeginDrawing();
             ClearBackground(BLACK);
-            if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
+            // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
             Shader_m::present();
             DrawFPS(10, 10);
         EndDrawing();
@@ -71,11 +66,12 @@ void Engine::render()
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
     std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false);
+    
     for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-        // if (!body->is_static) DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
+        // DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
 }
 

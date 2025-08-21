@@ -11,3 +11,6 @@
 template <typename T> int sgn(T val) {
     return (T(0) < val) - (val < T(0));
 }
+
+#define NATIVE_RES_WIDTH  320
+#define NATIVE_RES_HEIGHT  240
