@@ -2,6 +2,7 @@
 #include "definitions.h"
 #include <nlohmann/json.hpp>
 #include <fstream>
+#include <filesystem>
 
 using json = nlohmann::json;
 
@@ -12,37 +13,46 @@ void Sprite_m::load() {
     if (loaded_) return;
     loaded_ = true;
     try {
-        std::string path = std::string(TEXTURES_PATH) + "sprites_meta.json";
-        std::ifstream f(path.c_str());
-        if (!f) return; // silently ignore if missing
-        json root; f >> root;
-        if (!root.is_object()) return;
-        for (auto it = root.begin(); it != root.end(); ++it) {
-            const std::string key = it.key();
-            const json& v = it.value();
-            if (!v.is_object()) continue;
-            SpriteDesc d;
-            if (v.contains("filename")) d.filename = v["filename"].get<std::string>();
-            if (v.contains("nb_frames")) d.nb_frames = v["nb_frames"].get<int>();
-            if (v.contains("frame_padding")) d.frame_padding = v["frame_padding"].get<int>();
-            if (v.contains("animation_speed")) d.animation_speed = v["animation_speed"].get<float>();
-            if (v.contains("flipX")) d.flipX = v["flipX"].get<bool>();
-            if (v.contains("flipY")) d.flipY = v["flipY"].get<bool>();
-            if (v.contains("source") && v["source"].is_object()) {
-                auto& s = v["source"];
-                d.source = Rectangle{ s.value("x", 0.0f), s.value("y", 0.0f), s.value("w", d.source.width), s.value("h", d.source.height) };
-            }
-            if (v.contains("tint")) {
-                const json& t = v["tint"];
-                if (t.is_array() && t.size() >= 3) {
-                    int r = t[0].get<int>();
-                    int g = t[1].get<int>();
-                    int b = t[2].get<int>();
-                    int a = (t.size() >= 4) ? t[3].get<int>() : 255;
-                    d.tint = Color{ (unsigned char)r, (unsigned char)g, (unsigned char)b, (unsigned char)a };
+        for (const auto& entry : std::filesystem::directory_iterator(TEXTURES_PATH)) {
+            if (entry.path().extension() == ".json") {
+                std::ifstream f(entry.path());
+                if (!f) continue; // silently ignore if missing
+                json root; f >> root;
+                if (!root.is_object()) continue;
+                if (!root.contains("frames") || !root.contains("meta")) continue;
+
+                SpriteDesc d;
+                std::string imageName = root["meta"].value("image", std::string("inv.png"));
+                d.filename = imageName;
+                const json& frames = root["frames"]; // object with each frame key
+                if (!frames.is_object()) continue;
+                // Collect frame rects and durations
+                for (auto it = frames.begin(); it != frames.end(); ++it) {
+                    const json& f = it.value();
+                    if (!f.is_object()) continue;
+                    if (f.contains("frame") && f["frame"].is_object()) {
+                        const json& fr = f["frame"];
+                        float x = fr.value("x", 0.0f);
+                        float y = fr.value("y", 0.0f);
+                        float w = fr.value("w", 0.0f);
+                        float h = fr.value("h", 0.0f);
+                        d.frameRects.push_back(Rectangle{ x, y, w, h });
+                    }
+                    // Duration in ms per Aseprite spec
+                    float durMs = f.value("duration", 100.0f);
+                    d.frameDurations.push_back(durMs / 1000.0f);
                 }
+                if (!d.frameRects.empty() && !d.frameDurations.empty()) {
+                    double sum = 0.0;
+                    for (float s : d.frameDurations) sum += s;
+                    if (sum > 0) d.defaultFrameDuration = (float)(sum / d.frameDurations.size());
+                }
+                // Key for this sprite: strip extension from imageName (e.g., chara_walk.png -> chara_walk)
+                std::string key = imageName;
+                auto posDot = key.find_last_of('.');
+                if (posDot != std::string::npos) key.erase(posDot);
+                if (!d.filename.empty()) meta_[key] = d;
             }
-            if (!d.filename.empty()) meta_[key] = d;
         }
     } catch (...) {
         // ignore malformed files

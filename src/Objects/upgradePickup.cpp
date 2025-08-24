@@ -18,8 +18,8 @@ void UpgradePickup::routine() {
     if (to_delete_) return;
     if (!body_) return;
     Rectangle mine = body_->getSurface();
-    // Check dynamic bodies only (player is dynamic); with_solid=false includes non-solid
-    for (CollisionRect* other : CollisionRect::query(mine, false)) {
+    
+    for (CollisionRect* other : CollisionRect::query(mine)) {
         if (other->getFather() == this) continue;
         if (!CheckCollisionRecs(mine, other->getSurface())) continue;
         if (auto* chr = dynamic_cast<Character*>(other->getFather())) {

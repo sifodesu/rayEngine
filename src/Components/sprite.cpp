@@ -5,30 +5,44 @@
 #include <cmath>
 
 Sprite::Sprite(const std::string& filename, Rectangle rect)
-    : filename_(filename), source_(rect), tint_(WHITE) {
-
+    : filename_(filename), tint_(WHITE) {
     sprite_sheet_ = Texture_m::getTexture(filename);
+    // Treat provided rect as single frame
+    frameRects_.push_back(rect);
 }
 
 Sprite::Sprite(const SpriteDesc& desc)
-    : filename_(desc.filename), source_(desc.source), tint_(desc.tint) {
+    : filename_(desc.filename), tint_(desc.tint) {
     sprite_sheet_ = Texture_m::getTexture(filename_);
-    nb_frames_ = desc.nb_frames;
-    frame_padding_ = desc.frame_padding;
-    anim_speed_fps_ = desc.animation_speed;
     flipX_ = desc.flipX;
     flipY_ = desc.flipY;
+    // Copy explicit frames (new system only)
+    frameRects_ = desc.frameRects;
+    frameDurations_ = desc.frameDurations;
+    uniformFrameDuration_ = desc.defaultFrameDuration;
+    if (frameRects_.empty()) {
+        // Fallback: single frame at origin if nothing specified
+        frameRects_.push_back({0,0,(float)sprite_sheet_.width,(float)sprite_sheet_.height});
+    }
 }
 
 void Sprite::routine() {
     if (is_frozen_) return;
-    if (nb_frames_ > 1 && anim_speed_fps_ > 0.0f) {
-        float dt = static_cast<float>(Clock::getLap());
-        time_acc_ += dt;
-        float frameTime = 1.0f / anim_speed_fps_;
-        while (time_acc_ >= frameTime) {
-            time_acc_ -= frameTime;
-            current_frame_ = (current_frame_ + 1) % nb_frames_;
+    float dt = static_cast<float>(Clock::getLap());
+    size_t frameCount = frameRects_.size();
+    if (frameCount > 1) {
+        if (!frameDurations_.empty() && frameDurations_.size() == frameCount) {
+            time_acc_ += dt;
+            while (time_acc_ > frameDurations_[current_frame_]) {
+                time_acc_ -= frameDurations_[current_frame_];
+                current_frame_ = (current_frame_ + 1) % (int)frameCount;
+            }
+        } else { // uniform duration
+            time_acc_ += dt;
+            while (time_acc_ >= uniformFrameDuration_) {
+                time_acc_ -= uniformFrameDuration_;
+                current_frame_ = (current_frame_ + 1) % (int)frameCount;
+            }
         }
     }
 }
@@ -37,11 +51,8 @@ void Sprite::draw(Vector2 pos) {
     // Snap to integer pixels to avoid subpixel sampling artifacts
     pos.x = std::roundf(pos.x);
     pos.y = std::roundf(pos.y);
-    Rectangle src = source_;
-    if (nb_frames_ > 1) {
-        // Assume horizontal strip; frame_padding_ pixels between frames
-        src.x = source_.x + (source_.width + frame_padding_) * current_frame_;
-    }
+    Rectangle src = frameRects_.empty()? Rectangle{0,0,0,0} : frameRects_[current_frame_ % frameRects_.size()];
+    
     // Slightly inset the source to avoid sampling neighboring texels due to float precision
     const float inset = 0.01f;
     bool willFlipX = flipX_;

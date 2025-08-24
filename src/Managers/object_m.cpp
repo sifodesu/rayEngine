@@ -10,6 +10,7 @@
 #include "kill.h"
 #include "checkpoint.h"
 #include "pano.h"
+#include "receptacle.h"
 
 using namespace std;
 
@@ -39,6 +40,8 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
         obj = std::make_unique<Kill>(data);
     } else if (data.type == "Pano") {
         obj = std::make_unique<Pano>(data);
+    } else if (data.type == "Receptacle") {
+        obj = std::make_unique<Receptacle>(data);
     } else {
         return nullptr;
     }
@@ -62,7 +65,7 @@ void Object_m::routine()
 {
     int nb_ents = level_ents_.size() + level_tiles_.size();
 
-    DrawText(std::to_string(nb_ents).c_str(), 200, 10, 20, BLACK);
+    // DrawText(std::to_string(nb_ents).c_str(), 200, 10, 20, BLACK);
 
     vector<int> toDelete;
     for (auto &[id, obj] : level_ents_)
@@ -77,7 +80,7 @@ void Object_m::routine()
     // Dispatch collisions for objects within camera view
     {
         auto camRect = Raycam_m::getRayCam().getRect();
-        std::vector<CollisionRect*> bodies = CollisionRect::query(camRect, false); // include non-solid
+        std::vector<CollisionRect*> bodies = CollisionRect::query(camRect); // include non-solid
         const size_t n = bodies.size();
         for (size_t i = 0; i < n; ++i) {
             CollisionRect* aBody = bodies[i];

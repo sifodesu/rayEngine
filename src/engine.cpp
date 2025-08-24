@@ -21,7 +21,8 @@ Engine::Engine()
     SetConfigFlags(FLAG_VSYNC_HINT);
     InitWindow(NATIVE_RES_WIDTH*6, NATIVE_RES_HEIGHT*6, "rayEngine");
     InitAudioDevice();
-
+    //fps limit
+    // SetTargetFPS(30);
     Raycam_m::init();
     Texture_m::load();
     Sprite_m::load();
@@ -65,7 +66,7 @@ void Engine::render()
         return a->getFather()->layer_ <= b->getFather()->layer_;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
-    std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect(), false);
+    std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect());
     
     for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 

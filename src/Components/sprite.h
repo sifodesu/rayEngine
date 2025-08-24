@@ -2,10 +2,11 @@
 #include <string>
 #include "raylib.h"
 #include "clock.h"
+#include <vector>
 
 class Sprite {
 public:
-    Sprite(const std::string& filename, Rectangle rect = Rectangle{0, 0, 32, 32});
+    Sprite(const std::string& filename, Rectangle rect = Rectangle{0, 0, 32, 32}); // rect becomes first frame
     Sprite(const struct SpriteDesc& desc);
     void draw(Vector2 pos);
     void routine();
@@ -22,13 +23,12 @@ public:
 private:
     Texture2D sprite_sheet_;
     std::string filename_;
-    Rectangle source_; // portion of the spritesheet
     CLITERAL(Color) tint_;
 
     // Animation
-    int nb_frames_{1};
-    int frame_padding_{0};
-    float anim_speed_fps_{0.0f};
+    std::vector<Rectangle> frameRects_; // explicit frames
+    std::vector<float> frameDurations_; // seconds per frame (optional)
+    float uniformFrameDuration_{0.2f}; // used if frameDurations_ empty and multiple frames
     bool is_frozen_{false};
     float time_acc_{0.0f};
     int current_frame_{0};

@@ -32,7 +32,7 @@ namespace {
         const int sw = NATIVE_RES_WIDTH;
         const int sh = NATIVE_RES_HEIGHT;
         const int margin = 20;
-        const int boxH = sh / 4; // quarter screen height
+        const int boxH = sh / 5;
 
         ui.box = {
             worldTL.x + margin / zoom,

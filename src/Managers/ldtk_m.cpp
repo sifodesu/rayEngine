@@ -68,7 +68,11 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, int px, 
     d.id = Object_m::genID();
     d.type = "tile";
     d.layer = layer;
-    d.sprite = SpriteDesc{tilesetFile, Rectangle{(float)sx,(float)sy,(float)tileSize,(float)tileSize}, WHITE};
+    SpriteDesc sd;
+    sd.filename = tilesetFile;
+    sd.tint = WHITE;
+    sd.frameRects.push_back({(float)sx,(float)sy,(float)tileSize,(float)tileSize});
+    d.sprite = sd;
     d.collision = CollisionDesc{Rectangle{(float)px,(float)py,(float)tileSize,(float)tileSize}, solid};
     Object_m::createFromSpawn(d);
 }
@@ -86,10 +90,18 @@ void fillEntityFields(const json& inst, SpawnData& d) {
         else if (fid == "sprite") {
             string key = f["__value"].get<string>();
             if (!d.sprite) d.sprite = SpriteDesc{};
-            if (auto meta = Sprite_m::get(key)) {
-                *d.sprite = *meta;
-            } else {
-                // Treat value as a direct filename fallback
+            auto tryLoad = [&](const std::string& k){ if (auto meta = Sprite_m::get(k)) { *d.sprite = *meta; return true; } return false; };
+            bool loaded = tryLoad(key);
+            if (!loaded) {
+                // If key has extension, strip and retry (handles .png names provided from LDtk fields)
+                auto pos = key.find_last_of('.');
+                if (pos != string::npos) {
+                    string base = key.substr(0, pos);
+                    loaded = tryLoad(base);
+                }
+            }
+            if (!loaded) {
+                // As last fallback treat as direct texture filename
                 d.sprite->filename = key;
             }
         }
@@ -108,7 +120,8 @@ void fillEntityTile(const json& e, const map<int,string>& tilesetNames, SpawnDat
     if (!d.sprite) d.sprite = SpriteDesc{};
     auto it = tilesetNames.find(uid);
     if (it != tilesetNames.end()) d.sprite->filename = it->second;
-    d.sprite->source = Rectangle{(float)e["__tile"]["x"], (float)e["__tile"]["y"], (float)e["__tile"]["w"], (float)e["__tile"]["h"]};
+    Rectangle r{(float)e["__tile"]["x"], (float)e["__tile"]["y"], (float)e["__tile"]["w"], (float)e["__tile"]["h"]};
+    if (d.sprite->frameRects.empty()) d.sprite->frameRects.push_back(r); else d.sprite->frameRects[0] = r; // ensure at least one frame
 }
 
 // Fully construct and spawn an entity; defaults to type "basic" if unspecified.

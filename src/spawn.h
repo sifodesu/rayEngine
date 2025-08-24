@@ -2,16 +2,17 @@
 #include <optional>
 #include <string>
 #include <raylib.h>
+#include <vector>
 
 struct SpriteDesc {
-    std::string filename{"inv.png"};    
-    Rectangle source{0, 0, 20, 20};
+    std::string filename{"inv.png"};
     Color tint{WHITE};
-    int nb_frames{1};
-    int frame_padding{0};
-    float animation_speed{5.0f}; // Frames per second
     bool flipX{false};
     bool flipY{false};
+    // New: explicit frame rectangles (overrides nb_frames/frame_padding when non-empty)
+    std::vector<Rectangle> frameRects; // each frame sub-rect
+    std::vector<float> frameDurations; // seconds per frame (same size as frameRects) optional
+    float defaultFrameDuration{0.2f}; // used if frameDurations empty (uniform timing)
 };
 
 struct CollisionDesc {
@@ -35,5 +36,3 @@ struct SpawnData {
     std::optional<BodyDesc> body;
     std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
 };
-
-
