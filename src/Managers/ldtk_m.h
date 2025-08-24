@@ -8,7 +8,6 @@
 
 class Ldtk_m {
 public:
-    // Load an LDtk project (.ldtk). If skipCharacters is true, entity layers are ignored.
     static void loadLevel(const std::string& filename, bool skipCharacters = false);
     static void routine(); // hot reload check
     static void enableHotReload(bool v) { hotReloadEnabled = v; }

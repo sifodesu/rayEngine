@@ -17,16 +17,12 @@ void UpgradePickup::routine() {
     BasicEnt::routine();
     if (to_delete_) return;
     if (!body_) return;
-    Rectangle mine = body_->getSurface();
-    
-    for (CollisionRect* other : CollisionRect::query(mine)) {
-        if (other->getFather() == this) continue;
-        if (!CheckCollisionRecs(mine, other->getSurface())) continue;
-        if (auto* chr = dynamic_cast<Character*>(other->getFather())) {
-            if (UpgradeRegistry::apply(upgradeType_, *chr)) {
-                to_delete_ = true;
-            }
-            break;
+}
+
+void UpgradePickup::onCollision(GObject* other) {
+    if (auto* chr = dynamic_cast<Character*>(other)) {
+        if (UpgradeRegistry::apply(upgradeType_, *chr)) {
+            to_delete_ = true;
         }
     }
 }

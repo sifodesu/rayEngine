@@ -8,6 +8,8 @@ class UpgradePickup : public BasicEnt {
 public:
     explicit UpgradePickup(const SpawnData& data);
     void routine() override; // overlap check with Character
+    void onCollision(GObject* other) override;
+
 private:
     std::string upgradeType_;
 };

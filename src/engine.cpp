@@ -22,7 +22,7 @@ Engine::Engine()
     InitWindow(NATIVE_RES_WIDTH*6, NATIVE_RES_HEIGHT*6, "rayEngine");
     InitAudioDevice();
     //fps limit
-    // SetTargetFPS(30);
+    SetTargetFPS(120);
     Raycam_m::init();
     Texture_m::load();
     Sprite_m::load();
