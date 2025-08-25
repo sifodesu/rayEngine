@@ -162,7 +162,7 @@ void Character::draw() {
     // Draw adi count above character (simple UI for now)
     Vector2 pos = body_->getCoord();
     // DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);
-    DrawText(TextFormat("Speed: %.0f Jump: %.0f", debugBaseSpeed_, debugJumpSpeed_), (int)pos.x, (int)pos.y - 30, 8, YELLOW);
+    // DrawText(TextFormat("Speed: %.0f Jump: %.0f", debugBaseSpeed_, debugJumpSpeed_), (int)pos.x, (int)pos.y - 30, 8, YELLOW);
 }
 
 void Character::respawn() {

@@ -16,6 +16,7 @@
 #include <string>
 #include "rlImGui.h"
 #include "imgui_layer.h"
+#include "save_manager.h"
 
 Engine::Engine()
 {
@@ -32,6 +33,8 @@ Engine::Engine()
     InputMap::init();
     UpgradeRegistry::initDefaults();
     Ldtk_m::loadLevel("ldtk_test.ldtk");
+    SaveManager::load(); // load save file (if exists)
+    SaveManager::applyToWorld(); // move player to saved checkpoint
 
     rlImGuiSetup(true);
 
@@ -46,14 +49,14 @@ void Engine::game_loop()
         Clock::lap();
         Ldtk_m::routine();
 
-    Shader_m::begin();
+        Shader_m::begin();
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});
             Object_m::routine();
             Raycam_m::getRayCam().routine();
             BeginMode2D(Raycam_m::getCam());
                 render();
             EndMode2D();
-    Shader_m::end();
+        Shader_m::end();
 
         BeginDrawing();
             ClearBackground(BLACK);
@@ -81,7 +84,7 @@ void Engine::render()
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-        DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
+        // DrawRectangleRec(body->getSurface(), Fade(RED, 0.3));
     }
 }
 

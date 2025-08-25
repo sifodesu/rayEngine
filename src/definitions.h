@@ -3,6 +3,7 @@
 #define TEXTURES_PATH "./Data/Textures/"
 #define POLICES_PATH  "./Data/Polices/"
 #define MUSICS_PATH "./Data/Musics/"
+#define SAVE_FILE_PATH "save.json"
 
 #define NATIVE_RES_WIDTH  320
 #define NATIVE_RES_HEIGHT  240

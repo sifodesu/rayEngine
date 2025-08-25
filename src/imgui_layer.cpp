@@ -21,9 +21,16 @@ void DrawWindows() {
     if (ImGui::Begin("Player Debug")) {
         if (auto *player = findPlayer()) {
             float jump = player->getDebugJumpSpeed();
-            if (ImGui::SliderFloat("Jump Speed", &jump, 50.0f, 800.0f, "%.0f")) {
+            if (ImGui::SliderFloat("Jump Speed", &jump, 100.0f, 300.0f, "%.0f")) {
                 player->setDebugJumpSpeed(jump);
             }
+
+            double mass = player->body_->getMass();
+            float massF = static_cast<float>(mass);
+            if (ImGui::SliderFloat("Gravity (mass)", &massF, 0.0f, 2000.0f, "%.0f")) {
+                player->body_->setMass(massF);
+            }
+        
         } else {
             ImGui::TextUnformatted("Player not found");
         }

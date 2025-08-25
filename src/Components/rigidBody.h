@@ -21,6 +21,9 @@ public:
     void setAcceleration(double acc);
     Vector2 getSpeed();
     void routine();
+    // Gravity acceleration accessor (named mass_ internally)
+    double getMass() const { return mass_; }
+    void setMass(double m) { mass_ = m; }
 
 private:
     Vector2 speed_;
