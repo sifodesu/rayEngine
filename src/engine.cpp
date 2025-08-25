@@ -14,14 +14,16 @@
 #include "collisionRect.h"
 #include "sprite_m.h"
 #include <string>
+#include "rlImGui.h"
+#include "imgui_layer.h"
 
 Engine::Engine()
 {
     SetTraceLogLevel(LOG_WARNING);
-    SetConfigFlags(FLAG_VSYNC_HINT);
+    SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(NATIVE_RES_WIDTH*6, NATIVE_RES_HEIGHT*6, "rayEngine");
     InitAudioDevice();
-    //fps limit
+    
     SetTargetFPS(120);
     Raycam_m::init();
     Texture_m::load();
@@ -30,6 +32,8 @@ Engine::Engine()
     InputMap::init();
     UpgradeRegistry::initDefaults();
     Ldtk_m::loadLevel("ldtk_test.ldtk");
+
+    rlImGuiSetup(true);
 
     // Shader_m::load();
 }
@@ -56,6 +60,11 @@ void Engine::game_loop()
             // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
             Shader_m::present();
             DrawFPS(10, 10);
+
+            // ImGui overlay
+            ImGuiLayer::BeginFrame();
+            ImGuiLayer::DrawWindows();
+            ImGuiLayer::EndFrame();
         EndDrawing();
     }
 }
@@ -72,7 +81,7 @@ void Engine::render()
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-        // DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
+        DrawRectangleRec(body->getSurface(), Fade(RED, 0.4));
     }
 }
 
@@ -81,5 +90,6 @@ Engine::~Engine()
     Shader_m::unload();
     Texture_m::unload();
     Object_m::unload();
+    rlImGuiShutdown();
     CloseWindow();
 }

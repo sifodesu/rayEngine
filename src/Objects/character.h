@@ -16,6 +16,9 @@ public:
     void addSpeedBoost(float factor) { speedMultiplier_ += factor; }
     void addDashBoost(float factor) { dashMultiplier_ += factor; }
     void setDashCooldownMs(int ms) { dashCooldown_ = ms / 1000.0; }
+    // Debug tuning API
+    float getDebugJumpSpeed() const { return debugJumpSpeed_; }
+    void setDebugJumpSpeed(float v) { if (v < 50.0f) v = 50.0f; if (v > 800.0f) v = 800.0f; debugJumpSpeed_ = v; }
     // Adi API
     int getAdi() const { return adiCount_; }
     int getAdiMax() const { return adiMax_; }
@@ -57,4 +60,8 @@ private:
     // Track last room grid (camera snap grid) to detect transitions
     int lastRoomGX_ = INT32_MIN;
     int lastRoomGY_ = INT32_MIN;
+    
+    // Debug speed controls
+    float debugBaseSpeed_ = 100.0f;
+    float debugJumpSpeed_ = 250.0f;
 };

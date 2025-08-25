@@ -5,7 +5,7 @@
 #include "sprite_m.h"
 #include "receptacle.h"
 #include "definitions.h"
-
+//100 250
 static constexpr float CHARACTER_BASE_SPEED = 120.0f;
 static constexpr float JUMP_SPEED_BASE = 300.0f; // base before adi scaling
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
@@ -39,7 +39,7 @@ void Character::onRoomEntered() {
 
 float Character::currentJumpSpeed() const {
     // base plus per-charge bonus
-    return JUMP_SPEED_BASE;// * (1.0f + adiJumpBonusPerCharge_ * adiCount_);
+    return debugJumpSpeed_;// * (1.0f + adiJumpBonusPerCharge_ * adiCount_);
 }
 float Character::currentDashFactor() const {
     return CHARACTER_DASH_FACTOR_BASE; //* (1.0f + adiDashBonusPerCharge_ * adiCount_);
@@ -48,6 +48,20 @@ float Character::currentDashFactor() const {
 void Character::routine() {
     double delta = Clock::getLap();
     dashing_ -= delta;
+    
+    // Debug speed controls
+    if (IsKeyPressed(KEY_ONE)) {
+        debugBaseSpeed_ = std::max(10.0f, debugBaseSpeed_ - 5.0f);
+    }
+    if (IsKeyPressed(KEY_TWO)) {
+        debugBaseSpeed_ = std::min(500.0f, debugBaseSpeed_ + 5.0f);
+    }
+    if (IsKeyPressed(KEY_THREE)) {
+        debugJumpSpeed_ = std::max(50.0f, debugJumpSpeed_ - 5.0f);
+    }
+    if (IsKeyPressed(KEY_FOUR)) {
+        debugJumpSpeed_ = std::min(800.0f, debugJumpSpeed_ + 5.0f);
+    }
 
     Vector2 bodySpeed = body_->getSpeed();
     // Reset jump counter if we are on the ground
@@ -70,7 +84,7 @@ void Character::routine() {
         if (InputMap::checkDown("left") && InputMap::checkDown("right"))
             body_->setSpeed({ 0, bodySpeed.y });
         else {
-            float moveSpeed = CHARACTER_BASE_SPEED * speedMultiplier_;
+            float moveSpeed = debugBaseSpeed_ * speedMultiplier_;
             if (InputMap::checkDown("left"))
                 body_->setSpeed({ -moveSpeed, bodySpeed.y });
             else if (bodySpeed.x < 0)
@@ -147,7 +161,8 @@ void Character::draw() {
     current_anim_->draw(body_->getCoord());
     // Draw adi count above character (simple UI for now)
     Vector2 pos = body_->getCoord();
-    DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);
+    // DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);
+    DrawText(TextFormat("Speed: %.0f Jump: %.0f", debugBaseSpeed_, debugJumpSpeed_), (int)pos.x, (int)pos.y - 30, 8, YELLOW);
 }
 
 void Character::respawn() {

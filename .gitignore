@@ -52,3 +52,4 @@ toolchain.cmake
 /Data/Ldtk/*/simplified
 /Data/Shaders
 /Data/Ldtk/ldtk_test/backups
+/examples
