@@ -78,7 +78,7 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, int px, 
 }
 
 // Pull user-defined fields (type, solid) from LDtk entity instance into SpawnData.
-void fillEntityFields(const json& inst, SpawnData& d) {
+void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize) {
     if (!inst.contains("fieldInstances")) return;
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
@@ -93,7 +93,6 @@ void fillEntityFields(const json& inst, SpawnData& d) {
             auto tryLoad = [&](const std::string& k){ if (auto meta = Sprite_m::get(k)) { *d.sprite = *meta; return true; } return false; };
             bool loaded = tryLoad(key);
             if (!loaded) {
-                // If key has extension, strip and retry (handles .png names provided from LDtk fields)
                 auto pos = key.find_last_of('.');
                 if (pos != string::npos) {
                     string base = key.substr(0, pos);
@@ -101,7 +100,6 @@ void fillEntityFields(const json& inst, SpawnData& d) {
                 }
             }
             if (!loaded) {
-                // As last fallback treat as direct texture filename
                 d.sprite->filename = key;
             }
         }
@@ -110,7 +108,21 @@ void fillEntityFields(const json& inst, SpawnData& d) {
                 d.dialog = f["__value"].get<string>();
             }
         }
+        else if (fid == "Point") {
+            if (f.contains("__value") && f["__value"].is_array()) {
+                std::vector<Vector2> pts;
+                for (auto& p : f["__value"]) {
+                    if (p.contains("cx") && p.contains("cy")) {
+                        int cx = p["cx"].get<int>();
+                        int cy = p["cy"].get<int>();
+                        pts.push_back({ (float)cx, (float)cy }); // store cell coords; conversion later
+                    }
+                }
+                if (!pts.empty()) d.pathPoints = pts;
+            }
+        }
     }
+    d.layerGridSize = layerGridSize;
 }
 
 // If the entity uses a tileset tile, set its sprite filename + source rectangle.
@@ -125,9 +137,9 @@ void fillEntityTile(const json& e, const map<int,string>& tilesetNames, SpawnDat
 }
 
 // Fully construct and spawn an entity; defaults to type "basic" if unspecified.
-void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int,string>& tilesetNames) {
+void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int,string>& tilesetNames, int layerGridSize) {
     SpawnData d; // default empty
-    fillEntityFields(e, d);
+    fillEntityFields(e, d, layerGridSize);
     if (!d.sprite.has_value()) fillEntityTile(e, tilesetNames, d);
     if (d.type.empty()) d.type = "basic";
     if (!d.collision) d.collision = CollisionDesc{};
@@ -184,9 +196,9 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
                     spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex); 
                 }
             } else if (type == "Entities" && !skipCharacters) { // Entity layer -> spawn entities
+                int entityGridSize = layer["__gridSize"].get<int>();
                 for (auto& e : layer["entityInstances"]) {
-                    // Keep large offset from tile layers but simpler constant
-                    spawnEntity(e, worldX, worldY, layerIndex + 100, tilesetNames);
+                    spawnEntity(e, worldX, worldY, layerIndex + 100, tilesetNames, entityGridSize);
                 }
             }
             ++layerIndex;

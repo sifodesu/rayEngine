@@ -9,7 +9,7 @@
 using json = nlohmann::json;
 
 std::string SaveManager::saveFilePath() {
-    return SAVE_FILE_PATH; // central path constant
+    return SAVE_FILE_PATH;
 }
 
 void SaveManager::load() {

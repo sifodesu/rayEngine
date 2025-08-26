@@ -35,4 +35,6 @@ struct SpawnData {
     std::optional<CollisionDesc> collision;
     std::optional<BodyDesc> body;
     std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
+    std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in pixels or cells)
+    std::optional<int> layerGridSize; // grid size of entity layer (cell size)
 };

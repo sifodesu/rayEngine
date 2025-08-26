@@ -5,7 +5,7 @@
 #include "sprite_m.h"
 #include "receptacle.h"
 #include "definitions.h"
-//100 250
+
 static constexpr float CHARACTER_BASE_SPEED = 120.0f;
 static constexpr float JUMP_SPEED_BASE = 300.0f; // base before adi scaling
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
@@ -49,19 +49,8 @@ void Character::routine() {
     double delta = Clock::getLap();
     dashing_ -= delta;
     
-    // Debug speed controls
-    if (IsKeyPressed(KEY_ONE)) {
-        debugBaseSpeed_ = std::max(10.0f, debugBaseSpeed_ - 5.0f);
-    }
-    if (IsKeyPressed(KEY_TWO)) {
-        debugBaseSpeed_ = std::min(500.0f, debugBaseSpeed_ + 5.0f);
-    }
-    if (IsKeyPressed(KEY_THREE)) {
-        debugJumpSpeed_ = std::max(50.0f, debugJumpSpeed_ - 5.0f);
-    }
-    if (IsKeyPressed(KEY_FOUR)) {
-        debugJumpSpeed_ = std::min(800.0f, debugJumpSpeed_ + 5.0f);
-    }
+    // Collision separation - push character out if embedded in solid objects
+    separateFromCollisions();
 
     Vector2 bodySpeed = body_->getSpeed();
     // Reset jump counter if we are on the ground
@@ -171,6 +160,56 @@ void Character::respawn() {
         body_->setSpeed({0,0});
         jumps_ = 1; // reset on respawn
         dashCooldownLeft_ = 0; // dash immediately available on respawn
+    }
+}
+
+void Character::separateFromCollisions() {
+    Rectangle myRect = body_->getSurface();
+    const float separationStep = 0.5f;
+    const int maxAttempts = 20;
+    
+    for (int attempt = 0; attempt < maxAttempts; ++attempt) {
+        bool hasCollision = false;
+        Vector2 separation = {0, 0};
+        
+        for (CollisionRect* other : CollisionRect::query(myRect, true)) {
+            if (!other->isSolid() || other->getId() == body_->getId()) continue;
+            
+            Rectangle otherRect = other->getSurface();
+            if (!CheckCollisionRecs(myRect, otherRect)) continue;
+            
+            hasCollision = true;
+            
+            // Calculate overlap
+            float overlapX = std::min(myRect.x + myRect.width - otherRect.x, 
+                                    otherRect.x + otherRect.width - myRect.x);
+            float overlapY = std::min(myRect.y + myRect.height - otherRect.y,
+                                    otherRect.y + otherRect.height - myRect.y);
+            
+            // Separate along the axis with smaller overlap
+            if (overlapX < overlapY) {
+                // Separate horizontally
+                if (myRect.x < otherRect.x) {
+                    separation.x -= separationStep;
+                } else {
+                    separation.x += separationStep;
+                }
+            } else {
+                // Separate vertically
+                if (myRect.y < otherRect.y) {
+                    separation.y -= separationStep;
+                } else {
+                    separation.y += separationStep;
+                }
+            }
+        }
+        
+        if (!hasCollision) break;
+        
+        // Apply separation
+        myRect.x += separation.x;
+        myRect.y += separation.y;
+        body_->setSurface(myRect);
     }
 }
 

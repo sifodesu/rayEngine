@@ -36,6 +36,7 @@ public:
 private:
     // Helpers
     bool isOnGround() const;
+    void separateFromCollisions();
 
     std::unordered_map<std::string, Sprite *> anims_;
     double dashing_;

@@ -11,6 +11,7 @@
 #include "checkpoint.h"
 #include "pano.h"
 #include "receptacle.h"
+#include "plateforme.h"
 
 using namespace std;
 
@@ -42,6 +43,8 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
         obj = std::make_unique<Pano>(data);
     } else if (data.type == "Receptacle") {
         obj = std::make_unique<Receptacle>(data);
+    } else if (data.type == "Plateforme") {
+        obj = std::make_unique<Plateforme>(data);
     } else {
         return nullptr;
     }
