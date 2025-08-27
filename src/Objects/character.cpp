@@ -6,8 +6,6 @@
 #include "receptacle.h"
 #include "definitions.h"
 
-static constexpr float CHARACTER_BASE_SPEED = 120.0f;
-static constexpr float JUMP_SPEED_BASE = 300.0f; // base before adi scaling
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
 
 Character::Character(const SpawnData& data) : GObject(data.id) {
@@ -53,6 +51,7 @@ void Character::routine() {
     separateFromCollisions();
 
     Vector2 bodySpeed = body_->getSpeed();
+
     // Reset jump counter if we are on the ground
     if (isOnGround()) {
         jumps_ = 2;
@@ -67,23 +66,38 @@ void Character::routine() {
         if (InputMap::checkPressed("r1") && jumps_ > 0) {
             body_->setSpeed({ bodySpeed.x, -currentJumpSpeed()});
             jumps_--;
+            jumpHeld_ = true;
         }
 
         bodySpeed = body_->getSpeed();
-        if (InputMap::checkDown("left") && InputMap::checkDown("right"))
+        if (InputMap::checkDown("left") && InputMap::checkDown("right")) {
             body_->setSpeed({ 0, bodySpeed.y });
+        }
         else {
             float moveSpeed = debugBaseSpeed_ * speedMultiplier_;
-            if (InputMap::checkDown("left"))
+            if (InputMap::checkDown("left")) {
                 body_->setSpeed({ -moveSpeed, bodySpeed.y });
-            else if (bodySpeed.x < 0)
+            } else if (bodySpeed.x < 0) {
                 body_->setSpeed({ 0, bodySpeed.y });
+            }
 
-            if (InputMap::checkDown("right"))
+            if (InputMap::checkDown("right")) {
                 body_->setSpeed({ moveSpeed, bodySpeed.y });
-            else if (bodySpeed.x > 0)
+            } else if (bodySpeed.x > 0) {
                 body_->setSpeed({ 0, bodySpeed.y });
+            }
         }
+
+        bodySpeed = body_->getSpeed();
+        if (InputMap::checkReleased("r1")) {
+            // Cut jump short if going up
+            if (bodySpeed.y < 0 && jumpHeld_) {
+                body_->setSpeed({ bodySpeed.x, bodySpeed.y * 0.5f });
+            }
+        }
+    }
+    if (InputMap::checkUp("r1")) {
+        jumpHeld_ = false;
     }
     bodySpeed = body_->getSpeed();
     

@@ -10,11 +10,13 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
     waypoints_.push_back(startCenter);
     lastCenter_ = startCenter;
     
-    float cell = (data.layerGridSize ? (float)*data.layerGridSize : 8.0f);
+    // Set enabled state from SpawnData (default to true if not specified)
+    enabled_ = data.enabled.value_or(true);
+    
     if (data.pathPoints && !data.pathPoints->empty()) {
-        for (auto cellPt : *data.pathPoints) {
-            // cellPt is in cell coordinates; convert to pixel center of that cell
-            Vector2 worldCenter { cellPt.x * cell + cell/2.0f, cellPt.y * cell + cell/2.0f };
+        for (auto absolutePt : *data.pathPoints) {
+            // absolutePt is already in absolute pixel coordinates
+            Vector2 worldCenter { absolutePt.x, absolutePt.y };
             waypoints_.push_back(worldCenter);
         }
     }
@@ -165,6 +167,9 @@ Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
 
 void Plateforme::routine() {
     BasicEnt::routine();
+    
+    // Only move if platform is enabled
+    if (!enabled_) return;
     
     if (waypoints_.size() < 2) return;
     

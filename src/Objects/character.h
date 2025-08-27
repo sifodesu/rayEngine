@@ -65,4 +65,7 @@ private:
     // Debug speed controls
     float debugBaseSpeed_ = 100.0f;
     float debugJumpSpeed_ = 250.0f;
+
+    bool cancelJump_ = false; // if true, cut jump short on next routine (for variable jump height
+    bool jumpHeld_ = false; // track if jump button is held across frames
 };

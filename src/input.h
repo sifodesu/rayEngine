@@ -9,5 +9,6 @@ public:
     static bool checkDown(std::string);
     static bool checkPressed(std::string);
     static bool checkUp(std::string);
+    static bool checkReleased(std::string);
     static std::map<std::string, int> mapping;
 };

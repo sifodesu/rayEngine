@@ -32,3 +32,7 @@ bool InputMap::checkUp(std::string action) {
     int key = getKeyFor(action);
     return key != 0 && IsKeyUp(key);
 }
+bool InputMap::checkReleased(std::string action) {
+    int key = getKeyFor(action);
+    return key != 0 && IsKeyReleased(key);
+}

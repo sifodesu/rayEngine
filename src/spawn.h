@@ -9,7 +9,6 @@ struct SpriteDesc {
     Color tint{WHITE};
     bool flipX{false};
     bool flipY{false};
-    // New: explicit frame rectangles (overrides nb_frames/frame_padding when non-empty)
     std::vector<Rectangle> frameRects; // each frame sub-rect
     std::vector<float> frameDurations; // seconds per frame (same size as frameRects) optional
     float defaultFrameDuration{0.2f}; // used if frameDurations empty (uniform timing)
@@ -35,6 +34,8 @@ struct SpawnData {
     std::optional<CollisionDesc> collision;
     std::optional<BodyDesc> body;
     std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
-    std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in pixels or cells)
-    std::optional<int> layerGridSize; // grid size of entity layer (cell size)
+    std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in absolute pixels)
+    std::optional<bool> enabled; // Optional enabled state (for platforms, etc.)
+    std::optional<std::string> targetId; // Optional target object LDtk IID (for receptacles to activate other objects)
+    std::optional<std::string> ldtkId; // Optional LDtk entity IID (unique identifier from LDtk)
 };

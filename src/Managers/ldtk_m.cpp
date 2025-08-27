@@ -78,7 +78,7 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, int px, 
 }
 
 // Pull user-defined fields (type, solid) from LDtk entity instance into SpawnData.
-void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize) {
+void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int worldX, int worldY) {
     if (!inst.contains("fieldInstances")) return;
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
@@ -115,14 +115,32 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize) {
                     if (p.contains("cx") && p.contains("cy")) {
                         int cx = p["cx"].get<int>();
                         int cy = p["cy"].get<int>();
-                        pts.push_back({ (float)cx, (float)cy }); // store cell coords; conversion later
+                        // Convert cell coordinates to absolute pixel coordinates including world offset
+                        float absoluteX = (float)(cx * layerGridSize + layerGridSize/2 + worldX);
+                        float absoluteY = (float)(cy * layerGridSize + layerGridSize/2 + worldY);
+                        pts.push_back({ absoluteX, absoluteY });
                     }
                 }
                 if (!pts.empty()) d.pathPoints = pts;
             }
         }
+        else if (fid == "enabled") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.enabled = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "trigger") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                // Handle EntityRef type for trigger/targetId field
+                if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
+                    d.targetId = f["__value"]["entityIid"].get<string>();
+                } else if (f["__value"].is_string()) {
+                    // Fallback for direct string references
+                    d.targetId = f["__value"].get<string>();
+                }
+            }
+        }
     }
-    d.layerGridSize = layerGridSize;
 }
 
 // If the entity uses a tileset tile, set its sprite filename + source rectangle.
@@ -139,13 +157,25 @@ void fillEntityTile(const json& e, const map<int,string>& tilesetNames, SpawnDat
 // Fully construct and spawn an entity; defaults to type "basic" if unspecified.
 void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int,string>& tilesetNames, int layerGridSize) {
     SpawnData d; // default empty
-    fillEntityFields(e, d, layerGridSize);
+    fillEntityFields(e, d, layerGridSize, worldX, worldY);
     if (!d.sprite.has_value()) fillEntityTile(e, tilesetNames, d);
     if (d.type.empty()) d.type = "basic";
     if (!d.collision) d.collision = CollisionDesc{};
     d.collision->rect = Rectangle{(float)(e["px"][0].get<int>() + worldX), (float)(e["px"][1].get<int>() + worldY), (float)e["width"].get<int>(), (float)e["height"].get<int>()};
+    
+    // Extract LDtk entity IID (unique identifier) and store it
+    if (e.contains("iid") && e["iid"].is_string()) {
+        d.ldtkId = e["iid"].get<string>();
+    }
+    
     d.id = Object_m::genID();
     d.layer = layer;
+    
+    // Store mapping from LDtk ID to engine ID
+    if (d.ldtkId.has_value()) {
+        Ldtk_m::registerIdMapping(*d.ldtkId, d.id);
+    }
+    
     Object_m::createFromSpawn(d);
 }
 } // namespace
@@ -160,6 +190,11 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     json root; file >> root;
     if (!root.contains("levels") || root["levels"].empty()) { cerr << "LDtk: no levels in " << filename << '\n'; return; }
 
+    // Clear previous ID mapping
+    if (!skipCharacters) {
+        clearIdMapping();
+    }
+    
     currentProjectFile = filename; // track for hot reload
     auto tilesetNames = collectTilesetNames(root);
 
@@ -217,3 +252,17 @@ void Ldtk_m::checkHotReload() {
 }
 
 void Ldtk_m::routine() { checkHotReload(); }
+
+// ID mapping methods
+void Ldtk_m::clearIdMapping() {
+    ldtkIdToEngineId_.clear();
+}
+
+void Ldtk_m::registerIdMapping(const std::string& ldtkId, int engineId) {
+    ldtkIdToEngineId_[ldtkId] = engineId;
+}
+
+int Ldtk_m::getEngineIdFromLdtkId(const std::string& ldtkId) {
+    auto it = ldtkIdToEngineId_.find(ldtkId);
+    return (it != ldtkIdToEngineId_.end()) ? it->second : -1;
+}

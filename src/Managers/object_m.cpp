@@ -71,6 +71,19 @@ void Object_m::routine()
     // DrawText(std::to_string(nb_ents).c_str(), 200, 10, 20, BLACK);
 
     vector<int> toDelete;
+
+    // std::vector<CollisionRect*> to_routine = CollisionRect::query(Raycam_m::getRayCam().getRect());
+    // for (CollisionRect* obj_rec : to_routine)
+    // {
+    //     GObject* obj = obj_rec->getFather();
+    //     obj->routine();
+        
+    //     if (obj->to_delete_)
+    //     {
+    //         toDelete.push_back(obj->id_);
+    //     }
+    // }
+
     for (auto &[id, obj] : level_ents_)
     {
         obj->routine();
