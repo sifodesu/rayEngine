@@ -1030,7 +1030,7 @@
 			]
 		},
 		{
-			"identifier": "Platform",
+			"identifier": "Plateforme",
 			"uid": 78,
 			"tags": [],
 			"exportToToc": false,
@@ -1169,7 +1169,7 @@
 					"acceptFileTypes": null,
 					"defaultOverride": {
 						"id": "V_String",
-						"params": ["Platform"]
+						"params": ["Plateforme"]
 					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
@@ -1255,7 +1255,7 @@
 		{ "id": "Kill", "tileRect": null, "color": 15389866 },
 		{ "id": "Pano", "tileRect": null, "color": 14984818 },
 		{ "id": "Receptacle", "tileRect": null, "color": 7552569 },
-		{ "id": "Platform", "tileRect": null, "color": 4073265 }
+		{ "id": "Plateforme", "tileRect": null, "color": 4073265 }
 	], "iconTilesetUid": 20, "externalRelPath": null, "externalFileChecksum": null, "tags": [] }], "externalEnums": [], "levelFields": [] },
 	"levels": [
 		{
@@ -1909,6 +1909,29 @@
 							],
 							"__worldX": 160,
 							"__worldY": 192
+						},
+						{
+							"__identifier": "Plateforme",
+							"__grid": [32,21],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 20, "x": 48, "y": 16, "w": 24, "h": 8 },
+							"__smartColor": "#D77643",
+							"iid": "8cf89260-5e50-11f0-a5ea-abb26ec768a6",
+							"width": 24,
+							"height": 8,
+							"defUid": 78,
+							"px": [256,168],
+							"fieldInstances": [
+								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 79, "realEditorValues": [] },
+								{ "__identifier": "Point", "__type": "Array<Point>", "__value": [{ "cx": 22, "cy": 10 }], "__tile": null, "defUid": 80, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["22,10"]
+								}] },
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Plateforme", "__tile": null, "defUid": 81, "realEditorValues": [] }
+							],
+							"__worldX": 256,
+							"__worldY": 168
 						}
 					]
 				},
