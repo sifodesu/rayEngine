@@ -54,3 +54,4 @@ toolchain.cmake
 /Data/Ldtk/ldtk_test/backups
 /examples
 imgui.ini
+save.json
