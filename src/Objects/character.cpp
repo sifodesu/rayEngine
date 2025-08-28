@@ -58,10 +58,13 @@ void Character::routine() {
     } else {
         jumps_ = std::min(jumps_, 1);
     }
+    
+    // Disable gravity during dash
     if (dashing_ > 0) {
+        body_->setGravityEnabled(false);
         body_->setSpeed({ bodySpeed.x, 0});
-    }
-    else {
+    } else {
+        body_->setGravityEnabled(true);
         // Jump: allow at most 2 jumps until grounded again
         if (InputMap::checkPressed("r1") && jumps_ > 0) {
             body_->setSpeed({ bodySpeed.x, -currentJumpSpeed()});
@@ -103,10 +106,11 @@ void Character::routine() {
     
     dashCooldownLeft_ = std::max(dashCooldownLeft_ - delta, 0.0);
     if (InputMap::checkPressed("dash")) {
-        // Conditions: not already dashing, some horizontal movement (direction), cooldown ready
-        if (dashing_ <= 0 && dashCooldownLeft_ <= 0 && bodySpeed.x != 0) {
+        // Conditions: not already dashing, cooldown ready
+        if (dashing_ <= 0 && dashCooldownLeft_ <= 0) {
             dashing_ = 0.1; // dash active window duration (seconds)
-            body_->setSpeed(Vector2Multiply(bodySpeed, { currentDashFactor() * dashMultiplier_, 0 }));
+            bool is_flipped = current_anim_->getFlipX();
+            body_->setSpeed({ currentDashFactor() * dashMultiplier_ * debugBaseSpeed_ * (is_flipped ? -1 : 1), bodySpeed.y });
             dashCooldownLeft_ = dashCooldown_; // reset cooldown
         }
     }

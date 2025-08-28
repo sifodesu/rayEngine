@@ -10,6 +10,8 @@ RigidBody::RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* fa
     acceleration_ = body.acceleration;
     curve_ = body.curve;
     mass_ = body.gravityAcceleration;
+    maxFallSpeed_ = body.maxFallSpeed;
+    gravityEnabled_ = true; // gravity enabled by default
 }
 
 
@@ -64,8 +66,13 @@ void RigidBody::routine() {
     if (delta > 0.2)
         return;
 
-    if (mass_)
+    if (mass_ && gravityEnabled_) {
         speed_.y += mass_ * delta;
+        // Limit falling speed
+        if (speed_.y > maxFallSpeed_) {
+            speed_.y = maxFallSpeed_;
+        }
+    }
 
     if (std::fabs(speed_.x) < FLT_EPSILON && std::fabs(speed_.y) < FLT_EPSILON)
         return;

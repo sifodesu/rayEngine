@@ -30,6 +30,12 @@ void DrawWindows() {
             if (ImGui::SliderFloat("Gravity (mass)", &massF, 0.0f, 2000.0f, "%.0f")) {
                 player->body_->setMass(massF);
             }
+
+            double maxFallSpeed = player->getMaxFallSpeed();
+            float maxFallSpeedF = static_cast<float>(maxFallSpeed);
+            if (ImGui::SliderFloat("Max Fall Speed", &maxFallSpeedF, 100.0f, 2000.0f, "%.0f")) {
+                player->setMaxFallSpeed(maxFallSpeedF);
+            }
         
         } else {
             ImGui::TextUnformatted("Player not found");

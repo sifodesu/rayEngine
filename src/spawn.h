@@ -24,6 +24,7 @@ struct BodyDesc {
     double acceleration{0};
     double curve{0};
     double gravityAcceleration{800};
+    double maxFallSpeed{280}; // Maximum falling speed in pixels/second
 };
 
 struct SpawnData {
