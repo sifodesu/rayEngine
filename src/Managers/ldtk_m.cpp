@@ -103,6 +103,18 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 d.sprite->filename = key;
             }
         }
+        else if (fid == "flipX") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.sprite) d.sprite = SpriteDesc{};
+                d.sprite->flipX = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "flipY") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.sprite) d.sprite = SpriteDesc{};
+                d.sprite->flipY = f["__value"].get<bool>();
+            }
+        }
         else if (fid == "Dialog") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 d.dialog = f["__value"].get<string>();

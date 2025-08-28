@@ -11,7 +11,7 @@
 	"iid": "e50a8b70-5e50-11f0-acf6-63ff8b495593",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 163,
+	"nextUid": 164,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "GridVania",
@@ -716,6 +716,43 @@
 						"id": "V_String",
 						"params": ["kill"]
 					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "flipY",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 163,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -1790,7 +1827,8 @@
 							"px": [96,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 96,
 							"__worldY": 192
@@ -1809,7 +1847,8 @@
 							"px": [104,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 104,
 							"__worldY": 192
@@ -1828,7 +1867,8 @@
 							"px": [112,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 112,
 							"__worldY": 192
@@ -1847,7 +1887,8 @@
 							"px": [120,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 120,
 							"__worldY": 192
@@ -1866,7 +1907,8 @@
 							"px": [128,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 128,
 							"__worldY": 192
@@ -1885,7 +1927,8 @@
 							"px": [136,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 136,
 							"__worldY": 192
@@ -1904,7 +1947,8 @@
 							"px": [144,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 144,
 							"__worldY": 192
@@ -1923,7 +1967,8 @@
 							"px": [152,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 152,
 							"__worldY": 192
@@ -1942,7 +1987,8 @@
 							"px": [160,192],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 160,
 							"__worldY": 192
@@ -2705,7 +2751,11 @@
 							"px": [192,136],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": true, "__tile": null, "defUid": 163, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
 							"__worldX": 512,
 							"__worldY": 136
@@ -2724,7 +2774,11 @@
 							"px": [200,136],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": true, "__tile": null, "defUid": 163, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
 							"__worldX": 520,
 							"__worldY": 136
@@ -2743,7 +2797,11 @@
 							"px": [208,136],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": true, "__tile": null, "defUid": 163, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
 							],
 							"__worldX": 528,
 							"__worldY": 136
@@ -2762,7 +2820,8 @@
 							"px": [176,200],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 496,
 							"__worldY": 200
@@ -2781,7 +2840,8 @@
 							"px": [184,200],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 504,
 							"__worldY": 200
@@ -2800,7 +2860,8 @@
 							"px": [192,200],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 512,
 							"__worldY": 200
@@ -2819,7 +2880,8 @@
 							"px": [200,200],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 520,
 							"__worldY": 200
@@ -2838,7 +2900,8 @@
 							"px": [208,200],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Kill", "__tile": null, "defUid": 62, "realEditorValues": [] },
-								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] }
+								{ "__identifier": "sprite", "__type": "String", "__value": "kill", "__tile": null, "defUid": 77, "realEditorValues": [] },
+								{ "__identifier": "flipY", "__type": "Bool", "__value": false, "__tile": null, "defUid": 163, "realEditorValues": [] }
 							],
 							"__worldX": 528,
 							"__worldY": 200
