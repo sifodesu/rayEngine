@@ -242,6 +242,20 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
                     bool solid = isTileSolid(intGrid, localPx, localPy);
                     spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex); 
                 }
+            } else if (type == "IntGrid") { // IntGrid layer -> spawn auto-generated tiles if any
+                if (layer.contains("autoLayerTiles") && !layer["autoLayerTiles"].empty()) {
+                    int tileSize = layer["__gridSize"].get<int>();
+                    string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
+                    for (auto& tile : layer["autoLayerTiles"]) {
+                        int localPx = tile["px"][0];
+                        int localPy = tile["px"][1];
+                        int sx = tile["src"][0];
+                        int sy = tile["src"][1];
+                        // IntGrid tiles with autoLayerTiles are typically solid based on their IntGrid value
+                        bool solid = isTileSolid(intGrid, localPx, localPy);
+                        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex);
+                    }
+                }
             } else if (type == "Entities" && !skipCharacters) { // Entity layer -> spawn entities
                 int entityGridSize = layer["__gridSize"].get<int>();
                 for (auto& e : layer["entityInstances"]) {
