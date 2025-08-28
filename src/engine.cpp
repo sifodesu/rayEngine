@@ -22,9 +22,10 @@ Engine::Engine()
 {
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
-    InitWindow(NATIVE_RES_WIDTH*6, NATIVE_RES_HEIGHT*6, "rayEngine");
+    InitWindow(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, "rayEngine");
+    MaximizeWindow();
     InitAudioDevice();
-    
+
     SetTargetFPS(120);
     Raycam_m::init();
     Texture_m::load();

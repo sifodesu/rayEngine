@@ -165,7 +165,7 @@ void Character::routine() {
 }
 
 void Character::draw() {
-    current_anim_->draw(body_->getCoord());
+    current_anim_->draw(body_->getSurface());
     // Draw adi count above character (simple UI for now)
     Vector2 pos = body_->getCoord();
     // DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);

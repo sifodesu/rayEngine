@@ -21,7 +21,7 @@ BasicEnt::~BasicEnt()
 
 void BasicEnt::draw()
 {
-    sprite_->draw(body_->getCoord());
+    sprite_->draw(body_->getSurface());
 }
 
 void BasicEnt::routine()

@@ -70,3 +70,33 @@ void Sprite::draw(Vector2 pos) {
     }
     DrawTextureRec(sprite_sheet_, src, pos, tint_);
 }
+
+void Sprite::draw(Rectangle targetRect) {
+    // Snap target rectangle to integer pixels to avoid subpixel sampling artifacts
+    targetRect.x = std::roundf(targetRect.x);
+    targetRect.y = std::roundf(targetRect.y);
+    targetRect.width = std::roundf(targetRect.width);
+    targetRect.height = std::roundf(targetRect.height);
+    
+    Rectangle src = frameRects_.empty()? Rectangle{0,0,0,0} : frameRects_[current_frame_ % frameRects_.size()];
+    
+    // Slightly inset the source to avoid sampling neighboring texels due to float precision
+    const float inset = 0.01f;
+    bool willFlipX = flipX_;
+    bool willFlipY = flipY_;
+    if (!willFlipX) { src.x += inset; src.width -= 2*inset; }
+    if (!willFlipY) { src.y += inset; src.height -= 2*inset; }
+    // Apply flipping by negating width/height and adjusting origin
+    if (flipX_) {
+        src.x += src.width; // shift to the right edge
+        src.width = -src.width;
+    }
+    if (flipY_) {
+        src.y += src.height; // shift to the bottom edge
+        src.height = -src.height;
+    }
+    
+    // Use DrawTexturePro to stretch the sprite to fit the target rectangle
+    Vector2 origin = {0, 0};  // No rotation offset needed
+    DrawTexturePro(sprite_sheet_, src, targetRect, origin, 0.0f, tint_);
+}

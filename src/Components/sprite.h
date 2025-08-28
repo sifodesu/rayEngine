@@ -9,6 +9,7 @@ public:
     Sprite(const std::string& filename, Rectangle rect = Rectangle{0, 0, 32, 32}); // rect becomes first frame
     Sprite(const struct SpriteDesc& desc);
     void draw(Vector2 pos);
+    void draw(Rectangle targetRect);  // Draw sprite stretched to fit target rectangle
     void routine();
     void setTint(Color tint) { tint_ = tint; };
     Color getTint() { return tint_; };
