@@ -143,12 +143,76 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         }
         else if (fid == "trigger") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                // Handle EntityRef type for trigger/targetId field
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                
+                std::string targetId;
+                // Handle EntityRef type for trigger field
                 if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
-                    d.targetId = f["__value"]["entityIid"].get<string>();
+                    targetId = f["__value"]["entityIid"].get<string>();
                 } else if (f["__value"].is_string()) {
                     // Fallback for direct string references
-                    d.targetId = f["__value"].get<string>();
+                    targetId = f["__value"].get<string>();
+                }
+                
+                if (!targetId.empty()) {
+                    d.adiComponent->targetIds.push_back(targetId);
+                    // Configuration par défaut pour receptacle style
+                    d.adiComponent->canReceiveAdi = true;
+                }
+            }
+        }
+        // AdiComponent configuration fields
+        else if (fid == "canReceiveAdi") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                d.adiComponent->canReceiveAdi = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "canBeTriggered") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                d.adiComponent->canBeTriggered = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "adiCapacity") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                d.adiComponent->maxCapacity = f["__value"].get<int>();
+            }
+        }
+        else if (fid == "adiThreshold") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                d.adiComponent->activationThreshold = f["__value"].get<int>();
+            }
+        }
+        else if (fid == "adiTargets") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                // Parse comma-separated target IDs
+                string targetsStr = f["__value"].get<string>();
+                if (!targetsStr.empty()) {
+                    std::vector<std::string> targets;
+                    size_t start = 0;
+                    size_t end = targetsStr.find(',');
+                    
+                    while (end != std::string::npos) {
+                        std::string target = targetsStr.substr(start, end - start);
+                        // Trim whitespace
+                        target.erase(0, target.find_first_not_of(" \t"));
+                        target.erase(target.find_last_not_of(" \t") + 1);
+                        if (!target.empty()) targets.push_back(target);
+                        start = end + 1;
+                        end = targetsStr.find(',', start);
+                    }
+                    
+                    // Add the last target
+                    std::string target = targetsStr.substr(start);
+                    target.erase(0, target.find_first_not_of(" \t"));
+                    target.erase(target.find_last_not_of(" \t") + 1);
+                    if (!target.empty()) targets.push_back(target);
+                    
+                    d.adiComponent->targetIds = targets;
                 }
             }
         }
@@ -175,17 +239,23 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int
     if (!d.collision) d.collision = CollisionDesc{};
     d.collision->rect = Rectangle{(float)(e["px"][0].get<int>() + worldX), (float)(e["px"][1].get<int>() + worldY), (float)e["width"].get<int>(), (float)e["height"].get<int>()};
     
-    // Extract LDtk entity IID (unique identifier) and store it
+    // Extract LDtk entity IID (unique identifier) and transfer to AdiComponent if needed
+    std::optional<std::string> ldtkId;
     if (e.contains("iid") && e["iid"].is_string()) {
-        d.ldtkId = e["iid"].get<string>();
+        ldtkId = e["iid"].get<string>();
+    }
+    
+    // Transfer ldtkId to AdiComponent if it exists
+    if (d.adiComponent.has_value() && ldtkId.has_value()) {
+        d.adiComponent->ldtkId = ldtkId;
     }
     
     d.id = Object_m::genID();
     d.layer = layer;
     
     // Store mapping from LDtk ID to engine ID
-    if (d.ldtkId.has_value()) {
-        Ldtk_m::registerIdMapping(*d.ldtkId, d.id);
+    if (ldtkId.has_value()) {
+        Ldtk_m::registerIdMapping(*ldtkId, d.id);
     }
     
     Object_m::createFromSpawn(d);

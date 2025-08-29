@@ -4,6 +4,10 @@
 #include "raycam_m.h"
 #include "sprite_m.h"
 #include "receptacle.h"
+#include "plateforme.h"
+#include "basicEnt.h"
+#include "adiComponent.h"
+#include "adiComponent.h"
 #include "definitions.h"
 
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
@@ -32,7 +36,6 @@ bool Character::retrieveOneAdi() {
 }
 
 void Character::onRoomEntered() {
-    Receptacle::recallAll(*this);
 }
 
 float Character::currentJumpSpeed() const {
@@ -115,21 +118,57 @@ void Character::routine() {
         }
     }
 
-    // Deposit adi into overlapping receptacle (press r2)
+    // Deposit adi into overlapping object with AdiComponent (press r2)
     if (InputMap::checkPressed("r2") && canDepositAdi()) {
         Rectangle mine = body_->getSurface();
-        for (CollisionRect* other : CollisionRect::query(mine)) {
+        
+        // Expand detection area slightly to include touching objects
+        const float touchDistance = 2.0f; // pixels
+        Rectangle expandedMine = {
+            mine.x - touchDistance,
+            mine.y - touchDistance,
+            mine.width + 2 * touchDistance,
+            mine.height + 2 * touchDistance
+        };
+        
+        for (CollisionRect* other : CollisionRect::query(expandedMine)) {
             if (other->getFather() == this) continue;
-            if (!CheckCollisionRecs(mine, other->getSurface())) continue;
-            if (auto* rec = dynamic_cast<Receptacle*>(other->getFather())) {
-                if (rec->deposit(*this)) break; // deposit only one per press
+            if (!CheckCollisionRecs(expandedMine, other->getSurface())) continue;
+            
+            // Try to get AdiComponent from the object using optional system
+            if (auto adiCompOpt = other->getFather()->getAdiComponent()) {
+                AdiComponent* adiComp = *adiCompOpt;
+                if (adiComp->canReceiveAdi && adiComp->depositAdi(*this)) {
+                    break; // deposit only one per press
+                }
             }
         }
     }
-
-    // Recall all adis from all receptacles (press r3)
-    if (InputMap::checkPressed("r3")) {
-        Receptacle::recallAll(*this);
+    // Retrieve adi from overlapping object with AdiComponent (press r3)
+    if (InputMap::checkPressed("r3") && adiCount_ < adiMax_) {
+        Rectangle mine = body_->getSurface();
+        
+        // Expand detection area slightly to include touching objects
+        const float touchDistance = 2.0f; // pixels
+        Rectangle expandedMine = {
+            mine.x - touchDistance,
+            mine.y - touchDistance,
+            mine.width + 2 * touchDistance,
+            mine.height + 2 * touchDistance
+        };
+        
+        for (CollisionRect* other : CollisionRect::query(expandedMine)) {
+            if (other->getFather() == this) continue;
+            if (!CheckCollisionRecs(expandedMine, other->getSurface())) continue;
+            
+            // Try to get AdiComponent from the object using optional system
+            if (auto adiCompOpt = other->getFather()->getAdiComponent()) {
+                AdiComponent* adiComp = *adiCompOpt;
+                if (adiComp->canReceiveAdi && adiComp->withdrawAdi(*this)) {
+                    break; // retrieve only one per press
+                }
+            }
+        }
     }
 
     current_anim_->routine();

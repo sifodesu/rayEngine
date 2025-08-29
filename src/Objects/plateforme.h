@@ -3,12 +3,22 @@
 #include <vector>
 #include <raylib.h> // ensure Vector2
 
+class AdiComponent;
+
 class Plateforme : public BasicEnt {
 public:
     explicit Plateforme(const SpawnData& data);
     void routine() override;
-    void setEnabled(bool enabled) { enabled_ = enabled; }
-    bool isEnabled() const { return enabled_; }
+    
+    // Interface publique (legacy compatibility)
+    void setEnabled(bool enabled);
+    bool isEnabled() const;
+    void draw() override;
+    
+    // Override pour le système optional
+    std::optional<AdiComponent*> getAdiComponent() override { 
+        return adiComponent_ ? std::optional<AdiComponent*>{adiComponent_} : std::nullopt; 
+    }
 
 private:
     // Helper methods for cleaner code organization
@@ -33,4 +43,5 @@ private:
     float accX_ = 0.0f;
     float accY_ = 0.0f;
     bool enabled_ = true; // whether platform should move
+    AdiComponent* adiComponent_ = nullptr; // Component pour être triggerable
 }; // Plateforme

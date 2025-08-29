@@ -2,6 +2,8 @@
 #include "clock.h"
 #include "character.h"
 #include "collisionRect.h"
+#include "adiComponent.h"
+
 
 Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
     // Starting center
@@ -12,6 +14,28 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
     
     // Set enabled state from SpawnData (default to true if not specified)
     enabled_ = data.enabled.value_or(true);
+    
+    // Créer AdiComponent depuis SpawnData si configuré
+    if (data.adiComponent.has_value()) {
+        const auto& desc = *data.adiComponent;
+        if (desc.canReceiveAdi || desc.canBeTriggered || !desc.targetIds.empty()) {
+            adiComponent_ = new AdiComponent(desc);
+        }
+    }
+    
+    // Configurer le callback pour réagir aux triggers
+    if (adiComponent_ && adiComponent_->canBeTriggered) {
+        adiComponent_->onTriggered = [this](bool triggered) {
+            this->setEnabled(triggered);
+        };
+    }
+
+    // Configurer le callback pour réagir aux triggers
+    if (adiComponent_ && adiComponent_->canReceiveAdi) {
+        adiComponent_->onActivationChanged = [this](bool triggered) {
+            this->setEnabled(triggered);
+        };
+    }
     
     if (data.pathPoints && !data.pathPoints->empty()) {
         for (auto absolutePt : *data.pathPoints) {
@@ -202,4 +226,23 @@ void Plateforme::routine() {
     moveCarriedCharacters(ridingCharacters, deltaMove, newCenter);
     
     lastCenter_ = newCenter;
+}
+
+// Public interface methods
+void Plateforme::setEnabled(bool enabled) {
+    enabled_ = enabled;
+}
+
+bool Plateforme::isEnabled() const {
+    return enabled_;
+}
+
+void Plateforme::draw() {
+    BasicEnt::draw();
+    
+    if (adiComponent_) {
+        Vector2 pos = body_->getCoord();
+        int stored = adiComponent_->getStoredAdi();
+        DrawText(TextFormat("P:%d", stored), (int)pos.x, (int)pos.y - 10, 8, stored > 0 ? YELLOW : GRAY);
+    }
 }

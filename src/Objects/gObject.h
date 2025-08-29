@@ -2,8 +2,11 @@
 #include <string>
 #include <map>
 #include <vector>
+#include <optional>
 #include <raylib.h>
 #include <nlohmann/json.hpp>
+
+class AdiComponent;
 
 class GObject {
 public:
@@ -14,6 +17,9 @@ public:
     virtual void draw() {}
     virtual void onCollision(GObject*) {}
     virtual Rectangle getRect() { return Rectangle{0.0f, 0.0f, 1.0f, 1.0f}; }
+    
+    // Méthode virtuelle pour récupérer l'AdiComponent (si présent)
+    virtual std::optional<AdiComponent*> getAdiComponent() { return std::nullopt; }
 
     const int id_;
     // int x, y;

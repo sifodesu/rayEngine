@@ -27,6 +27,15 @@ struct BodyDesc {
     double maxFallSpeed{280}; // Maximum falling speed in pixels/second
 };
 
+struct AdiComponentDesc {
+    bool canReceiveAdi = false;
+    bool canBeTriggered = false;
+    int maxCapacity = 1;
+    int activationThreshold = 1;
+    std::vector<std::string> targetIds;
+    std::optional<std::string> ldtkId; // Optional LDtk entity IID (unique identifier from LDtk)
+};
+
 struct SpawnData {
     int id{0};
     std::string type; // e.g. "tile", "character"
@@ -37,6 +46,5 @@ struct SpawnData {
     std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
     std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in absolute pixels)
     std::optional<bool> enabled; // Optional enabled state (for platforms, etc.)
-    std::optional<std::string> targetId; // Optional target object LDtk IID (for receptacles to activate other objects)
-    std::optional<std::string> ldtkId; // Optional LDtk entity IID (unique identifier from LDtk)
+    std::optional<AdiComponentDesc> adiComponent; // Optional ADI component configuration
 };
