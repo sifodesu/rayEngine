@@ -12,6 +12,7 @@
 #include "pano.h"
 #include "receptacle.h"
 #include "plateforme.h"
+#include "portal.h"
 
 using namespace std;
 
@@ -45,6 +46,8 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
         obj = std::make_unique<Receptacle>(data);
     } else if (data.type == "Plateforme") {
         obj = std::make_unique<Plateforme>(data);
+    } else if (data.type == "Portal") {
+        obj = std::make_unique<Portal>(data);
     } else {
         return nullptr;
     }

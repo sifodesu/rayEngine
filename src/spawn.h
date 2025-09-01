@@ -47,4 +47,6 @@ struct SpawnData {
     std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in absolute pixels)
     std::optional<bool> enabled; // Optional enabled state (for platforms, etc.)
     std::optional<AdiComponentDesc> adiComponent; // Optional ADI component configuration
+    std::optional<std::string> linkId; // Optional link ID for generic linking system
+    std::optional<std::vector<std::string>> targetIds; // Optional target IDs for generic linking system
 };

@@ -23,10 +23,14 @@ Engine::Engine()
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, "rayEngine");
-    MaximizeWindow();
+    SetTargetFPS(120);
+    
+    int scale = std::max(1, int(GetMonitorHeight(GetCurrentMonitor())*0.90 / NATIVE_RES_HEIGHT));
+    SetWindowSize(NATIVE_RES_WIDTH * scale, NATIVE_RES_HEIGHT * scale);
+    SetWindowPosition((GetMonitorWidth(GetCurrentMonitor()) - GetScreenWidth()) / 2, (GetMonitorHeight(GetCurrentMonitor()) - GetScreenHeight()) / 2);
+    
     InitAudioDevice();
 
-    SetTargetFPS(120);
     Raycam_m::init();
     Texture_m::load();
     Sprite_m::load();
@@ -45,10 +49,9 @@ Engine::Engine()
 void Engine::game_loop()
 {
     while (!WindowShouldClose()) {
-        Shader_m::routine();
-
         Clock::lap();
-        Ldtk_m::routine();
+
+        Shader_m::routine();
 
         Shader_m::begin();
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});

@@ -7,6 +7,7 @@
 #include <nlohmann/json.hpp>
 
 class AdiComponent;
+class LinkableComponent;
 
 class GObject {
 public:
@@ -20,6 +21,9 @@ public:
     
     // Méthode virtuelle pour récupérer l'AdiComponent (si présent)
     virtual std::optional<AdiComponent*> getAdiComponent() { return std::nullopt; }
+    
+    // Méthode virtuelle pour récupérer le LinkableComponent (si présent)
+    virtual std::optional<LinkableComponent*> getLinkableComponent() { return std::nullopt; }
 
     const int id_;
     // int x, y;

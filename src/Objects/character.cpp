@@ -9,6 +9,7 @@
 #include "adiComponent.h"
 #include "adiComponent.h"
 #include "definitions.h"
+#include "portal.h"
 
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
 
@@ -169,6 +170,15 @@ void Character::routine() {
                 }
             }
         }
+    }
+
+
+    if (InputMap::checkPressed("r3")) { // N key alternative for spawning portal
+        Portal::spawnPortalAtPlayer();
+    }
+    
+    if (InputMap::checkPressed("r4")) { // J key for teleporting to spawned portal
+        Portal::teleportPlayerToSpawnedPortal();
     }
 
     current_anim_->routine();

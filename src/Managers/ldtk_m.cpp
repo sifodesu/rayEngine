@@ -141,6 +141,41 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 d.enabled = f["__value"].get<bool>();
             }
         }
+        else if (fid == "linkId") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.linkId = f["__value"].get<string>();
+            }
+        }
+        else if (fid == "targetIds") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                std::string targetsStr = f["__value"].get<string>();
+                std::vector<std::string> targets;
+                
+                // Parse comma-separated target IDs
+                size_t start = 0;
+                size_t end = targetsStr.find(',');
+                
+                while (end != std::string::npos) {
+                    std::string target = targetsStr.substr(start, end - start);
+                    // Trim whitespace
+                    target.erase(0, target.find_first_not_of(" \t"));
+                    target.erase(target.find_last_not_of(" \t") + 1);
+                    if (!target.empty()) targets.push_back(target);
+                    start = end + 1;
+                    end = targetsStr.find(',', start);
+                }
+                
+                // Add the last target
+                std::string target = targetsStr.substr(start);
+                target.erase(0, target.find_first_not_of(" \t"));
+                target.erase(target.find_last_not_of(" \t") + 1);
+                if (!target.empty()) targets.push_back(target);
+                
+                if (!targets.empty()) {
+                    d.targetIds = targets;
+                }
+            }
+        }
         else if (fid == "trigger") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
@@ -337,17 +372,6 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     }
 }
 
-// Hot reload: if project timestamp changed, clear only tiles (preserve dynamic ents) and re-import (entities skipped).
-void Ldtk_m::checkHotReload() {
-    if (!hotReloadEnabled || currentProjectFile.empty()) return;
-    error_code ec; auto path = filesystem::path(LDTK_PATH) / currentProjectFile; auto cur = filesystem::last_write_time(path, ec); if (ec) return;
-    if (lastWrite.time_since_epoch().count() == 0) { lastWrite = cur; return; }
-    if (cur == lastWrite) return;
-    lastWrite = cur;
-    try { Object_m::clearTiles(); loadLevel(currentProjectFile, true); } catch (...) { /* swallow */ }
-}
-
-void Ldtk_m::routine() { checkHotReload(); }
 
 // ID mapping methods
 void Ldtk_m::clearIdMapping() {
