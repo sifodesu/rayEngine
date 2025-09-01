@@ -3,6 +3,7 @@
 #include "raycam_m.h"
 #include "object_m.h"
 #include "input.h"
+#include "ldtk_m.h"
 #include <raymath.h>
 
 Portal* Portal::playerSpawnedPortal_ = nullptr;
@@ -10,16 +11,23 @@ Portal* Portal::playerSpawnedPortal_ = nullptr;
 Portal::Portal(const SpawnData& data) 
     : BasicEnt(data), isPlayerSpawned_(false), cooldownTimer_(0.0f) {
     
-    // Create linkable component
-    std::string linkId = data.linkId.value_or("");
-    linkable_ = new LinkableComponent(this, linkId);
+    // Create linkable component using a unique identifier
+    // Use the object's ID as a string for linkable identification
+    std::string ownId = std::to_string(id_);
+    linkable_ = new LinkableComponent(this, ownId);
+        
     
     // Set up portal-specific linking callback
     linkable_->onTriggerReceived = [this](const std::string& sourceId, const std::string& message, void* data) {
         this->onPortalLink(sourceId, message, data);
     };
     
-    // Add target IDs if provided
+    // Store the target LDtk ID for later resolution
+    if (data.linkId.has_value()) {
+        targetLdtkId_ = data.linkId.value();
+    }
+    
+    // Add additional target IDs if provided (these should be engine IDs)
     if (data.targetIds.has_value()) {
         for (const std::string& targetId : data.targetIds.value()) {
             linkable_->addTargetId(targetId);
@@ -53,12 +61,14 @@ std::optional<LinkableComponent*> Portal::getLinkableComponent() {
 Portal* Portal::getLinkedPortal() const {
     // Get the first linked portal from the linkable component
     std::vector<GObject*> linkedObjects = linkable_->getLinkedObjects();
+    
     for (GObject* obj : linkedObjects) {
         Portal* portal = dynamic_cast<Portal*>(obj);
         if (portal) {
             return portal;
         }
     }
+    
     return nullptr;
 }
 
@@ -66,6 +76,7 @@ void Portal::onCollision(GObject* other) {
     // Check if the colliding object is a character (player)
     Character* character = dynamic_cast<Character*>(other);
     Portal* linkedPortal = getLinkedPortal();
+    
     if (character && cooldownTimer_ <= 0.0f && linkedPortal) {
         performTeleportation(other);
     }
@@ -117,7 +128,7 @@ void Portal::spawnPortalAtPlayer() {
     
     // Portal collision configuration
     CollisionDesc collision;
-    collision.rect = Rectangle{playerCenter.x - 16, playerCenter.y - 16, 32, 32};
+    collision.rect = Rectangle{playerCenter.x - 4, playerCenter.y - 4, 8, 8};
     collision.solid = false; // Not solid so player can pass through
     portalData.collision = collision;
     
@@ -193,4 +204,19 @@ void Portal::performTeleportation(GObject* player) {
 void Portal::onPortalLink(const std::string& sourceId, const std::string& message, void* data) {
     // Handle portal-specific linking messages if needed
     // For basic teleportation, no special handling is required
+}
+
+void Portal::setupPortalLinks() {
+    // Find all portal objects and resolve their target links
+    for (auto& [id, obj] : Object_m::level_ents_) {
+        Portal* portal = dynamic_cast<Portal*>(obj.get());
+        if (portal && !portal->targetLdtkId_.empty()) {            
+            // Convert LDtk ID to engine ID
+            int targetEngineId = Ldtk_m::getEngineIdFromLdtkId(portal->targetLdtkId_);
+            if (targetEngineId != -1) {
+                std::string targetIdStr = std::to_string(targetEngineId);
+                portal->linkable_->addTargetId(targetIdStr);
+            }
+        }
+    }
 }

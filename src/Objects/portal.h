@@ -26,11 +26,15 @@ public:
     
     Vector2 getCenter() const;
     
+    // Static method for post-load linking setup
+    static void setupPortalLinks();
+    
 private:
     LinkableComponent* linkable_;
     bool isPlayerSpawned_;
     float cooldownTimer_; // To prevent immediate re-teleportation
     static constexpr float TELEPORT_COOLDOWN = 1.0f; // 1 second cooldown
+    std::string targetLdtkId_; // Store the target LDtk ID for later resolution
     
     // Static portal management
     static Portal* playerSpawnedPortal_;

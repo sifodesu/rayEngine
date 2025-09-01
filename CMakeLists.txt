@@ -16,20 +16,26 @@ file(GLOB_RECURSE CPPS "src/*.cpp")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(RAYLIB_VERSION 5.5)
 include(FetchContent)
 
-FetchContent_Declare(
-  raylib
-  DOWNLOAD_EXTRACT_TIMESTAMP OFF
-  URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
-)
-FetchContent_GetProperties(raylib)
-if(NOT raylib_POPULATED)
-  FetchContent_Populate(raylib)
+# Handle raylib based on platform
+if(WIN32)
+    # On Windows, download and build raylib
+    set(RAYLIB_VERSION 5.5)
+    FetchContent_Declare(
+        raylib
+        DOWNLOAD_EXTRACT_TIMESTAMP OFF
+        URL https://github.com/raysan5/raylib/archive/refs/tags/${RAYLIB_VERSION}.tar.gz
+    )
+    FetchContent_GetProperties(raylib)
+    if(NOT raylib_POPULATED)
+        FetchContent_Populate(raylib)
+    endif()
+    add_subdirectory(${raylib_SOURCE_DIR} raylib)
+else()
+    # On Linux/Unix, use system-installed raylib
+    find_package(raylib REQUIRED)
 endif()
-
-add_subdirectory(${raylib_SOURCE_DIR} raylib)
 
 FetchContent_Declare(json URL https://github.com/nlohmann/json/releases/download/v3.11.3/json.tar.xz)
 FetchContent_MakeAvailable(json)

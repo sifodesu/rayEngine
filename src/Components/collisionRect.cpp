@@ -10,6 +10,8 @@ CollisionRect::CollisionRect(const CollisionDesc& desc, GObject* father) {
     surface_ = desc.rect;
     solid_ = desc.solid;
     pool_id_ = -1;
+    in_quadtree_ = false;  // Initialize the flag
+    stored_node_ = {-1, {0, 0, 0, 0}};  // Initialize stored node
 
     if (pool.size()) {
         pool_id_ = (--pool.end())->first + 1;
@@ -35,6 +37,12 @@ void CollisionRect::setDims(Vector2 dims) {
     remove();
     surface_.width = dims.x;
     surface_.height = dims.y;
+    add();
+}
+
+void CollisionRect::setSurface(Rectangle surf) {
+    remove();
+    surface_ = surf;
     add();
 }
 

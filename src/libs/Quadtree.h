@@ -52,6 +52,10 @@ namespace quadtree {
             remove(mRoot.get(), nullptr, mBox, value);
         }
 
+        bool contains(const quadNode& value) const {
+            return contains(mRoot.get(), mBox, value);
+        }
+
         std::vector<quadNode> query(const Rectangle& rect) const {
             const Box<float> box (rect);
             auto values = std::vector<quadNode>();
@@ -291,6 +295,30 @@ namespace quadtree {
                 for (const auto& child : node->children)
                     findIntersectionsInDescendants(child.get(), value, intersections);
             }
+        }
+
+        bool contains(Node* node, const Box<float>& box, const quadNode& value) const {
+            assert(node != nullptr);
+            if (!box.contains(mGetBox(value))) {
+                return false;
+            }
+            
+            // Check if value is in this node
+            for (const auto& nodeValue : node->values) {
+                if (mEqual(value, nodeValue)) {
+                    return true;
+                }
+            }
+            
+            // If not a leaf, check children
+            if (!isLeaf(node)) {
+                auto i = getQuadrant(box, mGetBox(value));
+                if (i != -1) {
+                    return contains(node->children[static_cast<std::size_t>(i)].get(), computeBox(box, i), value);
+                }
+            }
+            
+            return false;
         }
     };
 

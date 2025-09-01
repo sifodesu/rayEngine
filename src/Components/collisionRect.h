@@ -13,7 +13,7 @@ public:
     virtual ~CollisionRect();
     void setCoord(Vector2 pos);
     void setDims(Vector2 dims);
-    void setSurface(Rectangle surf) { surface_ = surf; }
+    void setSurface(Rectangle surf);
     Vector2 getCoord() { return { surface_.x, surface_.y }; }
     Vector2 getCenterCoord() { return { surface_.x + surface_.width / 2, surface_.y + surface_.height / 2 }; }
     Rectangle& getSurface() { return surface_; }
@@ -28,11 +28,21 @@ public:
     bool isSolid() { return solid_; }
     void add()
     {
-        quad_.add({pool_id_, surface_});
+        if (!in_quadtree_) {
+            stored_node_ = {pool_id_, surface_};
+            quad_.add(stored_node_);
+            in_quadtree_ = true;
+        }
     }
     void remove()
     {
-        quad_.remove({pool_id_, surface_});
+        if (in_quadtree_) {
+            // Use the exact node that was stored when added
+            if (quad_.contains(stored_node_)) {
+                quad_.remove(stored_node_);
+            }
+            in_quadtree_ = false;
+        }
     }
 
     GObject* getFather() { return father_; }
@@ -43,6 +53,8 @@ protected:
     Rectangle surface_;
     bool solid_;
     int pool_id_;
+    bool in_quadtree_;  // Track if this object is currently in the quadtree
+    quadNode stored_node_;  // Store the exact node that was added to the quadtree
 
     GObject* father_;
 };

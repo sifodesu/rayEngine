@@ -8,6 +8,7 @@
 #include "spawn.h"
 #include "definitions.h"
 #include "sprite_m.h"
+#include "portal.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -143,7 +144,13 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         }
         else if (fid == "linkId") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                d.linkId = f["__value"].get<string>();
+                // Handle EntityRef type for linkId field
+                if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
+                    d.linkId = f["__value"]["entityIid"].get<string>();
+                } else if (f["__value"].is_string()) {
+                    // Fallback for direct string references
+                    d.linkId = f["__value"].get<string>();
+                }
             }
         }
         else if (fid == "targetIds") {
@@ -370,6 +377,9 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
             ++layerIndex;
         }
     }
+    
+    // After all entities are loaded, setup portal links
+    Portal::setupPortalLinks();
 }
 
 
