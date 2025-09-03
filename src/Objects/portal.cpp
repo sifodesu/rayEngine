@@ -5,11 +5,12 @@
 #include "input.h"
 #include "ldtk_m.h"
 #include <raymath.h>
+#include <vector>
 
 Portal* Portal::playerSpawnedPortal_ = nullptr;
 
 Portal::Portal(const SpawnData& data) 
-    : BasicEnt(data), isPlayerSpawned_(false), cooldownTimer_(0.0f) {
+    : BasicEnt(data), isPlayerSpawned_(false) {
     
     // Create linkable component using a unique identifier
     // Use the object's ID as a string for linkable identification
@@ -47,10 +48,23 @@ Portal::~Portal() {
 
 void Portal::routine() {
     BasicEnt::routine();
-    
-    // Update cooldown timer
-    if (cooldownTimer_ > 0.0f) {
-        cooldownTimer_ -= GetFrameTime();
+
+    // Prune entities that are no longer overlapping (simple AABB test)
+    if (!overlappingEntities_.empty()) {
+        Rectangle myRect = body_->getSurface();
+        std::vector<int> toRemove;
+        for (int entId : overlappingEntities_) {
+            auto it = Object_m::level_ents_.find(entId);
+            if (it == Object_m::level_ents_.end()) { toRemove.push_back(entId); continue; }
+            GObject* obj = it->second.get();
+            Character* ch = dynamic_cast<Character*>(obj);
+            if (!ch) { toRemove.push_back(entId); continue; }
+            Rectangle otherRect = ch->getRect();
+            if (!CheckCollisionRecs(myRect, otherRect)) {
+                toRemove.push_back(entId); // entity left portal
+            }
+        }
+        for (int rem : toRemove) overlappingEntities_.erase(rem);
     }
 }
 
@@ -73,13 +87,19 @@ Portal* Portal::getLinkedPortal() const {
 }
 
 void Portal::onCollision(GObject* other) {
-    // Check if the colliding object is a character (player)
+    // Trigger teleport only on collision enter (not already overlapping)
+    if (!other) return;
+    int oid = other->id_;
+    if (overlappingEntities_.find(oid) != overlappingEntities_.end()) return; // already inside
+
     Character* character = dynamic_cast<Character*>(other);
+    if (!character) return;
+
     Portal* linkedPortal = getLinkedPortal();
-    
-    if (character && cooldownTimer_ <= 0.0f && linkedPortal) {
-        performTeleportation(other);
-    }
+    if (!linkedPortal) return;
+
+    overlappingEntities_.insert(oid);
+    performTeleportation(other);
 }
 
 Vector2 Portal::getCenter() const {
@@ -123,7 +143,6 @@ void Portal::spawnPortalAtPlayer() {
     // Portal sprite configuration
     SpriteDesc sprite;
     sprite.filename = "gateway.png"; // Using existing texture
-    sprite.tint = BLUE; // Blue tint for player-spawned portals
     portalData.sprite = sprite;
     
     // Portal collision configuration
@@ -143,62 +162,50 @@ void Portal::spawnPortalAtPlayer() {
 
 void Portal::teleportPlayerToSpawnedPortal() {
     if (!playerSpawnedPortal_) return;
-    
+
     // Find the player
     Character* player = nullptr;
     for (auto& [id, obj] : Object_m::level_ents_) {
         Character* character = dynamic_cast<Character*>(obj.get());
-        if (character) {
-            player = character;
-            break;
-        }
+        if (character) { player = character; break; }
     }
-    
     if (!player) return;
-    
-    // Teleport player to the spawned portal
+
     Vector2 portalCenter = playerSpawnedPortal_->getCenter();
     Rectangle playerRect = player->getRect();
-    
-    // Calculate new position (center player on portal)
     float newX = portalCenter.x - playerRect.width / 2.0f;
     float newY = portalCenter.y - playerRect.height / 2.0f;
-    
-    // Update player position through collision body
     if (player->body_) {
         Rectangle newRect = player->body_->getSurface();
         newRect.x = newX;
         newRect.y = newY;
         player->body_->setSurface(newRect);
     }
-    
-    // Set cooldown on the spawned portal to prevent immediate re-teleportation
-    playerSpawnedPortal_->cooldownTimer_ = TELEPORT_COOLDOWN;
+    // Mark overlap so manual teleport doesn't immediately retrigger until player exits
+    playerSpawnedPortal_->overlappingEntities_.insert(player->id_);
 }
 
 void Portal::performTeleportation(GObject* player) {
     Portal* linkedPortal = getLinkedPortal();
     if (!linkedPortal) return;
-    
+
     Vector2 targetCenter = linkedPortal->getCenter();
     Rectangle playerRect = player->getRect();
-    
-    // Calculate new position (center player on target portal)
     float newX = targetCenter.x - playerRect.width / 2.0f;
     float newY = targetCenter.y - playerRect.height / 2.0f;
-    
-    // Update player position
+
     Character* character = dynamic_cast<Character*>(player);
     if (character && character->body_) {
         Rectangle newRect = character->body_->getSurface();
         newRect.x = newX;
         newRect.y = newY;
         character->body_->setSurface(newRect);
+        Vector2 spd = character->body_->getSpeed();
+        spd.y = -spd.y; // invert vertical velocity
+        character->body_->setSpeed(spd);
+        // Mark the player as overlapping the destination portal to avoid immediate bounce-back
+    linkedPortal->overlappingEntities_.insert(character->id_);
     }
-    
-    // Set cooldown on both portals
-    cooldownTimer_ = TELEPORT_COOLDOWN;
-    linkedPortal->cooldownTimer_ = TELEPORT_COOLDOWN;
 }
 
 void Portal::onPortalLink(const std::string& sourceId, const std::string& message, void* data) {

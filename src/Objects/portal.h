@@ -2,6 +2,7 @@
 #include "basicEnt.h"
 #include "linkableComponent.h"
 #include <optional>
+#include <unordered_set>
 
 class Portal : public BasicEnt {
 public:
@@ -32,8 +33,11 @@ public:
 private:
     LinkableComponent* linkable_;
     bool isPlayerSpawned_;
-    float cooldownTimer_; // To prevent immediate re-teleportation
-    static constexpr float TELEPORT_COOLDOWN = 1.0f; // 1 second cooldown
+    // Track which entity IDs are currently overlapping this portal. Teleport
+    // only triggers on collision enter (id not already in set). When the
+    // entity leaves the portal area it's removed during routine(), allowing
+    // immediate reactivation without time-based cooldown.
+    std::unordered_set<int> overlappingEntities_;
     std::string targetLdtkId_; // Store the target LDtk ID for later resolution
     
     // Static portal management
