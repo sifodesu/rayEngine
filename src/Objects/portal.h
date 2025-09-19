@@ -1,6 +1,7 @@
 #pragma once
 #include "basicEnt.h"
 #include "linkableComponent.h"
+#include "spawn.h"
 #include <optional>
 #include <unordered_set>
 
@@ -27,12 +28,16 @@ public:
     
     Vector2 getCenter() const;
     
+    // Get portal direction
+    std::optional<PortalDirection> getDirection() const { return direction_; }
+    
     // Static method for post-load linking setup
     static void setupPortalLinks();
     
 private:
     LinkableComponent* linkable_;
     bool isPlayerSpawned_;
+    std::optional<PortalDirection> direction_; // Portal direction for velocity modification
     // Track which entity IDs are currently overlapping this portal. Teleport
     // only triggers on collision enter (id not already in set). When the
     // entity leaves the portal area it's removed during routine(), allowing

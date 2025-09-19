@@ -6,11 +6,17 @@
 #include "ldtk_m.h"
 #include <raymath.h>
 #include <vector>
+#include <cmath>
 
 Portal* Portal::playerSpawnedPortal_ = nullptr;
 
 Portal::Portal(const SpawnData& data) 
     : BasicEnt(data), isPlayerSpawned_(false) {
+    
+    // Store portal direction if provided
+    if (data.direction.has_value()) {
+        direction_ = data.direction.value();
+    }
     
     // Create linkable component using a unique identifier
     // Use the object's ID as a string for linkable identification
@@ -189,23 +195,67 @@ void Portal::performTeleportation(GObject* player) {
     Portal* linkedPortal = getLinkedPortal();
     if (!linkedPortal) return;
 
-    Vector2 targetCenter = linkedPortal->getCenter();
-    Rectangle playerRect = player->getRect();
-    float newX = targetCenter.x - playerRect.width / 2.0f;
-    float newY = targetCenter.y - playerRect.height / 2.0f;
-
     Character* character = dynamic_cast<Character*>(player);
-    if (character && character->body_) {
-        Rectangle newRect = character->body_->getSurface();
-        newRect.x = newX;
-        newRect.y = newY;
-        character->body_->setSurface(newRect);
-        Vector2 spd = character->body_->getSpeed();
-        spd.y = -spd.y; // invert vertical velocity
-        character->body_->setSpeed(spd);
-        // Mark the player as overlapping the destination portal to avoid immediate bounce-back
-    linkedPortal->overlappingEntities_.insert(character->id_);
+    if (!character || !character->body_) return;
+
+    Rectangle playerRect = character->body_->getSurface();
+    Rectangle sourcePortalRect = body_->getSurface();
+    Rectangle targetPortalRect = linkedPortal->body_->getSurface();
+
+    // Calculate relative position within source portal (0.0 to 1.0)
+    float relativeX = (playerRect.x + playerRect.width / 2.0f - sourcePortalRect.x) / sourcePortalRect.width;
+    float relativeY = (playerRect.y + playerRect.height / 2.0f - sourcePortalRect.y) / sourcePortalRect.height;
+    
+    // Clamp to valid range
+    relativeX = std::max(0.0f, std::min(1.0f, relativeX));
+    relativeY = std::max(0.0f, std::min(1.0f, relativeY));
+
+    Vector2 spd = character->body_->getSpeed();
+    float newX, newY;
+
+    // Apply direction-based positioning and velocity modification from the destination portal
+    if (linkedPortal->direction_.has_value()) {
+        switch (linkedPortal->direction_.value()) {
+            case PortalDirection::UP:
+                // Exit from bottom of target portal, maintain horizontal relative position
+                newX = targetPortalRect.x + relativeX * targetPortalRect.width - playerRect.width / 2.0f;
+                newY = targetPortalRect.y + targetPortalRect.height - playerRect.height;
+                spd.y = -abs(spd.y); // Force upward velocity
+                break;
+            case PortalDirection::DOWN:
+                // Exit from top of target portal, maintain horizontal relative position
+                newX = targetPortalRect.x + relativeX * targetPortalRect.width - playerRect.width / 2.0f;
+                newY = targetPortalRect.y;
+                spd.y = abs(spd.y); // Force downward velocity
+                break;
+            case PortalDirection::LEFT:
+                // Exit from right side of target portal, maintain vertical relative position
+                newX = targetPortalRect.x + targetPortalRect.width - playerRect.width;
+                newY = targetPortalRect.y + relativeY * targetPortalRect.height - playerRect.height / 2.0f;
+                spd.x = -abs(spd.x); // Force leftward velocity
+                break;
+            case PortalDirection::RIGHT:
+                // Exit from left side of target portal, maintain vertical relative position
+                newX = targetPortalRect.x;
+                newY = targetPortalRect.y + relativeY * targetPortalRect.height - playerRect.height / 2.0f;
+                spd.x = abs(spd.x); // Force rightward velocity
+                break;
+        }
+    } else {
+        // Default behavior: center positioning with inverted vertical velocity
+        newX = targetPortalRect.x + targetPortalRect.width / 2.0f - playerRect.width / 2.0f;
+        newY = targetPortalRect.y + targetPortalRect.height / 2.0f - playerRect.height / 2.0f;
+        spd.y = -spd.y;
     }
+
+    Rectangle newRect = playerRect;
+    newRect.x = newX;
+    newRect.y = newY;
+    character->body_->setSurface(newRect);
+    character->body_->setSpeed(spd);
+    
+    // Mark the player as overlapping the destination portal to avoid immediate bounce-back
+    linkedPortal->overlappingEntities_.insert(character->id_);
 }
 
 void Portal::onPortalLink(const std::string& sourceId, const std::string& message, void* data) {

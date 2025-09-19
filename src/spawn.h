@@ -24,7 +24,7 @@ struct BodyDesc {
     double acceleration{0};
     double curve{0};
     double gravityAcceleration{800};
-    double maxFallSpeed{280}; // Maximum falling speed in pixels/second
+    double maxFallSpeed{1000}; // Maximum falling speed in pixels/second
 };
 
 struct AdiComponentDesc {
@@ -34,6 +34,13 @@ struct AdiComponentDesc {
     int activationThreshold = 1;
     std::vector<std::string> targetIds;
     std::optional<std::string> ldtkId; // Optional LDtk entity IID (unique identifier from LDtk)
+};
+
+enum class PortalDirection {
+    UP,
+    DOWN,
+    LEFT,
+    RIGHT
 };
 
 struct SpawnData {
@@ -49,4 +56,5 @@ struct SpawnData {
     std::optional<AdiComponentDesc> adiComponent; // Optional ADI component configuration
     std::optional<std::string> linkId; // Optional link ID for generic linking system
     std::optional<std::vector<std::string>> targetIds; // Optional target IDs for generic linking system
+    std::optional<PortalDirection> direction; // Optional portal direction for velocity modification
 };

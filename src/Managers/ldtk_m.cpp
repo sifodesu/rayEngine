@@ -258,6 +258,20 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 }
             }
         }
+        else if (fid == "Gw_dir") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                std::string dirStr = f["__value"].get<string>();
+                if (dirStr == "UP") {
+                    d.direction = PortalDirection::UP;
+                } else if (dirStr == "DOWN") {
+                    d.direction = PortalDirection::DOWN;
+                } else if (dirStr == "LEFT") {
+                    d.direction = PortalDirection::LEFT;
+                } else if (dirStr == "RIGHT") {
+                    d.direction = PortalDirection::RIGHT;
+                }
+            }
+        }
     }
 }
 
