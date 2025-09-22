@@ -50,4 +50,5 @@ private:
     
     void performTeleportation(GObject* player);
     void onPortalLink(const std::string& sourceId, const std::string& message, void* data);
+    bool findSafePosition(Rectangle& playerRect, const Rectangle& targetPortalRect, PortalDirection direction);
 };

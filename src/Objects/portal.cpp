@@ -4,6 +4,7 @@
 #include "object_m.h"
 #include "input.h"
 #include "ldtk_m.h"
+#include "collisionRect.h"
 #include <raymath.h>
 #include <vector>
 #include <cmath>
@@ -104,8 +105,36 @@ void Portal::onCollision(GObject* other) {
     Portal* linkedPortal = getLinkedPortal();
     if (!linkedPortal) return;
 
-    overlappingEntities_.insert(oid);
-    performTeleportation(other);
+    // Check if player is fully inside the portal based on direction
+    Rectangle playerRect = character->body_->getSurface();
+    Rectangle portalRect = body_->getSurface();
+    
+    bool shouldTeleport = false;
+    
+    if (linkedPortal->direction_.has_value()) {
+        switch (linkedPortal->direction_.value()) {
+            case PortalDirection::UP:
+            case PortalDirection::DOWN:
+                // For vertical directions, check if player is fully inside horizontally
+                shouldTeleport = (playerRect.x >= portalRect.x && 
+                                (playerRect.x + playerRect.width) <= (portalRect.x + portalRect.width));
+                break;
+            case PortalDirection::LEFT:
+            case PortalDirection::RIGHT:
+                // For horizontal directions, check if player is fully inside vertically
+                shouldTeleport = (playerRect.y >= portalRect.y && 
+                                (playerRect.y + playerRect.height) <= (portalRect.y + portalRect.height));
+                break;
+        }
+    } else {
+        // Default behavior: teleport on any collision
+        shouldTeleport = true;
+    }
+    
+    if (shouldTeleport) {
+        overlappingEntities_.insert(oid);
+        performTeleportation(other);
+    }
 }
 
 Vector2 Portal::getCenter() const {
@@ -191,6 +220,66 @@ void Portal::teleportPlayerToSpawnedPortal() {
     playerSpawnedPortal_->overlappingEntities_.insert(player->id_);
 }
 
+bool Portal::findSafePosition(Rectangle& playerRect, const Rectangle& targetPortalRect, PortalDirection direction) {
+    Portal* linkedPortal = getLinkedPortal();
+    
+    // Test the initially calculated position
+    std::vector<CollisionRect*> collisions = CollisionRect::query(playerRect, true); // only solid objects
+    
+    // Filter out the target portal itself from collision check
+    auto it = std::remove_if(collisions.begin(), collisions.end(), 
+        [this, linkedPortal](CollisionRect* col) {
+            return col->getFather() == this || 
+                   (linkedPortal && col->getFather() == linkedPortal);
+        });
+    collisions.erase(it, collisions.end());
+    
+    if (collisions.empty()) {
+        return true; // Position is safe
+    }
+    
+    // Try to push the player away from the portal in the direction they should exit
+    float pushDistance = 2.0f; // pixels to push per attempt
+    int maxAttempts = 20;
+    
+    for (int attempt = 1; attempt <= maxAttempts; ++attempt) {
+        Rectangle testRect = playerRect;
+        
+        switch (direction) {
+            case PortalDirection::UP:
+                testRect.y -= pushDistance * attempt;
+                break;
+            case PortalDirection::DOWN:
+                testRect.y += pushDistance * attempt;
+                break;
+            case PortalDirection::LEFT:
+                testRect.x -= pushDistance * attempt;
+                break;
+            case PortalDirection::RIGHT:
+                testRect.x += pushDistance * attempt;
+                break;
+        }
+        
+        // Check if this position is safe
+        std::vector<CollisionRect*> testCollisions = CollisionRect::query(testRect, true);
+        
+        // Filter out portals again
+        auto testIt = std::remove_if(testCollisions.begin(), testCollisions.end(), 
+            [this, linkedPortal](CollisionRect* col) {
+                return col->getFather() == this || 
+                       (linkedPortal && col->getFather() == linkedPortal);
+            });
+        testCollisions.erase(testIt, testCollisions.end());
+        
+        if (testCollisions.empty()) {
+            playerRect = testRect;
+            return true;
+        }
+    }
+    
+    return false; // Couldn't find a safe position
+}
+
 void Portal::performTeleportation(GObject* player) {
     Portal* linkedPortal = getLinkedPortal();
     if (!linkedPortal) return;
@@ -251,6 +340,21 @@ void Portal::performTeleportation(GObject* player) {
     Rectangle newRect = playerRect;
     newRect.x = newX;
     newRect.y = newY;
+    
+    // Ensure the position is safe (not colliding with solid walls)
+    PortalDirection safetyDirection = linkedPortal->direction_.value_or(PortalDirection::UP);
+    if (!findSafePosition(newRect, targetPortalRect, safetyDirection)) {
+        // If we can't find a safe position, fall back to center positioning
+        newRect.x = targetPortalRect.x + targetPortalRect.width / 2.0f - playerRect.width / 2.0f;
+        newRect.y = targetPortalRect.y + targetPortalRect.height / 2.0f - playerRect.height / 2.0f;
+        
+        // Try center position safety check
+        if (!findSafePosition(newRect, targetPortalRect, safetyDirection)) {
+            // Last resort: don't teleport if even center isn't safe
+            return;
+        }
+    }
+    
     character->body_->setSurface(newRect);
     character->body_->setSpeed(spd);
     
