@@ -20,6 +20,6 @@ public:
     
     CollisionRect *body_;
 
-private:
+protected:
     Sprite *sprite_;
 };

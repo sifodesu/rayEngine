@@ -55,3 +55,4 @@ toolchain.cmake
 /examples
 imgui.ini
 save.json
+/.github

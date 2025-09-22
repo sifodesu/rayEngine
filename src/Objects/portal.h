@@ -12,6 +12,7 @@ public:
     
     void onCollision(GObject* other) override;
     void routine() override;
+    void draw() override;
     
     // Override to provide linkable component
     std::optional<LinkableComponent*> getLinkableComponent() override;

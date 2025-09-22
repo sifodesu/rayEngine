@@ -75,6 +75,50 @@ void Portal::routine() {
     }
 }
 
+void Portal::draw() {
+    // Generate a distinctive color based on linked portal
+    Color portalColor = WHITE; // Default color
+    
+    Portal* linkedPortal = getLinkedPortal();
+    if (linkedPortal) {
+        // Use the smaller ID of the pair to ensure both portals get the same color
+        int colorSeed = std::min(id_, linkedPortal->id_);
+        
+        // Generate HSV color based on the seed for better color distribution
+        float hue = (colorSeed * 137.5f) / 360.0f; // Golden angle approximation for good distribution
+        hue = hue - floor(hue); // Keep fractional part (0.0 to 1.0)
+        
+        // Convert HSV to RGB with high saturation and moderate brightness
+        float saturation = 0.8f;
+        float brightness = 0.9f;
+        
+        // HSV to RGB conversion
+        float c = brightness * saturation;
+        float x = c * (1 - abs(fmod(hue * 6, 2) - 1));
+        float m = brightness - c;
+        
+        float r, g, b;
+        if (hue < 1.0f/6.0f) { r = c; g = x; b = 0; }
+        else if (hue < 2.0f/6.0f) { r = x; g = c; b = 0; }
+        else if (hue < 3.0f/6.0f) { r = 0; g = c; b = x; }
+        else if (hue < 4.0f/6.0f) { r = 0; g = x; b = c; }
+        else if (hue < 5.0f/6.0f) { r = x; g = 0; b = c; }
+        else { r = c; g = 0; b = x; }
+        
+        portalColor = Color{
+            (unsigned char)((r + m) * 255),
+            (unsigned char)((g + m) * 255), 
+            (unsigned char)((b + m) * 255),
+            255
+        };
+    } 
+    
+    // Set the tint and draw
+    sprite_->setTint(portalColor);
+    BasicEnt::draw();
+    sprite_->setTint(WHITE); // Reset tint for next frame
+}
+
 std::optional<LinkableComponent*> Portal::getLinkableComponent() {
     return linkable_;
 }
