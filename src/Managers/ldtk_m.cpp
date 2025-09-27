@@ -31,7 +31,10 @@ map<int,string> collectTilesetNames(const json& root) {
     if (!root.contains("defs") || !root["defs"].contains("tilesets")) return out;
     for (auto& ts : root["defs"]["tilesets"]) {
         int uid = ts["uid"];
-        out[uid] = basename(ts["relPath"].get<string>());
+        if (ts["relPath"].is_null()) continue;
+        string base = basename(ts["relPath"].get<string>());
+        if (base.empty()) continue;
+        out[uid] = base;
     }
     return out;
 }
@@ -342,7 +345,7 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
         auto intGrid = extractIntGrid(level);
 
         int layerIndex = 0;
-    for (auto& layer : level["layerInstances"]) { // Iterate draw order as provided
+        for (auto& layer : level["layerInstances"]) { // Iterate draw order as provided
             string type = layer["__type"].get<string>();
             if (type == "Tiles") { // Tile layer -> spawn tiles
                 int tileSize = layer["__gridSize"].get<int>();

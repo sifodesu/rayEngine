@@ -35,7 +35,7 @@ private:
     std::vector<Vector2> waypoints_; // center waypoints
     int current_ = 0;
     int dir_ = 1; // direction through waypoints
-    float speed_ = 60.0f; // pixels per second
+    float speed_ = 80.0f; // pixels per second
     float waitTime_ = 0.4f; // seconds to wait at endpoints
     float waiting_ = 0.0f;
     Vector2 lastCenter_{0,0}; // previous center for stable delta
