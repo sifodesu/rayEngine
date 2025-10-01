@@ -9,7 +9,7 @@
 #include "raycam_m.h"
 
 UpgradePickup::UpgradePickup(const SpawnData& data) : BasicEnt(data) {
-    upgradeType_ = data.type; // e.g. "upgrade_speed"
+    upgradeType_ = data.typeDetail; // e.g. "upgrade_speed"
     if (body_) body_->setSolid(false); // allow passing through
 }
 

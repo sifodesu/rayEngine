@@ -30,30 +30,41 @@ int Object_m::genID()
 GObject* Object_m::createFromSpawn(const SpawnData& data)
 {
     std::unique_ptr<GObject> obj;
-    if (data.type == "tile" || data.type == "basic") {
-        obj = std::make_unique<BasicEnt>(data);
-    } else if (data.type == "Character") {
-        obj = std::make_unique<Character>(data);
-    } else if (data.type.rfind("upgrade_", 0) == 0) { // any upgrade_* type
-        obj = std::make_unique<UpgradePickup>(data);
-    } else if (data.type == "Checkpoint") {
-        obj = std::make_unique<Checkpoint>(data);
-    } else if (data.type == "Kill") {
-        obj = std::make_unique<Kill>(data);
-    } else if (data.type == "Pano") {
-        obj = std::make_unique<Pano>(data);
-    } else if (data.type == "Receptacle") {
-        obj = std::make_unique<Receptacle>(data);
-    } else if (data.type == "Plateforme") {
-        obj = std::make_unique<Plateforme>(data);
-    } else if (data.type == "Portal") {
-        obj = std::make_unique<Portal>(data);
-    } else {
-        return nullptr;
+    switch (data.entityType) {
+        case EntityType::Tile:
+        case EntityType::Basic:
+            obj = std::make_unique<BasicEnt>(data);
+            break;
+        case EntityType::Character:
+            obj = std::make_unique<Character>(data);
+            break;
+        case EntityType::UpgradePickup:
+            obj = std::make_unique<UpgradePickup>(data);
+            break;
+        case EntityType::Checkpoint:
+            obj = std::make_unique<Checkpoint>(data);
+            break;
+        case EntityType::Kill:
+            obj = std::make_unique<Kill>(data);
+            break;
+        case EntityType::Pano:
+            obj = std::make_unique<Pano>(data);
+            break;
+        case EntityType::Receptacle:
+            obj = std::make_unique<Receptacle>(data);
+            break;
+        case EntityType::Plateforme:
+            obj = std::make_unique<Plateforme>(data);
+            break;
+        case EntityType::Portal:
+            obj = std::make_unique<Portal>(data);
+            break;
+        default:
+            return nullptr;
     }
     obj->layer_ = data.layer;
     GObject* raw = obj.get();
-    if (data.type == "tile")
+    if (data.entityType == EntityType::Tile)
         level_tiles_.emplace(data.id, std::move(obj));
     else
         level_ents_.emplace(data.id, std::move(obj));

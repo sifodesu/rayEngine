@@ -14,9 +14,8 @@ Portal* Portal::playerSpawnedPortal_ = nullptr;
 Portal::Portal(const SpawnData& data) 
     : BasicEnt(data), isPlayerSpawned_(false) {
     
-    // Store portal direction if provided
-    if (data.direction.has_value()) {
-        direction_ = data.direction.value();
+    if (data.interaction.direction.has_value()) {
+        direction_ = data.interaction.direction.value();
     }
     
     // Create linkable component using a unique identifier
@@ -30,14 +29,12 @@ Portal::Portal(const SpawnData& data)
         this->onPortalLink(sourceId, message, data);
     };
     
-    // Store the target LDtk ID for later resolution
-    if (data.linkId.has_value()) {
-        targetLdtkId_ = data.linkId.value();
+    if (data.ldtk.linkId.has_value()) {
+        targetLdtkId_ = data.ldtk.linkId.value();
     }
     
-    // Add additional target IDs if provided (these should be engine IDs)
-    if (data.targetIds.has_value()) {
-        for (const std::string& targetId : data.targetIds.value()) {
+    if (data.ldtk.targetIds.has_value()) {
+        for (const std::string& targetId : data.ldtk.targetIds.value()) {
             linkable_->addTargetId(targetId);
         }
     }
@@ -208,11 +205,11 @@ void Portal::spawnPortalAtPlayer() {
     // Create a new portal at player position
     SpawnData portalData;
     portalData.id = Object_m::genID();
-    portalData.type = "Portal";
+    portalData.entityType = EntityType::Portal;
     portalData.layer = 1;
     
     // Set unique link ID for player spawned portal
-    portalData.linkId = "player_portal";
+    portalData.ldtk.linkId = "player_portal";
     
     // Set position near player
     Rectangle playerRect = player->getRect();
@@ -224,11 +221,10 @@ void Portal::spawnPortalAtPlayer() {
     sprite.filename = "gateway.png"; // Using existing texture
     portalData.sprite = sprite;
     
-    // Portal collision configuration
     CollisionDesc collision;
     collision.rect = Rectangle{playerCenter.x - 4, playerCenter.y - 4, 8, 8};
-    collision.solid = false; // Not solid so player can pass through
-    portalData.collision = collision;
+    collision.solid = false;
+    portalData.physics.collision = collision;
     
     // Create the portal
     GObject* newPortalObj = Object_m::createFromSpawn(portalData);

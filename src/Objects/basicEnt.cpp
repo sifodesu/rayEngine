@@ -7,7 +7,7 @@ BasicEnt::BasicEnt(const SpawnData& data) : GObject(data.id) {
     SpriteDesc sprite = data.sprite.value_or(SpriteDesc{});
     sprite_ = new Sprite(sprite);
 
-    CollisionDesc col = data.collision.value_or(CollisionDesc{});
+    CollisionDesc col = data.physics.collision.value_or(CollisionDesc{});
     body_ = new CollisionRect(col, this);
 }
 

@@ -7,10 +7,12 @@
 
 Receptacle::Receptacle(const SpawnData& data) : BasicEnt(data) {
     // Créer et configurer l'AdiComponent depuis SpawnData
-    if (data.adiComponent.has_value()) {
-        const auto& desc = *data.adiComponent;
+    if (data.interaction.adiComponent.has_value()) {
+        const auto& desc = *data.interaction.adiComponent;
         if (desc.canReceiveAdi || desc.canBeTriggered || !desc.targetIds.empty()) {
-            adiComponent_ = new AdiComponent(desc);
+            // Passer l'ID LDtk au constructeur pour l'auto-enregistrement
+            std::string ldtkId = data.ldtk.iid.value_or("");
+            adiComponent_ = new AdiComponent(desc, ldtkId);
         }
     }
     
@@ -18,6 +20,10 @@ Receptacle::Receptacle(const SpawnData& data) : BasicEnt(data) {
     if (adiComponent_) {
         adiComponent_->canReceiveAdi = true;
     }
+}
+
+Receptacle::~Receptacle() {
+    delete adiComponent_;
 }
 
 void Receptacle::draw() {

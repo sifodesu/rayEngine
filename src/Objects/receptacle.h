@@ -9,6 +9,7 @@ class AdiComponent;
 class Receptacle : public BasicEnt {
 public:
     explicit Receptacle(const SpawnData& data);
+    ~Receptacle();
     void draw() override;
     
     // Override pour le système optional
@@ -17,5 +18,5 @@ public:
     }
     
 private:
-    AdiComponent* adiComponent_; // Component qui gère la logique ADI
+    AdiComponent* adiComponent_;
 };

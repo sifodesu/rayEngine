@@ -14,8 +14,8 @@
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
 
 Character::Character(const SpawnData& data) : GObject(data.id) {
-    CollisionDesc col = data.collision.value_or(CollisionDesc{});
-    BodyDesc body = data.body.value_or(BodyDesc{});
+    CollisionDesc col = data.physics.collision.value_or(CollisionDesc{});
+    BodyDesc body = data.physics.body.value_or(BodyDesc{});
     body_ = new RigidBody(col, body, this);
     dashing_ = 0;
     Raycam_m::setTarget(body_, true);

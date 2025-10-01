@@ -1,9 +1,15 @@
 #include "ldtk_m.h"
-#include <nlohmann/json.hpp>
+
+// Standard library
 #include <fstream>
 #include <vector>
 #include <map>
 #include <algorithm>
+
+// Third party
+#include <nlohmann/json.hpp>
+
+// Project includes
 #include "object_m.h"
 #include "spawn.h"
 #include "definitions.h"
@@ -13,38 +19,65 @@
 using json = nlohmann::json;
 using namespace std;
 
+// ============================================================================
+// ANONYMOUS NAMESPACE - INTERNAL HELPERS
+// ============================================================================
+
 namespace {
+
+// ----------------------------------------------------------------------------
+// String & Path Utilities
+// ----------------------------------------------------------------------------
 
 bool strEndsWith(const string& s, const string& suf) {
     return s.size() >= suf.size() && equal(suf.rbegin(), suf.rend(), s.rbegin());
 }
 
-// Extract filename from a path (handles / or \). Returns path if no separators.
 string basename(const string& path) {
     size_t pos = path.find_last_of("/\\");
     return (pos == string::npos) ? path : path.substr(pos + 1);
 }
 
-// Build map tilesetUid -> tileset filename (basename only) for quick lookup.
-map<int,string> collectTilesetNames(const json& root) {
-    map<int,string> out;
-    if (!root.contains("defs") || !root["defs"].contains("tilesets")) return out;
+// ----------------------------------------------------------------------------
+// Tileset Processing
+// ----------------------------------------------------------------------------
+
+map<int, string> collectTilesetNames(const json& root) {
+    map<int, string> out;
+    
+    if (!root.contains("defs") || !root["defs"].contains("tilesets")) 
+        return out;
+    
     for (auto& ts : root["defs"]["tilesets"]) {
         int uid = ts["uid"];
         if (ts["relPath"].is_null()) continue;
+        
         string base = basename(ts["relPath"].get<string>());
         if (base.empty()) continue;
+        
         out[uid] = base;
     }
+    
     return out;
 }
 
-// Minimal IntGrid capture: presence flag, flattened csv, width, and cell size.
-struct IntGridInfo { bool has=false; vector<int> csv; int width=0; int cell=0; };
-// Locate the first IntGrid layer (if any) and capture its CSV & dimensions.
+// ----------------------------------------------------------------------------
+// IntGrid Collision System
+// ----------------------------------------------------------------------------
+
+struct IntGridInfo { 
+    bool has = false; 
+    vector<int> csv; 
+    int width = 0; 
+    int cell = 0; 
+};
+
 IntGridInfo extractIntGrid(const json& level) {
     IntGridInfo info;
-    if (!level.contains("layerInstances")) return info;
+    
+    if (!level.contains("layerInstances")) 
+        return info;
+    
     for (auto& layer : level["layerInstances"]) {
         if (layer["__type"] == "IntGrid") {
             info.has = true;
@@ -54,47 +87,104 @@ IntGridInfo extractIntGrid(const json& level) {
             break;
         }
     }
+    
     return info;
 }
 
-// Convert a tile's local pixel coordinate into an IntGrid cell index and test solidity.
 bool isTileSolid(const IntGridInfo& g, int localPx, int localPy) {
-    if (!g.has || g.cell <= 0) return false;
+    if (!g.has || g.cell <= 0) 
+        return false;
+    
     int i = localPx / g.cell;
     int j = localPy / g.cell;
     int idx = j * g.width + i;
+    
     return idx >= 0 && idx < (int)g.csv.size() && g.csv[idx] > 0;
 }
 
-// Spawn a tile object: sprite source rectangle + collision box (static if solid/not solid)
-void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, int px, int py, bool solid, int layer) {
+// ----------------------------------------------------------------------------
+// Tile Spawning
+// ----------------------------------------------------------------------------
+
+void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, 
+               int px, int py, bool solid, int layer) {
     SpawnData d;
     d.id = Object_m::genID();
-    d.type = "tile";
+    d.entityType = EntityType::Tile;
     d.layer = layer;
+    
+    // Setup sprite
     SpriteDesc sd;
     sd.filename = tilesetFile;
     sd.tint = WHITE;
-    sd.frameRects.push_back({(float)sx,(float)sy,(float)tileSize,(float)tileSize});
+    sd.frameRects.push_back({(float)sx, (float)sy, (float)tileSize, (float)tileSize});
     d.sprite = sd;
-    d.collision = CollisionDesc{Rectangle{(float)px,(float)py,(float)tileSize,(float)tileSize}, solid};
+    
+    // Setup collision
+    Rectangle collisionRect = {(float)px, (float)py, (float)tileSize, (float)tileSize};
+    d.physics.collision = CollisionDesc{collisionRect, solid};
+    
     Object_m::createFromSpawn(d);
 }
 
-// Pull user-defined fields (type, solid) from LDtk entity instance into SpawnData.
+// ----------------------------------------------------------------------------
+// Entity Field Processing
+// ----------------------------------------------------------------------------
+
+// Parse comma-separated string into vector of trimmed strings
+vector<string> parseCommaSeparatedIds(const string& input) {
+    vector<string> result;
+    if (input.empty()) return result;
+    
+    size_t start = 0;
+    size_t end = input.find(',');
+    
+    while (end != string::npos) {
+        string item = input.substr(start, end - start);
+        // Trim whitespace
+        item.erase(0, item.find_first_not_of(" \t"));
+        item.erase(item.find_last_not_of(" \t") + 1);
+        if (!item.empty()) result.push_back(item);
+        
+        start = end + 1;
+        end = input.find(',', start);
+    }
+    
+    // Add last item
+    string item = input.substr(start);
+    item.erase(0, item.find_first_not_of(" \t"));
+    item.erase(item.find_last_not_of(" \t") + 1);
+    if (!item.empty()) result.push_back(item);
+    
+    return result;
+}
+
 void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int worldX, int worldY) {
-    if (!inst.contains("fieldInstances")) return;
+    if (!inst.contains("fieldInstances")) 
+        return;
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
-        if (fid == "Type") d.type = f["__value"].get<string>();
+        if (fid == "Type") {
+            string typeStr = f["__value"].get<string>();
+            d.entityType = stringToEntityType(typeStr);
+            d.typeDetail = typeStr; // preserve original string for subtypes
+        }
         else if (fid == "solid") {
-            if (!d.collision) d.collision = CollisionDesc{};
-            d.collision->solid = f["__value"].get<bool>();
+            if (!d.physics.collision) d.physics.collision = CollisionDesc{};
+            d.physics.collision->solid = f["__value"].get<bool>();
         }
         else if (fid == "sprite") {
             string key = f["__value"].get<string>();
             if (!d.sprite) d.sprite = SpriteDesc{};
-            auto tryLoad = [&](const std::string& k){ if (auto meta = Sprite_m::get(k)) { *d.sprite = *meta; return true; } return false; };
+            
+            auto tryLoad = [&](const std::string& k) { 
+                if (auto meta = Sprite_m::get(k)) { 
+                    *d.sprite = *meta; 
+                    return true; 
+                } 
+                return false; 
+            };
+            
             bool loaded = tryLoad(key);
             if (!loaded) {
                 auto pos = key.find_last_of('.');
@@ -103,6 +193,7 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                     loaded = tryLoad(base);
                 }
             }
+            
             if (!loaded) {
                 d.sprite->filename = key;
             }
@@ -121,7 +212,7 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         }
         else if (fid == "Dialog") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                d.dialog = f["__value"].get<string>();
+                d.interaction.dialog = f["__value"].get<string>();
             }
         }
         else if (fid == "Point") {
@@ -137,127 +228,79 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                         pts.push_back({ absoluteX, absoluteY });
                     }
                 }
-                if (!pts.empty()) d.pathPoints = pts;
+                if (!pts.empty()) d.interaction.pathPoints = pts;
             }
         }
         else if (fid == "enabled") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                d.enabled = f["__value"].get<bool>();
+                d.interaction.enabled = f["__value"].get<bool>();
             }
         }
         else if (fid == "linkId") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                // Handle EntityRef type for linkId field
                 if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
-                    d.linkId = f["__value"]["entityIid"].get<string>();
+                    d.ldtk.linkId = f["__value"]["entityIid"].get<string>();
                 } else if (f["__value"].is_string()) {
-                    // Fallback for direct string references
-                    d.linkId = f["__value"].get<string>();
+                    d.ldtk.linkId = f["__value"].get<string>();
                 }
             }
         }
         else if (fid == "targetIds") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                std::string targetsStr = f["__value"].get<string>();
-                std::vector<std::string> targets;
-                
-                // Parse comma-separated target IDs
-                size_t start = 0;
-                size_t end = targetsStr.find(',');
-                
-                while (end != std::string::npos) {
-                    std::string target = targetsStr.substr(start, end - start);
-                    // Trim whitespace
-                    target.erase(0, target.find_first_not_of(" \t"));
-                    target.erase(target.find_last_not_of(" \t") + 1);
-                    if (!target.empty()) targets.push_back(target);
-                    start = end + 1;
-                    end = targetsStr.find(',', start);
-                }
-                
-                // Add the last target
-                std::string target = targetsStr.substr(start);
-                target.erase(0, target.find_first_not_of(" \t"));
-                target.erase(target.find_last_not_of(" \t") + 1);
-                if (!target.empty()) targets.push_back(target);
-                
+                auto targets = parseCommaSeparatedIds(f["__value"].get<string>());
                 if (!targets.empty()) {
-                    d.targetIds = targets;
+                    d.ldtk.targetIds = targets;
                 }
             }
         }
         else if (fid == "trigger") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
                 
                 std::string targetId;
-                // Handle EntityRef type for trigger field
                 if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
                     targetId = f["__value"]["entityIid"].get<string>();
                 } else if (f["__value"].is_string()) {
-                    // Fallback for direct string references
                     targetId = f["__value"].get<string>();
                 }
                 
                 if (!targetId.empty()) {
-                    d.adiComponent->targetIds.push_back(targetId);
-                    // Configuration par défaut pour receptacle style
-                    d.adiComponent->canReceiveAdi = true;
+                    d.interaction.adiComponent->targetIds.push_back(targetId);
+                    d.interaction.adiComponent->canReceiveAdi = true;
                 }
             }
         }
-        // AdiComponent configuration fields
         else if (fid == "canReceiveAdi") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
-                d.adiComponent->canReceiveAdi = f["__value"].get<bool>();
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
+                d.interaction.adiComponent->canReceiveAdi = f["__value"].get<bool>();
             }
         }
         else if (fid == "canBeTriggered") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
-                d.adiComponent->canBeTriggered = f["__value"].get<bool>();
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
+                d.interaction.adiComponent->canBeTriggered = f["__value"].get<bool>();
             }
         }
         else if (fid == "adiCapacity") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
-                d.adiComponent->maxCapacity = f["__value"].get<int>();
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
+                d.interaction.adiComponent->maxCapacity = f["__value"].get<int>();
             }
         }
         else if (fid == "adiThreshold") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
-                d.adiComponent->activationThreshold = f["__value"].get<int>();
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
+                d.interaction.adiComponent->activationThreshold = f["__value"].get<int>();
             }
         }
         else if (fid == "adiTargets") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                if (!d.adiComponent) d.adiComponent = AdiComponentDesc{};
-                // Parse comma-separated target IDs
-                string targetsStr = f["__value"].get<string>();
-                if (!targetsStr.empty()) {
-                    std::vector<std::string> targets;
-                    size_t start = 0;
-                    size_t end = targetsStr.find(',');
-                    
-                    while (end != std::string::npos) {
-                        std::string target = targetsStr.substr(start, end - start);
-                        // Trim whitespace
-                        target.erase(0, target.find_first_not_of(" \t"));
-                        target.erase(target.find_last_not_of(" \t") + 1);
-                        if (!target.empty()) targets.push_back(target);
-                        start = end + 1;
-                        end = targetsStr.find(',', start);
-                    }
-                    
-                    // Add the last target
-                    std::string target = targetsStr.substr(start);
-                    target.erase(0, target.find_first_not_of(" \t"));
-                    target.erase(target.find_last_not_of(" \t") + 1);
-                    if (!target.empty()) targets.push_back(target);
-                    
-                    d.adiComponent->targetIds = targets;
+                if (!d.interaction.adiComponent) d.interaction.adiComponent = AdiComponentDesc{};
+                
+                auto targets = parseCommaSeparatedIds(f["__value"].get<string>());
+                if (!targets.empty()) {
+                    d.interaction.adiComponent->targetIds = targets;
                 }
             }
         }
@@ -265,60 +308,83 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
             if (f.contains("__value") && !f["__value"].is_null()) {
                 std::string dirStr = f["__value"].get<string>();
                 if (dirStr == "UP") {
-                    d.direction = PortalDirection::UP;
+                    d.interaction.direction = PortalDirection::UP;
                 } else if (dirStr == "DOWN") {
-                    d.direction = PortalDirection::DOWN;
+                    d.interaction.direction = PortalDirection::DOWN;
                 } else if (dirStr == "LEFT") {
-                    d.direction = PortalDirection::LEFT;
+                    d.interaction.direction = PortalDirection::LEFT;
                 } else if (dirStr == "RIGHT") {
-                    d.direction = PortalDirection::RIGHT;
+                    d.interaction.direction = PortalDirection::RIGHT;
                 }
             }
         }
     }
 }
 
-// If the entity uses a tileset tile, set its sprite filename + source rectangle.
-void fillEntityTile(const json& e, const map<int,string>& tilesetNames, SpawnData& d) {
-    if (!e.contains("__tile") || !e["__tile"].is_object()) return;
+// ----------------------------------------------------------------------------
+// Entity Spawning
+// ----------------------------------------------------------------------------
+
+void fillEntityTile(const json& e, const map<int, string>& tilesetNames, SpawnData& d) {
+    if (!e.contains("__tile") || !e["__tile"].is_object()) 
+        return;
+    
     int uid = e["__tile"]["tilesetUid"];
     if (!d.sprite) d.sprite = SpriteDesc{};
+    
     auto it = tilesetNames.find(uid);
-    if (it != tilesetNames.end()) d.sprite->filename = it->second;
-    Rectangle r{(float)e["__tile"]["x"], (float)e["__tile"]["y"], (float)e["__tile"]["w"], (float)e["__tile"]["h"]};
-    if (d.sprite->frameRects.empty()) d.sprite->frameRects.push_back(r); else d.sprite->frameRects[0] = r; // ensure at least one frame
+    if (it != tilesetNames.end()) 
+        d.sprite->filename = it->second;
+    
+    Rectangle r{
+        (float)e["__tile"]["x"], 
+        (float)e["__tile"]["y"], 
+        (float)e["__tile"]["w"], 
+        (float)e["__tile"]["h"]
+    };
+    
+    if (d.sprite->frameRects.empty()) 
+        d.sprite->frameRects.push_back(r);
+    else 
+        d.sprite->frameRects[0] = r;
 }
 
-// Fully construct and spawn an entity; defaults to type "basic" if unspecified.
-void spawnEntity(const json& e, int worldX, int worldY, int layer, const map<int,string>& tilesetNames, int layerGridSize) {
-    SpawnData d; // default empty
+void spawnEntity(const json& e, int worldX, int worldY, int layer, 
+                 const map<int, string>& tilesetNames, int layerGridSize) {
+    SpawnData d;
+    
+    // Fill entity data from LDtk fields
     fillEntityFields(e, d, layerGridSize, worldX, worldY);
-    if (!d.sprite.has_value()) fillEntityTile(e, tilesetNames, d);
-    if (d.type.empty()) d.type = "basic";
-    if (!d.collision) d.collision = CollisionDesc{};
-    d.collision->rect = Rectangle{(float)(e["px"][0].get<int>() + worldX), (float)(e["px"][1].get<int>() + worldY), (float)e["width"].get<int>(), (float)e["height"].get<int>()};
+    if (!d.sprite.has_value()) 
+        fillEntityTile(e, tilesetNames, d);
     
-    // Extract LDtk entity IID (unique identifier) and transfer to AdiComponent if needed
-    std::optional<std::string> ldtkId;
+    // Setup collision box
+    if (!d.physics.collision) 
+        d.physics.collision = CollisionDesc{};
+    
+    d.physics.collision->rect = Rectangle{
+        (float)(e["px"][0].get<int>() + worldX), 
+        (float)(e["px"][1].get<int>() + worldY), 
+        (float)e["width"].get<int>(), 
+        (float)e["height"].get<int>()
+    };
+    
+    // Store LDtk IID for linking
     if (e.contains("iid") && e["iid"].is_string()) {
-        ldtkId = e["iid"].get<string>();
-    }
-    
-    // Transfer ldtkId to AdiComponent if it exists
-    if (d.adiComponent.has_value() && ldtkId.has_value()) {
-        d.adiComponent->ldtkId = ldtkId;
+        d.ldtk.iid = e["iid"].get<string>();
     }
     
     d.id = Object_m::genID();
     d.layer = layer;
     
-    // Store mapping from LDtk ID to engine ID
-    if (ldtkId.has_value()) {
-        Ldtk_m::registerIdMapping(*ldtkId, d.id);
+    // Register ID mapping
+    if (d.ldtk.iid.has_value()) {
+        Ldtk_m::registerIdMapping(*d.ldtk.iid, d.id);
     }
     
     Object_m::createFromSpawn(d);
 }
+
 } // namespace
 
 // Public API: import an LDtk project (.ldtk). Optionally skip entities (characters) when doing hot reload.

@@ -4,14 +4,42 @@
 #include <raylib.h>
 #include <vector>
 
+enum class EntityType {
+    Tile,
+    Basic,
+    Character,
+    Portal,
+    Plateforme,
+    Checkpoint,
+    Kill,
+    Pano,
+    Receptacle,
+    UpgradePickup
+};
+
+// Helper function to convert string to EntityType
+inline EntityType stringToEntityType(const std::string& typeStr) {
+    if (typeStr == "tile") return EntityType::Tile;
+    if (typeStr == "basic") return EntityType::Basic;
+    if (typeStr == "Character") return EntityType::Character;
+    if (typeStr == "Portal") return EntityType::Portal;
+    if (typeStr == "Plateforme") return EntityType::Plateforme;
+    if (typeStr == "Checkpoint") return EntityType::Checkpoint;
+    if (typeStr == "Kill") return EntityType::Kill;
+    if (typeStr == "Pano") return EntityType::Pano;
+    if (typeStr == "Receptacle") return EntityType::Receptacle;
+    if (typeStr.rfind("upgrade_", 0) == 0) return EntityType::UpgradePickup;
+    return EntityType::Basic; // default fallback
+}
+
 struct SpriteDesc {
     std::string filename{"inv.png"};
     Color tint{WHITE};
     bool flipX{false};
     bool flipY{false};
-    std::vector<Rectangle> frameRects; // each frame sub-rect
-    std::vector<float> frameDurations; // seconds per frame (same size as frameRects) optional
-    float defaultFrameDuration{0.2f}; // used if frameDurations empty (uniform timing)
+    std::vector<Rectangle> frameRects;
+    std::vector<float> frameDurations;
+    float defaultFrameDuration{0.2f};
 };
 
 struct CollisionDesc {
@@ -24,7 +52,7 @@ struct BodyDesc {
     double acceleration{0};
     double curve{0};
     double gravityAcceleration{800};
-    double maxFallSpeed{1000}; // Maximum falling speed in pixels/second
+    double maxFallSpeed{300};
 };
 
 struct AdiComponentDesc {
@@ -33,7 +61,6 @@ struct AdiComponentDesc {
     int maxCapacity = 1;
     int activationThreshold = 1;
     std::vector<std::string> targetIds;
-    std::optional<std::string> ldtkId; // Optional LDtk entity IID (unique identifier from LDtk)
 };
 
 enum class PortalDirection {
@@ -43,18 +70,32 @@ enum class PortalDirection {
     RIGHT
 };
 
-struct SpawnData {
-    int id{0};
-    std::string type; // e.g. "tile", "character"
-    int layer{0};
-    std::optional<SpriteDesc> sprite;
+struct PhysicsConfig {
     std::optional<CollisionDesc> collision;
     std::optional<BodyDesc> body;
-    std::optional<std::string> dialog; // Optional dialog text (from LDtk field "Dialog")
-    std::optional<std::vector<Vector2>> pathPoints; // Optional path points (platform movement waypoints in absolute pixels)
-    std::optional<bool> enabled; // Optional enabled state (for platforms, etc.)
-    std::optional<AdiComponentDesc> adiComponent; // Optional ADI component configuration
-    std::optional<std::string> linkId; // Optional link ID for generic linking system
-    std::optional<std::vector<std::string>> targetIds; // Optional target IDs for generic linking system
-    std::optional<PortalDirection> direction; // Optional portal direction for velocity modification
+};
+
+struct InteractionConfig {
+    std::optional<AdiComponentDesc> adiComponent;
+    std::optional<std::string> dialog;
+    std::optional<std::vector<Vector2>> pathPoints;
+    std::optional<bool> enabled;
+    std::optional<PortalDirection> direction;
+};
+
+struct LdtkMetadata {
+    std::optional<std::string> iid;
+    std::optional<std::string> linkId;
+    std::optional<std::vector<std::string>> targetIds;
+};
+
+struct SpawnData {
+    int id{0};
+    EntityType entityType{EntityType::Basic};
+    std::string typeDetail; // e.g., "upgrade_speed", "upgrade_jump" for subtypes
+    int layer{0};
+    std::optional<SpriteDesc> sprite;
+    PhysicsConfig physics;
+    InteractionConfig interaction;
+    LdtkMetadata ldtk;
 };

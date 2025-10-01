@@ -12,14 +12,14 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
     waypoints_.push_back(startCenter);
     lastCenter_ = startCenter;
     
-    // Set enabled state from SpawnData (default to true if not specified)
-    enabled_ = data.enabled.value_or(true);
+    enabled_ = data.interaction.enabled.value_or(true);
     
-    // Créer AdiComponent depuis SpawnData si configuré
-    if (data.adiComponent.has_value()) {
-        const auto& desc = *data.adiComponent;
+    if (data.interaction.adiComponent.has_value()) {
+        const auto& desc = *data.interaction.adiComponent;
         if (desc.canReceiveAdi || desc.canBeTriggered || !desc.targetIds.empty()) {
-            adiComponent_ = new AdiComponent(desc);
+            // Passer l'ID LDtk au constructeur pour l'auto-enregistrement
+            std::string ldtkId = data.ldtk.iid.value_or("");
+            adiComponent_ = new AdiComponent(desc, ldtkId);
         }
     }
     
@@ -37,13 +37,17 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
         };
     }
     
-    if (data.pathPoints && !data.pathPoints->empty()) {
-        for (auto absolutePt : *data.pathPoints) {
+    if (data.interaction.pathPoints && !data.interaction.pathPoints->empty()) {
+        for (auto absolutePt : *data.interaction.pathPoints) {
             // absolutePt is already in absolute pixel coordinates
             Vector2 worldCenter { absolutePt.x, absolutePt.y };
             waypoints_.push_back(worldCenter);
         }
     }
+}
+
+Plateforme::~Plateforme() {
+    delete adiComponent_;
 }
 
 Vector2 Plateforme::getCurrentCenter() const {

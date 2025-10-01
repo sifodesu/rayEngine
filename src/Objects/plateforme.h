@@ -8,6 +8,7 @@ class AdiComponent;
 class Plateforme : public BasicEnt {
 public:
     explicit Plateforme(const SpawnData& data);
+    ~Plateforme();
     void routine() override;
     
     // Interface publique (legacy compatibility)

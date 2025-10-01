@@ -4,24 +4,24 @@
 // Registre statique minimal pour les interactions
 std::unordered_map<std::string, AdiComponent*> AdiComponent::triggerRegistry_;
 
-AdiComponent::AdiComponent(const AdiComponentDesc& desc)
+AdiComponent::AdiComponent(const AdiComponentDesc& desc, const std::string& ldtkId)
     : canReceiveAdi(desc.canReceiveAdi)
     , canBeTriggered(desc.canBeTriggered)
     , maxCapacity(desc.maxCapacity)
     , activationThreshold(desc.activationThreshold)
     , targetIds(desc.targetIds)
-    , ldtkId_(desc.ldtkId)
+    , ldtkId_(ldtkId)
 {
-    // Auto-enregistrement pour les triggers si on a un ID LDtk
-    if (ldtkId_.has_value()) {
-        registerForTrigger(*ldtkId_, this);
+    // S'auto-enregistrer dans le registre si un ID LDtk est fourni
+    if (!ldtkId_.empty()) {
+        registerForTrigger(ldtkId_, this);
     }
 }
 
 AdiComponent::~AdiComponent() {
-    // Auto-désenregistrement lors de la destruction
-    if (ldtkId_.has_value()) {
-        unregisterForTrigger(*ldtkId_);
+    // S'auto-dés-enregistrer du registre si on était enregistré
+    if (!ldtkId_.empty()) {
+        unregisterForTrigger(ldtkId_);
     }
 }
 

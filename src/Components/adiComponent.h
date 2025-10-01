@@ -31,7 +31,7 @@ public:
     
     // Constructeur et destructeur
     AdiComponent() = default;
-    explicit AdiComponent(const AdiComponentDesc& desc);
+    explicit AdiComponent(const AdiComponentDesc& desc, const std::string& ldtkId = "");
     ~AdiComponent();
     
     // Méthodes principales
@@ -64,15 +64,11 @@ public:
     static void clearTriggerRegistry();
     
 private:
-    void updateActivation();  // Met à jour son propre état selon les ADI
-    void triggerTargets(bool activated);  // Trigger les objets cibles
+    void updateActivation();
+    void triggerTargets(bool activated);
     
-    // État interne pour détecter les changements
     bool wasActivated = false;
+    std::string ldtkId_; // ID LDtk pour l'enregistrement dans le registre
     
-    // ID LDtk pour auto-désenregistrement
-    std::optional<std::string> ldtkId_;
-    
-    // Registre minimal pour les interactions (juste les IDs vers composants)
     static std::unordered_map<std::string, AdiComponent*> triggerRegistry_;
 };

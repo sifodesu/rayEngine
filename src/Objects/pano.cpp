@@ -176,7 +176,7 @@ namespace {
 }
 
 Pano::Pano(const SpawnData& data) : BasicEnt(data) {
-    if (data.dialog.has_value()) text_ = *data.dialog;
+    if (data.interaction.dialog.has_value()) text_ = *data.interaction.dialog;
 }
 
 Pano::~Pano() = default;
