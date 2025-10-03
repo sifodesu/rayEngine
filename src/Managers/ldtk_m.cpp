@@ -42,8 +42,13 @@ string basename(const string& path) {
 // Tileset Processing
 // ----------------------------------------------------------------------------
 
-map<int, string> collectTilesetNames(const json& root) {
-    map<int, string> out;
+struct TilesetInfo {
+    string filename;
+    map<int, string> tileIdToType; // Maps tile ID to EntityType string
+};
+
+map<int, TilesetInfo> collectTilesetInfo(const json& root) {
+    map<int, TilesetInfo> out;
     
     if (!root.contains("defs") || !root["defs"].contains("tilesets")) 
         return out;
@@ -52,10 +57,23 @@ map<int, string> collectTilesetNames(const json& root) {
         int uid = ts["uid"];
         if (ts["relPath"].is_null()) continue;
         
-        string base = basename(ts["relPath"].get<string>());
-        if (base.empty()) continue;
+        TilesetInfo info;
+        info.filename = basename(ts["relPath"].get<string>());
+        if (info.filename.empty()) continue;
         
-        out[uid] = base;
+        // Collect enum tags if they exist
+        if (ts.contains("enumTags") && ts["enumTags"].is_array()) {
+            for (auto& tag : ts["enumTags"]) {
+                if (tag.contains("enumValueId") && tag.contains("tileIds")) {
+                    string typeStr = tag["enumValueId"].get<string>();
+                    for (auto& tileId : tag["tileIds"]) {
+                        info.tileIdToType[tileId.get<int>()] = typeStr;
+                    }
+                }
+            }
+        }
+        
+        out[uid] = info;
     }
     
     return out;
@@ -99,7 +117,7 @@ bool isTileSolid(const IntGridInfo& g, int localPx, int localPy) {
     int j = localPy / g.cell;
     int idx = j * g.width + i;
     
-    return idx >= 0 && idx < (int)g.csv.size() && g.csv[idx] > 0;
+    return idx >= 0 && idx < (int)g.csv.size() && g.csv[idx] == 1; // Assuming value 1 indicates solid
 }
 
 // ----------------------------------------------------------------------------
@@ -107,10 +125,18 @@ bool isTileSolid(const IntGridInfo& g, int localPx, int localPy) {
 // ----------------------------------------------------------------------------
 
 void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, 
-               int px, int py, bool solid, int layer) {
+               int px, int py, bool solid, int layer, const string& typeStr = "") {
     SpawnData d;
     d.id = Object_m::genID();
-    d.entityType = EntityType::Tile;
+    
+    // Use provided type or default to Tile
+    if (!typeStr.empty()) {
+        d.entityType = stringToEntityType(typeStr);
+        d.typeDetail = typeStr;
+    } else {
+        d.entityType = EntityType::Tile;
+    }
+    
     d.layer = layer;
     
     // Setup sprite
@@ -322,19 +348,54 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
 }
 
 // ----------------------------------------------------------------------------
+// Tile Processing Helper
+// ----------------------------------------------------------------------------
+
+void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const string& tilesetFile,
+                      const map<int, TilesetInfo>& tilesetInfo, const IntGridInfo& intGrid,
+                      int worldX, int worldY, int layer) {
+    // Get tileset info for type lookups
+    const TilesetInfo* tsInfo = nullptr;
+    auto tsIt = tilesetInfo.find(tilesetUid);
+    if (tsIt != tilesetInfo.end()) {
+        tsInfo = &tsIt->second;
+    }
+    
+    for (auto& tile : tileArray) {
+        int localPx = tile["px"][0];
+        int localPy = tile["px"][1];
+        int sx = tile["src"][0];
+        int sy = tile["src"][1];
+        bool solid = isTileSolid(intGrid, localPx, localPy);
+        
+        // Look up tile type from enum tags
+        string tileType = "";
+        if (tsInfo && tile.contains("t")) {
+            int tileId = tile["t"].get<int>();
+            auto typeIt = tsInfo->tileIdToType.find(tileId);
+            if (typeIt != tsInfo->tileIdToType.end()) {
+                tileType = typeIt->second;
+            }
+        }
+        
+        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layer, tileType);
+    }
+}
+
+// ----------------------------------------------------------------------------
 // Entity Spawning
 // ----------------------------------------------------------------------------
 
-void fillEntityTile(const json& e, const map<int, string>& tilesetNames, SpawnData& d) {
+void fillEntityTile(const json& e, const map<int, TilesetInfo>& tilesetInfo, SpawnData& d) {
     if (!e.contains("__tile") || !e["__tile"].is_object()) 
         return;
     
     int uid = e["__tile"]["tilesetUid"];
     if (!d.sprite) d.sprite = SpriteDesc{};
     
-    auto it = tilesetNames.find(uid);
-    if (it != tilesetNames.end()) 
-        d.sprite->filename = it->second;
+    auto it = tilesetInfo.find(uid);
+    if (it != tilesetInfo.end()) 
+        d.sprite->filename = it->second.filename;
     
     Rectangle r{
         (float)e["__tile"]["x"], 
@@ -350,13 +411,13 @@ void fillEntityTile(const json& e, const map<int, string>& tilesetNames, SpawnDa
 }
 
 void spawnEntity(const json& e, int worldX, int worldY, int layer, 
-                 const map<int, string>& tilesetNames, int layerGridSize) {
+                 const map<int, TilesetInfo>& tilesetInfo, int layerGridSize) {
     SpawnData d;
     
     // Fill entity data from LDtk fields
     fillEntityFields(e, d, layerGridSize, worldX, worldY);
     if (!d.sprite.has_value()) 
-        fillEntityTile(e, tilesetNames, d);
+        fillEntityTile(e, tilesetInfo, d);
     
     // Setup collision box
     if (!d.physics.collision) 
@@ -403,7 +464,7 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     }
     
     currentProjectFile = filename; // track for hot reload
-    auto tilesetNames = collectTilesetNames(root);
+    auto tilesetInfo = collectTilesetInfo(root);
 
     for (auto& level : root["levels"]) { // Each LDtk level (supports multi-level worlds)
         int worldX = level.value("worldX", 0);
@@ -415,46 +476,28 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
             string type = layer["__type"].get<string>();
             if (type == "Tiles") { // Tile layer -> spawn tiles
                 int tileSize = layer["__gridSize"].get<int>();
+                int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
-                for (auto& tile : layer["gridTiles"]) {
-                    int localPx = tile["px"][0];
-                    int localPy = tile["px"][1];
-                    int sx = tile["src"][0];
-                    int sy = tile["src"][1];
-                    bool solid = isTileSolid(intGrid, localPx, localPy);
-                    spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex);
-                }
+                processTileArray(layer["gridTiles"], tileSize, tilesetUid, tilesetFile, 
+                                tilesetInfo, intGrid, worldX, worldY, layerIndex);
             } else if (type == "AutoLayer") { // AutoLayer -> spawn autolayer tiles
                 int tileSize = layer["__gridSize"].get<int>();
+                int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
-                for (auto& tile : layer["autoLayerTiles"]) {
-                    int localPx = tile["px"][0];
-                    int localPy = tile["px"][1];
-                    int sx = tile["src"][0];
-                    int sy = tile["src"][1];
-                    // AutoLayer tiles are typically decorative, not solid by default
-                    // But still check IntGrid for consistency
-                    bool solid = isTileSolid(intGrid, localPx, localPy);
-                    spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex); 
-                }
+                processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
+                                tilesetInfo, intGrid, worldX, worldY, layerIndex);
             } else if (type == "IntGrid") { // IntGrid layer -> spawn auto-generated tiles if any
                 if (layer.contains("autoLayerTiles") && !layer["autoLayerTiles"].empty()) {
                     int tileSize = layer["__gridSize"].get<int>();
+                    int tilesetUid = layer.value("__tilesetDefUid", -1);
                     string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
-                    for (auto& tile : layer["autoLayerTiles"]) {
-                        int localPx = tile["px"][0];
-                        int localPy = tile["px"][1];
-                        int sx = tile["src"][0];
-                        int sy = tile["src"][1];
-                        // IntGrid tiles with autoLayerTiles are typically solid based on their IntGrid value
-                        bool solid = isTileSolid(intGrid, localPx, localPy);
-                        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layerIndex);
-                    }
+                    processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
+                                    tilesetInfo, intGrid, worldX, worldY, layerIndex);
                 }
             } else if (type == "Entities" && !skipCharacters) { // Entity layer -> spawn entities
                 int entityGridSize = layer["__gridSize"].get<int>();
                 for (auto& e : layer["entityInstances"]) {
-                    spawnEntity(e, worldX, worldY, layerIndex + 100, tilesetNames, entityGridSize);
+                    spawnEntity(e, worldX, worldY, layerIndex + 100, tilesetInfo, entityGridSize);
                 }
             }
             ++layerIndex;

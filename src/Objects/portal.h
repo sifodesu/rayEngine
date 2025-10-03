@@ -39,6 +39,7 @@ private:
     LinkableComponent* linkable_;
     bool isPlayerSpawned_;
     std::optional<PortalDirection> direction_; // Portal direction for velocity modification
+    Rectangle spriteRect_; // Original sprite rectangle (before collision box extension)
     // Track which entity IDs are currently overlapping this portal. Teleport
     // only triggers on collision enter (id not already in set). When the
     // entity leaves the portal area it's removed during routine(), allowing

@@ -14,8 +14,33 @@ Portal* Portal::playerSpawnedPortal_ = nullptr;
 Portal::Portal(const SpawnData& data) 
     : BasicEnt(data), isPlayerSpawned_(false) {
     
+    // Store the original sprite rectangle before modifying collision box
+    spriteRect_ = body_->getSurface();
+    
     if (data.interaction.direction.has_value()) {
         direction_ = data.interaction.direction.value();
+        
+        // Extend collision box by 1 pixel in the direction the portal faces
+        // This ensures portals embedded in walls can still detect the character
+        // Note: This only affects the hitbox, not the visual sprite
+        Rectangle collisionRect = body_->getSurface();
+        switch (direction_.value()) {
+            case PortalDirection::UP:
+                collisionRect.y -= 1;
+                collisionRect.height += 1;
+                break;
+            case PortalDirection::DOWN:
+                collisionRect.height += 1;
+                break;
+            case PortalDirection::LEFT:
+                collisionRect.x -= 1;
+                collisionRect.width += 1;
+                break;
+            case PortalDirection::RIGHT:
+                collisionRect.width += 1;
+                break;
+        }
+        body_->setSurface(collisionRect);
     }
     
     // Create linkable component using a unique identifier
@@ -110,9 +135,9 @@ void Portal::draw() {
         };
     } 
     
-    // Set the tint and draw
+    // Set the tint and draw using the original sprite rectangle (not the extended collision box)
     sprite_->setTint(portalColor);
-    BasicEnt::draw();
+    sprite_->draw(spriteRect_);
     sprite_->setTint(WHITE); // Reset tint for next frame
 }
 
