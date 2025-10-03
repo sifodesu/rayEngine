@@ -18,6 +18,9 @@
 #include "imgui_layer.h"
 #include "save_manager.h"
 
+// Debug visualization state
+static bool showCollisionBoxes = false;
+
 Engine::Engine()
 {
     SetTraceLogLevel(LOG_WARNING);
@@ -78,6 +81,11 @@ void Engine::game_loop()
 
 void Engine::render()
 {
+    // Toggle collision box visualization with F3
+    if (IsKeyPressed(KEY_R)) {
+        showCollisionBoxes = !showCollisionBoxes;
+    }
+    
     auto comp = [](CollisionRect* a, CollisionRect* b) {
         return a->getFather()->layer_ <= b->getFather()->layer_;
     };
@@ -88,7 +96,9 @@ void Engine::render()
 
     for (CollisionRect* body : sorted_bodies) {
         body->getFather()->draw();
-        // DrawRectangleRec(body->getSurface(), Fade(RED, 0.3));
+        if (showCollisionBoxes) {
+            DrawRectangleRec(body->getSurface(), Fade(RED, 0.3));
+        }
     }
 }
 
