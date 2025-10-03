@@ -109,23 +109,12 @@ IntGridInfo extractIntGrid(const json& level) {
     return info;
 }
 
-bool isTileSolid(const IntGridInfo& g, int localPx, int localPy) {
-    if (!g.has || g.cell <= 0) 
-        return false;
-    
-    int i = localPx / g.cell;
-    int j = localPy / g.cell;
-    int idx = j * g.width + i;
-    
-    return idx >= 0 && idx < (int)g.csv.size() && g.csv[idx] == 1; // Assuming value 1 indicates solid
-}
-
 // ----------------------------------------------------------------------------
 // Tile Spawning
 // ----------------------------------------------------------------------------
 
 void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, 
-               int px, int py, bool solid, int layer, const string& typeStr = "") {
+               int px, int py, int layer, const string& typeStr = "") {
     SpawnData d;
     d.id = Object_m::genID();
     
@@ -136,7 +125,9 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy,
     } else {
         d.entityType = EntityType::Tile;
     }
-    
+
+    bool solid = d.entityType == EntityType::Basic ? true : false;
+
     d.layer = layer;
     
     // Setup sprite
@@ -371,7 +362,6 @@ void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const
         int localPy = tile["px"][1];
         int sx = tile["src"][0];
         int sy = tile["src"][1];
-        bool solid = isTileSolid(intGrid, localPx, localPy);
         
         // Look up tile type from enum tags
         string tileType = "";
@@ -383,7 +373,7 @@ void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const
             }
         }
         
-        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, solid, layer, tileType);
+        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, layer, tileType);
     }
 }
 
