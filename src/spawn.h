@@ -81,6 +81,7 @@ struct InteractionConfig {
     std::optional<std::vector<Vector2>> pathPoints;
     std::optional<bool> enabled;
     std::optional<PortalDirection> direction;
+    std::optional<bool> forceGravity; // Portal forces gravity direction on player
 };
 
 struct LdtkMetadata {

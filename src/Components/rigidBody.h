@@ -12,6 +12,13 @@
 #include "collisionRect.h"
 #include "spawn.h"
 
+enum class GravityDirection {
+    DOWN,   // Normal gravity (positive Y)
+    UP,     // Reversed gravity (negative Y)
+    LEFT,   // Gravity to the left (negative X)
+    RIGHT   // Gravity to the right (positive X)
+};
+
 class RigidBody : public CollisionRect {
 public:
     RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* father);
@@ -30,6 +37,8 @@ public:
     // Gravity control
     bool isGravityEnabled() const { return gravityEnabled_; }
     void setGravityEnabled(bool enabled) { gravityEnabled_ = enabled; }
+    GravityDirection getGravityDirection() const { return gravityDirection_; }
+    void setGravityDirection(GravityDirection dir) { gravityDirection_ = dir; }
 
 private:
     Vector2 speed_;
@@ -38,6 +47,7 @@ private:
     double mass_;
     double maxFallSpeed_;
     bool gravityEnabled_;
+    GravityDirection gravityDirection_;
 
     void fixSpeed();    // set to 0 if collision ahead
 };

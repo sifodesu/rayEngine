@@ -5,15 +5,10 @@
 
 //TODO: handle case when out of box quad
 RigidBody::RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* father)
-    : CollisionRect(col, father) {
-    speed_ = body.speed;
-    acceleration_ = body.acceleration;
-    curve_ = body.curve;
-    mass_ = body.gravityAcceleration;
-    maxFallSpeed_ = body.maxFallSpeed;
-    gravityEnabled_ = true; // gravity enabled by default
+    : CollisionRect(col, father), speed_(body.speed), acceleration_(body.acceleration), 
+      curve_(body.curve), mass_(body.gravityAcceleration), maxFallSpeed_(body.maxFallSpeed),
+      gravityEnabled_(true), gravityDirection_(GravityDirection::DOWN) {
 }
-
 
 void RigidBody::setCurve(double curve) {
     curve_ = curve;
@@ -66,11 +61,33 @@ void RigidBody::routine() {
     if (delta > 0.2)
         return;
 
-    if (mass_ && gravityEnabled_) {
-        speed_.y += mass_ * delta;
-        // Limit falling speed
-        if (speed_.y > maxFallSpeed_) {
-            speed_.y = maxFallSpeed_;
+    // Apply gravity if enabled
+    if (gravityEnabled_) {
+        switch (gravityDirection_) {
+            case GravityDirection::DOWN:
+                speed_.y += mass_ * delta;
+                if (speed_.y > maxFallSpeed_) {
+                    speed_.y = maxFallSpeed_;
+                }
+                break;
+            case GravityDirection::UP:
+                speed_.y -= mass_ * delta;
+                if (speed_.y < -maxFallSpeed_) {
+                    speed_.y = -maxFallSpeed_;
+                }
+                break;
+            case GravityDirection::LEFT:
+                speed_.x -= mass_ * delta;
+                if (speed_.x < -maxFallSpeed_) {
+                    speed_.x = -maxFallSpeed_;
+                }
+                break;
+            case GravityDirection::RIGHT:
+                speed_.x += mass_ * delta;
+                if (speed_.x > maxFallSpeed_) {
+                    speed_.x = maxFallSpeed_;
+                }
+                break;
         }
     }
 

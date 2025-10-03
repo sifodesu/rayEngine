@@ -43,6 +43,10 @@ Portal::Portal(const SpawnData& data)
         body_->setSurface(collisionRect);
     }
     
+    if (data.interaction.forceGravity.has_value()) {
+        forceGravity_ = data.interaction.forceGravity.value();
+    }
+    
     // Create linkable component using a unique identifier
     // Use the object's ID as a string for linkable identification
     std::string ownId = std::to_string(id_);
@@ -175,32 +179,32 @@ void Portal::onCollision(GObject* other) {
     Rectangle playerRect = character->body_->getSurface();
     Rectangle portalRect = body_->getSurface();
     
-    bool shouldTeleport = false;
+    // bool shouldTeleport = false;
     
-    if (linkedPortal->direction_.has_value()) {
-        switch (linkedPortal->direction_.value()) {
-            case PortalDirection::UP:
-            case PortalDirection::DOWN:
-                // For vertical directions, check if player is fully inside horizontally
-                shouldTeleport = (playerRect.x >= portalRect.x && 
-                                (playerRect.x + playerRect.width) <= (portalRect.x + portalRect.width));
-                break;
-            case PortalDirection::LEFT:
-            case PortalDirection::RIGHT:
-                // For horizontal directions, check if player is fully inside vertically
-                shouldTeleport = (playerRect.y >= portalRect.y && 
-                                (playerRect.y + playerRect.height) <= (portalRect.y + portalRect.height));
-                break;
-        }
-    } else {
-        // Default behavior: teleport on any collision
-        shouldTeleport = true;
-    }
+    // if (linkedPortal->direction_.has_value()) {
+    //     switch (linkedPortal->direction_.value()) {
+    //         case PortalDirection::UP:
+    //         case PortalDirection::DOWN:
+    //             // For vertical directions, check if player is fully inside horizontally
+    //             shouldTeleport = (playerRect.x >= portalRect.x && 
+    //                             (playerRect.x + playerRect.width) <= (portalRect.x + portalRect.width));
+    //             break;
+    //         case PortalDirection::LEFT:
+    //         case PortalDirection::RIGHT:
+    //             // For horizontal directions, check if player is fully inside vertically
+    //             shouldTeleport = (playerRect.y >= portalRect.y && 
+    //                             (playerRect.y + playerRect.height) <= (portalRect.y + portalRect.height));
+    //             break;
+    //     }
+    // } else {
+    //     // Default behavior: teleport on any collision
+    //     shouldTeleport = true;
+    // }
     
-    if (shouldTeleport) {
-        overlappingEntities_.insert(oid);
-        performTeleportation(other);
-    }
+    // if (shouldTeleport) {
+    overlappingEntities_.insert(oid);
+    performTeleportation(other);
+    // }
 }
 
 Vector2 Portal::getCenter() const {
@@ -422,6 +426,27 @@ void Portal::performTeleportation(GObject* player) {
     
     character->body_->setSurface(newRect);
     character->body_->setSpeed(spd);
+    
+    // Apply gravity direction change if the destination portal forces gravity
+    if (linkedPortal->forceGravity_ && linkedPortal->direction_.has_value()) {
+        RigidBody* rigidBody = dynamic_cast<RigidBody*>(character->body_);
+        if (rigidBody) {
+            switch (linkedPortal->direction_.value()) {
+                case PortalDirection::UP:
+                    rigidBody->setGravityDirection(GravityDirection::UP);
+                    break;
+                case PortalDirection::DOWN:
+                    rigidBody->setGravityDirection(GravityDirection::DOWN);
+                    break;
+                case PortalDirection::LEFT:
+                    rigidBody->setGravityDirection(GravityDirection::LEFT);
+                    break;
+                case PortalDirection::RIGHT:
+                    rigidBody->setGravityDirection(GravityDirection::RIGHT);
+                    break;
+            }
+        }
+    }
     
     // Mark the player as overlapping the destination portal to avoid immediate bounce-back
     linkedPortal->overlappingEntities_.insert(character->id_);

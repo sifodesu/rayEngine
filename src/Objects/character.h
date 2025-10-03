@@ -71,4 +71,10 @@ private:
 
     bool cancelJump_ = false; // if true, cut jump short on next routine (for variable jump height
     bool jumpHeld_ = false; // track if jump button is held across frames
+    
+    // Original hitbox dimensions (for rotation)
+    Vector2 originalHitboxDims_{0, 0};
+    GravityDirection lastGravityDir_ = GravityDirection::DOWN;
+    
+    void updateHitboxRotation();
 };

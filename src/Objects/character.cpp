@@ -22,6 +22,9 @@ Character::Character(const SpawnData& data) : GObject(data.id) {
     if (auto s = Sprite_m::get("chara_idle")) anims_["idle"] = new Sprite(*s); else anims_["idle"] = new Sprite(SpriteDesc{});
     if (auto s = Sprite_m::get("chara_walk")) anims_["walk"] = new Sprite(*s); else anims_["walk"] = new Sprite(SpriteDesc{});
     current_anim_ = anims_["idle"];
+    
+    // Store original hitbox dimensions
+    originalHitboxDims_ = body_->getDims();
 }
 
 bool Character::depositOneAdi() {
@@ -55,6 +58,16 @@ void Character::routine() {
     separateFromCollisions();
 
     Vector2 bodySpeed = body_->getSpeed();
+    
+    // Get gravity direction for movement adaptation
+    RigidBody* rigidBody = dynamic_cast<RigidBody*>(body_);
+    GravityDirection gravityDir = rigidBody ? rigidBody->getGravityDirection() : GravityDirection::DOWN;
+    
+    // Update hitbox rotation if gravity direction changed
+    if (gravityDir != lastGravityDir_) {
+        lastGravityDir_ = gravityDir;
+        updateHitboxRotation();
+    }
 
     // Reset jump counter if we are on the ground
     if (isOnGround()) {
@@ -66,40 +79,128 @@ void Character::routine() {
     // Disable gravity during dash
     if (dashing_ > 0) {
         body_->setGravityEnabled(false);
-        body_->setSpeed({ bodySpeed.x, 0});
+        // During dash, preserve movement in the appropriate direction based on gravity
+        switch (gravityDir) {
+            case GravityDirection::DOWN:
+            case GravityDirection::UP:
+                body_->setSpeed({ bodySpeed.x, 0});
+                break;
+            case GravityDirection::LEFT:
+            case GravityDirection::RIGHT:
+                body_->setSpeed({ 0, bodySpeed.y});
+                break;
+        }
     } else {
         body_->setGravityEnabled(true);
+        
         // Jump: allow at most 2 jumps until grounded again
+        // Jump direction depends on gravity direction
         if (InputMap::checkPressed("r1") && jumps_ > 0) {
-            body_->setSpeed({ bodySpeed.x, -currentJumpSpeed()});
+            float jumpSpeed = currentJumpSpeed();
+            switch (gravityDir) {
+                case GravityDirection::DOWN:
+                    body_->setSpeed({ bodySpeed.x, -jumpSpeed}); // Jump up
+                    break;
+                case GravityDirection::UP:
+                    body_->setSpeed({ bodySpeed.x, jumpSpeed}); // Jump down (away from ceiling)
+                    break;
+                case GravityDirection::LEFT:
+                    body_->setSpeed({ jumpSpeed, bodySpeed.y}); // Jump right (away from left wall)
+                    break;
+                case GravityDirection::RIGHT:
+                    body_->setSpeed({ -jumpSpeed, bodySpeed.y}); // Jump left (away from right wall)
+                    break;
+            }
             jumps_--;
             jumpHeld_ = true;
         }
 
         bodySpeed = body_->getSpeed();
-        if (InputMap::checkDown("left") && InputMap::checkDown("right")) {
-            body_->setSpeed({ 0, bodySpeed.y });
-        }
-        else {
-            float moveSpeed = debugBaseSpeed_ * speedMultiplier_;
-            if (InputMap::checkDown("left")) {
-                body_->setSpeed({ -moveSpeed, bodySpeed.y });
-            } else if (bodySpeed.x < 0) {
-                body_->setSpeed({ 0, bodySpeed.y });
-            }
+        
+        // Movement input - direction depends on gravity
+        float moveSpeed = debugBaseSpeed_ * speedMultiplier_;
+        
+        switch (gravityDir) {
+            case GravityDirection::DOWN:
+            case GravityDirection::UP:
+                // Normal/inverted gravity: left/right moves horizontally
+                if (InputMap::checkDown("left") && InputMap::checkDown("right")) {
+                    body_->setSpeed({ 0, bodySpeed.y });
+                } else {
+                    if (InputMap::checkDown("left")) {
+                        body_->setSpeed({ -moveSpeed, bodySpeed.y });
+                    } else if (bodySpeed.x < 0) {
+                        body_->setSpeed({ 0, bodySpeed.y });
+                    }
 
-            if (InputMap::checkDown("right")) {
-                body_->setSpeed({ moveSpeed, bodySpeed.y });
-            } else if (bodySpeed.x > 0) {
-                body_->setSpeed({ 0, bodySpeed.y });
-            }
+                    if (InputMap::checkDown("right")) {
+                        body_->setSpeed({ moveSpeed, bodySpeed.y });
+                    } else if (bodySpeed.x > 0) {
+                        body_->setSpeed({ 0, bodySpeed.y });
+                    }
+                }
+                break;
+                
+            case GravityDirection::LEFT:
+                // Left wall gravity: left/right moves vertically (up/down on the wall)
+                if (InputMap::checkDown("left") && InputMap::checkDown("right")) {
+                    body_->setSpeed({ bodySpeed.x, 0 });
+                } else {
+                    // On left wall: "left" = move up wall, "right" = move down wall
+                    if (InputMap::checkDown("left")) {
+                        body_->setSpeed({ bodySpeed.x, -moveSpeed });
+                    } else if (bodySpeed.y < 0) {
+                        body_->setSpeed({ bodySpeed.x, 0 });
+                    }
+
+                    if (InputMap::checkDown("right")) {
+                        body_->setSpeed({ bodySpeed.x, moveSpeed });
+                    } else if (bodySpeed.y > 0) {
+                        body_->setSpeed({ bodySpeed.x, 0 });
+                    }
+                }
+                break;
+                
+            case GravityDirection::RIGHT:
+                // Right wall gravity: reverse inputs for natural feel
+                if (InputMap::checkDown("left") && InputMap::checkDown("right")) {
+                    body_->setSpeed({ bodySpeed.x, 0 });
+                } else {
+                    // On right wall: "left" = move down wall, "right" = move up wall (reversed)
+                    if (InputMap::checkDown("left")) {
+                        body_->setSpeed({ bodySpeed.x, moveSpeed });
+                    } else if (bodySpeed.y > 0) {
+                        body_->setSpeed({ bodySpeed.x, 0 });
+                    }
+
+                    if (InputMap::checkDown("right")) {
+                        body_->setSpeed({ bodySpeed.x, -moveSpeed });
+                    } else if (bodySpeed.y < 0) {
+                        body_->setSpeed({ bodySpeed.x, 0 });
+                    }
+                }
+                break;
         }
 
         bodySpeed = body_->getSpeed();
+        
+        // Cut jump short on release
         if (InputMap::checkReleased("r1")) {
-            // Cut jump short if going up
-            if (bodySpeed.y < 0 && jumpHeld_) {
-                body_->setSpeed({ bodySpeed.x, bodySpeed.y * 0.5f });
+            if (jumpHeld_) {
+                switch (gravityDir) {
+                    case GravityDirection::DOWN:
+                        if (bodySpeed.y < 0) body_->setSpeed({ bodySpeed.x, bodySpeed.y * 0.5f });
+                        break;
+                    case GravityDirection::UP:
+                        if (bodySpeed.y > 0) body_->setSpeed({ bodySpeed.x, bodySpeed.y * 0.5f });
+                        break;
+                    case GravityDirection::LEFT:
+                        if (bodySpeed.x > 0) body_->setSpeed({ bodySpeed.x * 0.5f, bodySpeed.y });
+                        break;
+                    case GravityDirection::RIGHT:
+                        if (bodySpeed.x < 0) body_->setSpeed({ bodySpeed.x * 0.5f, bodySpeed.y });
+                        break;
+                }
             }
         }
     }
@@ -114,7 +215,21 @@ void Character::routine() {
         if (dashing_ <= 0 && dashCooldownLeft_ <= 0) {
             dashing_ = 0.1; // dash active window duration (seconds)
             bool is_flipped = current_anim_->getFlipX();
-            body_->setSpeed({ currentDashFactor() * dashMultiplier_ * debugBaseSpeed_ * (is_flipped ? -1 : 1), bodySpeed.y });
+            float dashSpeed = currentDashFactor() * dashMultiplier_ * debugBaseSpeed_;
+            
+            // Dash direction depends on gravity direction
+            switch (gravityDir) {
+                case GravityDirection::DOWN:
+                case GravityDirection::UP:
+                    // Normal/inverted: dash horizontally based on flip
+                    body_->setSpeed({ dashSpeed * (is_flipped ? -1 : 1), bodySpeed.y });
+                    break;
+                case GravityDirection::LEFT:
+                case GravityDirection::RIGHT:
+                    // Side gravity: dash vertically based on flip
+                    body_->setSpeed({ bodySpeed.x, dashSpeed * (is_flipped ? -1 : 1) });
+                    break;
+            }
             dashCooldownLeft_ = dashCooldown_; // reset cooldown
         }
     }
@@ -189,14 +304,69 @@ void Character::routine() {
     if (bodySpeed.x == 0 && bodySpeed.y == 0) {
         dashing_ = 0;
     }
-    if (bodySpeed.x < 0) {
-        current_anim_ = anims_["walk"];
-        current_anim_->setFlipX(true);
-    } else if (bodySpeed.x > 0) {
-        current_anim_ = anims_["walk"];
-        current_anim_->setFlipX(false);
+    
+    // Determine sprite flip based on gravity direction (reuse rigidBody from earlier)
+    bool isMoving = false;
+    bool shouldFlip = false;
+    
+    if (rigidBody) {
+        switch (rigidBody->getGravityDirection()) {
+            case GravityDirection::DOWN:
+                // Normal gravity: flip based on horizontal movement
+                if (bodySpeed.x < 0) {
+                    isMoving = true;
+                    shouldFlip = true;
+                } else if (bodySpeed.x > 0) {
+                    isMoving = true;
+                    shouldFlip = false;
+                }
+                break;
+            case GravityDirection::UP:
+                // Upside down: flip based on horizontal movement (reversed)
+                if (bodySpeed.x < 0) {
+                    isMoving = true;
+                    shouldFlip = false; // reversed from normal
+                } else if (bodySpeed.x > 0) {
+                    isMoving = true;
+                    shouldFlip = true; // reversed from normal
+                }
+                break;
+            case GravityDirection::LEFT:
+                // Left wall gravity: flip based on vertical movement
+                if (bodySpeed.y < 0) {
+                    isMoving = true;
+                    shouldFlip = true; // moving up on wall = facing left
+                } else if (bodySpeed.y > 0) {
+                    isMoving = true;
+                    shouldFlip = false; // moving down on wall = facing right
+                }
+                break;
+            case GravityDirection::RIGHT:
+                // Right wall gravity: flip based on vertical movement (reversed)
+                if (bodySpeed.y < 0) {
+                    isMoving = true;
+                    shouldFlip = false; // moving up on wall = facing right
+                } else if (bodySpeed.y > 0) {
+                    isMoving = true;
+                    shouldFlip = true; // moving down on wall = facing left
+                }
+                break;
+        }
+    } else {
+        // Fallback to old behavior if not RigidBody
+        if (bodySpeed.x < 0) {
+            isMoving = true;
+            shouldFlip = true;
+        } else if (bodySpeed.x > 0) {
+            isMoving = true;
+            shouldFlip = false;
+        }
     }
-    else {
+    
+    if (isMoving) {
+        current_anim_ = anims_["walk"];
+        current_anim_->setFlipX(shouldFlip);
+    } else {
         bool was_flipped = current_anim_->getFlipX();
         current_anim_ = anims_["idle"];
         current_anim_->setFlipX(was_flipped);
@@ -214,7 +384,37 @@ void Character::routine() {
 }
 
 void Character::draw() {
-    current_anim_->draw(body_->getSurface());
+    // Set sprite rotation based on gravity direction
+    if (body_) {
+        RigidBody* rigidBody = dynamic_cast<RigidBody*>(body_);
+        if (rigidBody) {
+            switch (rigidBody->getGravityDirection()) {
+                case GravityDirection::DOWN:
+                    current_anim_->setRotation(0.0f); // Normal, upright
+                    break;
+                case GravityDirection::UP:
+                    current_anim_->setRotation(180.0f); // Upside down
+                    break;
+                case GravityDirection::LEFT:
+                    current_anim_->setRotation(90.0f); // Rotated so feet point left
+                    break;
+                case GravityDirection::RIGHT:
+                    current_anim_->setRotation(-90.0f); // Rotated so feet point right
+                    break;
+            }
+        }
+    }
+    
+    // Create sprite rectangle with original dimensions (not rotated hitbox)
+    Vector2 center = body_->getCenterCoord();
+    Rectangle spriteRect = {
+        center.x - originalHitboxDims_.x / 2.0f,
+        center.y - originalHitboxDims_.y / 2.0f,
+        originalHitboxDims_.x,
+        originalHitboxDims_.y
+    };
+    
+    current_anim_->draw(spriteRect);
     // Draw adi count above character (simple UI for now)
     Vector2 pos = body_->getCoord();
     // DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);
@@ -281,12 +481,60 @@ void Character::separateFromCollisions() {
 }
 
 bool Character::isOnGround() const {
-    // Consider grounded if there's a solid directly below the character rect
+    // Consider grounded if there's a solid in the direction of gravity
     Rectangle probe = body_->getSurface();
-    probe.y += 0.1f;
+    
+    RigidBody* rigidBody = dynamic_cast<RigidBody*>(body_);
+    GravityDirection gravityDir = rigidBody ? rigidBody->getGravityDirection() : GravityDirection::DOWN;
+    
+    switch (gravityDir) {
+        case GravityDirection::DOWN:
+            probe.y += 0.1f; // Check below
+            break;
+        case GravityDirection::UP:
+            probe.y -= 0.1f; // Check above
+            break;
+        case GravityDirection::LEFT:
+            probe.x -= 0.1f; // Check left
+            break;
+        case GravityDirection::RIGHT:
+            probe.x += 0.1f; // Check right
+            break;
+    }
+    
     for (CollisionRect* other : CollisionRect::query(probe, true)) {
         if (other->isSolid() && (other->getId() != body_->getId()))
             return true;
     }
     return false;
+}
+
+void Character::updateHitboxRotation() {
+    // Rotate hitbox dimensions based on gravity direction
+    Rectangle currentHitbox = body_->getSurface();
+    Vector2 center = {currentHitbox.x + currentHitbox.width / 2.0f, currentHitbox.y + currentHitbox.height / 2.0f};
+    
+    Vector2 newDims;
+    switch (lastGravityDir_) {
+        case GravityDirection::DOWN:
+        case GravityDirection::UP:
+            // Normal orientation: use original dimensions
+            newDims = originalHitboxDims_;
+            break;
+        case GravityDirection::LEFT:
+        case GravityDirection::RIGHT:
+            // Rotated 90 degrees: swap width and height
+            newDims = {originalHitboxDims_.y, originalHitboxDims_.x};
+            break;
+    }
+    
+    // Update hitbox with new dimensions, keeping center position
+    Rectangle newHitbox = {
+        center.x - newDims.x / 2.0f,
+        center.y - newDims.y / 2.0f,
+        newDims.x,
+        newDims.y
+    };
+    
+    body_->setSurface(newHitbox);
 }

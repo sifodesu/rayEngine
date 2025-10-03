@@ -17,6 +17,8 @@ public:
     void setFlipY(bool v) { flipY_ = v; }
     bool getFlipX() const { return flipX_; }
     bool getFlipY() const { return flipY_; }
+    void setRotation(float rotation) { rotation_ = rotation; } // rotation in degrees
+    float getRotation() const { return rotation_; }
     void freeze(bool value) {
         is_frozen_ = value;
     }
@@ -37,4 +39,7 @@ private:
     // Flipping
     bool flipX_{false};
     bool flipY_{false};
+    
+    // Rotation
+    float rotation_{0.0f}; // rotation in degrees
 };

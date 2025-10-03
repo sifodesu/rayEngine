@@ -81,7 +81,6 @@ void Engine::game_loop()
 
 void Engine::render()
 {
-    // Toggle collision box visualization with F3
     if (IsKeyPressed(KEY_R)) {
         showCollisionBoxes = !showCollisionBoxes;
     }

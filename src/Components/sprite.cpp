@@ -97,6 +97,10 @@ void Sprite::draw(Rectangle targetRect) {
     }
     
     // Use DrawTexturePro to stretch the sprite to fit the target rectangle
-    Vector2 origin = {0, 0};  // No rotation offset needed
-    DrawTexturePro(sprite_sheet_, src, targetRect, origin, 0.0f, tint_);
+    // Set origin to center of sprite for proper rotation
+    Vector2 origin = {targetRect.width / 2.0f, targetRect.height / 2.0f};
+    Rectangle rotatedTarget = targetRect;
+    rotatedTarget.x += origin.x; // Offset to center
+    rotatedTarget.y += origin.y;
+    DrawTexturePro(sprite_sheet_, src, rotatedTarget, origin, rotation_, tint_);
 }

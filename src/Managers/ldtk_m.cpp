@@ -344,6 +344,11 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 }
             }
         }
+        else if (fid == "Force_gravity") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.forceGravity = f["__value"].get<bool>();
+            }
+        }
     }
 }
 
