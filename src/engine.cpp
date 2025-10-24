@@ -86,7 +86,14 @@ void Engine::render()
     }
     
     auto comp = [](CollisionRect* a, CollisionRect* b) {
-        return a->getFather()->layer_ <= b->getFather()->layer_;
+        int layerA = a->getFather()->layer_;
+        int layerB = b->getFather()->layer_;
+
+        if (layerA == layerB) {
+            return a < b;
+        }
+
+        return layerA > layerB;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
     std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect());
