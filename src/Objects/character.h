@@ -19,9 +19,7 @@ public:
     // Debug tuning API
     float getDebugJumpSpeed() const { return debugJumpSpeed_; }
     void setDebugJumpSpeed(float v) { if (v < 50.0f) v = 50.0f; if (v > 800.0f) v = 800.0f; debugJumpSpeed_ = v; }
-    // Max fall speed API
-    double getMaxFallSpeed() const { return body_->getMaxFallSpeed(); }
-    void setMaxFallSpeed(double v) { if (v < 100.0) v = 100.0; if (v > 2000.0) v = 2000.0; body_->setMaxFallSpeed(v); }
+
     // Adi API
     int getAdi() const { return adiCount_; }
     int getAdiMax() const { return adiMax_; }

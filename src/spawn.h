@@ -56,7 +56,7 @@ struct BodyDesc {
     double acceleration{0};
     double curve{0};
     double gravityAcceleration{800};
-    double maxFallSpeed{300};
+
 };
 
 struct AdiComponentDesc {
