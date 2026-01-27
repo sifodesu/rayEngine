@@ -13,6 +13,7 @@
 #include "receptacle.h"
 #include "plateforme.h"
 #include "portal.h"
+#include "projectile.h"
 
 using namespace std;
 
@@ -46,6 +47,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::Kill:
             obj = std::make_unique<Kill>(data);
+            break;
+        case EntityType::Projectile:
+            obj = std::make_unique<Projectile>(data);
             break;
         case EntityType::Pano:
             obj = std::make_unique<Pano>(data);

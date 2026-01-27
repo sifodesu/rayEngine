@@ -43,11 +43,10 @@ void Character::onRoomEntered() {
 }
 
 float Character::currentJumpSpeed() const {
-    // base plus per-charge bonus
-    return debugJumpSpeed_;// * (1.0f + adiJumpBonusPerCharge_ * adiCount_);
+    return debugJumpSpeed_;
 }
 float Character::currentDashFactor() const {
-    return CHARACTER_DASH_FACTOR_BASE; //* (1.0f + adiDashBonusPerCharge_ * adiCount_);
+    return CHARACTER_DASH_FACTOR_BASE;
 }
 
 void Character::routine() {
@@ -220,9 +219,13 @@ void Character::routine() {
             // Dash direction depends on gravity direction
             switch (gravityDir) {
                 case GravityDirection::DOWN:
-                case GravityDirection::UP:
-                    // Normal/inverted: dash horizontally based on flip
+                    // Normal gravity: dash horizontally based on flip
                     body_->setSpeed({ dashSpeed * (is_flipped ? -1 : 1), bodySpeed.y });
+                    break;
+                case GravityDirection::UP:
+                    // Inverted gravity: dash logic is inverted compared to normal gravity
+                    // because the visual sprite is rotated 180 degrees.
+                    body_->setSpeed({ dashSpeed * (is_flipped ? 1 : -1), bodySpeed.y });
                     break;
                 case GravityDirection::LEFT:
                 case GravityDirection::RIGHT:
@@ -415,10 +418,6 @@ void Character::draw() {
     };
     
     current_anim_->draw(spriteRect);
-    // Draw adi count above character (simple UI for now)
-    Vector2 pos = body_->getCoord();
-    // DrawText(TextFormat("ADI: %d/%d", adiCount_, adiMax_), (int)pos.x, (int)pos.y - 20, 8, WHITE);
-    // DrawText(TextFormat("Speed: %.0f Jump: %.0f", debugBaseSpeed_, debugJumpSpeed_), (int)pos.x, (int)pos.y - 30, 8, YELLOW);
 }
 
 void Character::respawn() {

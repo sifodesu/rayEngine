@@ -41,8 +41,8 @@ Engine::Engine()
     InputMap::init();
     UpgradeRegistry::initDefaults();
     Ldtk_m::loadLevel("ldtk_test.ldtk");
-    SaveManager::load(); // load save file (if exists)
-    SaveManager::applyToWorld(); // move player to saved checkpoint
+    // SaveManager::load(); // load save file (if exists)
+    // SaveManager::applyToWorld(); // move player to saved checkpoint
 
     rlImGuiSetup(true);
 

@@ -56,3 +56,5 @@ toolchain.cmake
 imgui.ini
 save.json
 /.github
+/.cache
+.clang-format

@@ -182,13 +182,24 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
         if (fid == "Type") {
-            string typeStr = f["__value"].get<string>();
-            d.entityType = stringToEntityType(typeStr);
-            d.typeDetail = typeStr; // preserve original string for subtypes
+            string val = f["__value"].get<string>();
+            d.entityType = stringToEntityType(val);
+            
+            // Check for specific behaviors/flags in the Type enum
+            if (val == "kill") {
+                d.interaction.isKill = true;
+            } else {
+                 d.typeDetail = val; // fallback
+            }
         }
         else if (fid == "solid") {
             if (!d.physics.collision) d.physics.collision = CollisionDesc{};
             d.physics.collision->solid = f["__value"].get<bool>();
+        }
+        else if (fid == "loop") {
+             if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.isLoop = f["__value"].get<bool>();
+            }
         }
         else if (fid == "sprite") {
             string key = f["__value"].get<string>();
@@ -408,6 +419,9 @@ void fillEntityTile(const json& e, const map<int, TilesetInfo>& tilesetInfo, Spa
 void spawnEntity(const json& e, int worldX, int worldY, int layer, 
                  const map<int, TilesetInfo>& tilesetInfo, int layerGridSize) {
     SpawnData d;
+    if (e.contains("__identifier")) {
+        d.entityType = stringToEntityType(e["__identifier"].get<string>());
+    }
     
     // Fill entity data from LDtk fields
     fillEntityFields(e, d, layerGridSize, worldX, worldY);

@@ -3,6 +3,7 @@
 #include "character.h"
 #include "collisionRect.h"
 #include "adiComponent.h"
+#include "killComponent.h"
 
 
 Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
@@ -44,10 +45,24 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
             waypoints_.push_back(worldCenter);
         }
     }
+
+    // Initialize KillComponent if "Kill" property is set
+    if (data.interaction.isKill.value_or(false)) {
+        killComponent_ = new KillComponent();
+    }
+    
+    // Default behavior is PING_PONG
+    behavior_ = Behavior::PING_PONG;
+    
+    // Parse behavior from interaction config
+    if (data.interaction.isLoop.value_or(false)) {
+        behavior_ = Behavior::LOOP;
+    }
 }
 
 Plateforme::~Plateforme() {
     delete adiComponent_;
+    delete killComponent_;
 }
 
 Vector2 Plateforme::getCurrentCenter() const {
@@ -57,7 +72,10 @@ Vector2 Plateforme::getCurrentCenter() const {
 
 Vector2 Plateforme::getCurrentTarget() const {
     if (waypoints_.size() < 2) return getCurrentCenter();
-    return waypoints_[current_ + dir_];
+    int idx = current_ + dir_;
+    if (idx < 0) idx = waypoints_.size() - 1; // Should not happen in PING_PONG
+    if (idx >= waypoints_.size()) idx = 0; // LOOP wrap
+    return waypoints_[idx];
 }
 
 std::vector<CollisionRect*> Plateforme::findRidingCharacters(const Rectangle& platformSurface) const {
@@ -115,6 +133,7 @@ void Plateforme::moveCarriedCharacters(const std::vector<CollisionRect*>& charac
 }
 
 bool Plateforme::shouldSwitchDirection() {
+    if (behavior_ == Behavior::LOOP) return false; // Loop never switches ping-pong direction
     return (current_ == 0 || current_ == (int)waypoints_.size() - 1);
 }
 
@@ -131,15 +150,24 @@ void Plateforme::snapToTarget(Vector2 target) {
 }
 
 Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
+    if (waypoints_.size() < 2) return currentCenter;
+
     Vector2 target = getCurrentTarget();
     Vector2 toTarget { target.x - currentCenter.x, target.y - currentCenter.y };
     float dist = sqrtf(toTarget.x*toTarget.x + toTarget.y*toTarget.y);
     
     if (dist < 0.5f) {
         snapToTarget(target);
-        current_ += dir_;
-        if (shouldSwitchDirection()) {
-            switchDirection();
+        
+        if (behavior_ == Behavior::PING_PONG) {
+            current_ += dir_;
+            if (shouldSwitchDirection()) {
+                switchDirection();
+            }
+        } else { // LOOP
+            current_++; 
+            if (current_ >= waypoints_.size()) current_ = 0;
+            // Immediate transition to next waypoint
         }
         return target;
     }
@@ -175,13 +203,19 @@ Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
         if (remainingInSegment < 0.5f) {
             snapToTarget(target);
             newCenter = target;
-            current_ += dir_;
-            if (shouldSwitchDirection()) {
-                switchDirection();
-                if (waiting_ > 0) {
-                    desired = 0;
-                    break;
+            
+            if (behavior_ == Behavior::PING_PONG) {
+                current_ += dir_;
+                if (shouldSwitchDirection()) {
+                    switchDirection();
+                    if (waiting_ > 0) {
+                        desired = 0;
+                        break;
+                    }
                 }
+            } else { // LOOP
+                current_++;
+                if (current_ >= waypoints_.size()) current_ = 0;
             }
             
             target = getCurrentTarget();
@@ -195,6 +229,22 @@ Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
 
 void Plateforme::routine() {
     BasicEnt::routine();
+    
+    // Check collisions for KillComponent (spikes)
+    // We manually check for overlap because onCollision might not trigger
+    // if the physics engine prevents deep interpenetration for solids.
+    if (killComponent_) {
+        Rectangle surf = body_->getSurface();
+        // Expand slightly to catch touching characters
+        Rectangle killZone = { surf.x - 1, surf.y - 1, surf.width + 2, surf.height + 2 };
+        
+        for (auto* other : CollisionRect::query(killZone)) {
+            if (other == body_) continue;
+            if (CheckCollisionRecs(killZone, other->getSurface())) {
+                killComponent_->onCollision(other->getFather());
+            }
+        }
+    }
     
     // Only move if platform is enabled
     if (!enabled_) return;

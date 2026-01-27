@@ -12,6 +12,7 @@ enum class EntityType {
     Plateforme,
     Checkpoint,
     Kill,
+    Projectile,
     Pano,
     Receptacle,
     UpgradePickup
@@ -19,6 +20,8 @@ enum class EntityType {
 
 // Helper function to convert string to EntityType
 inline EntityType stringToEntityType(const std::string& typeStr) {
+    if (typeStr == "Character")
+        return EntityType::Character;
     if (typeStr == "tile") return EntityType::Tile;
     if (typeStr == "basic") return EntityType::Basic;
     if (typeStr == "Character") return EntityType::Character;
@@ -26,6 +29,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Plateforme") return EntityType::Plateforme;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;
     if (typeStr == "Kill") return EntityType::Kill;
+    if (typeStr == "Projectile") return EntityType::Projectile;
     if (typeStr == "Pano") return EntityType::Pano;
     if (typeStr == "Receptacle") return EntityType::Receptacle;
     if (typeStr.rfind("upgrade_", 0) == 0) return EntityType::UpgradePickup;
@@ -82,6 +86,9 @@ struct InteractionConfig {
     std::optional<bool> enabled;
     std::optional<PortalDirection> direction;
     std::optional<bool> forceGravity; // Portal forces gravity direction on player
+    std::optional<bool> isKill;
+    std::optional<bool> isLoop;
+    std::optional<std::string> behavior;
 };
 
 struct LdtkMetadata {
