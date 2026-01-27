@@ -3,7 +3,7 @@
 #include "character.h"
 #include "collisionRect.h"
 #include "adiComponent.h"
-#include "killComponent.h"
+#include "adiComponent.h"
 
 
 Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
@@ -46,11 +46,6 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
         }
     }
 
-    // Initialize KillComponent if "Kill" property is set
-    if (data.interaction.isKill.value_or(false)) {
-        killComponent_ = new KillComponent();
-    }
-    
     // Default behavior is PING_PONG
     behavior_ = Behavior::PING_PONG;
     
@@ -62,7 +57,6 @@ Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
 
 Plateforme::~Plateforme() {
     delete adiComponent_;
-    delete killComponent_;
 }
 
 Vector2 Plateforme::getCurrentCenter() const {
@@ -78,7 +72,7 @@ Vector2 Plateforme::getCurrentTarget() const {
     return waypoints_[idx];
 }
 
-std::vector<CollisionRect*> Plateforme::findRidingCharacters(const Rectangle& platformSurface) const {
+std::vector<CollisionRect*> Plateforme::findRidingObjects(const Rectangle& platformSurface) const {
     std::vector<CollisionRect*> carryList;
     Rectangle topProbe = platformSurface;
     topProbe.y -= 2.0f;            // small margin above
@@ -87,17 +81,19 @@ std::vector<CollisionRect*> Plateforme::findRidingCharacters(const Rectangle& pl
     for (auto* rect : CollisionRect::query(topProbe)) {
         if (!rect || rect == body_) continue;
         
-        Character* character = dynamic_cast<Character*>(rect->getFather());
-        if (!character) continue;
+        // We no longer strict-filter for Characters only.
+        // Any physical object resting on us should move.
+        // Optional: filter out non-movable objects if we had a "static" flag,
+        // but for now we assume collisionRects are movable if they are effectively on top.
         
-        Rectangle charRect = rect->getSurface();
-        float charBottom = charRect.y + charRect.height;
+        Rectangle objRect = rect->getSurface();
+        float objBottom = objRect.y + objRect.height;
         float platTop = platformSurface.y;
         
-        // Check if character is standing on platform
-        bool onPlatform = (charBottom >= platTop - 1.0f && charBottom <= platTop + 2.0f &&
-                          charRect.x < platformSurface.x + platformSurface.width &&
-                          charRect.x + charRect.width > platformSurface.x);
+        // Check if object is standing on platform
+        bool onPlatform = (objBottom >= platTop - 1.0f && objBottom <= platTop + 2.0f &&
+                          objRect.x < platformSurface.x + platformSurface.width &&
+                          objRect.x + objRect.width > platformSurface.x);
         
         if (onPlatform) {
             carryList.push_back(rect);
@@ -106,13 +102,14 @@ std::vector<CollisionRect*> Plateforme::findRidingCharacters(const Rectangle& pl
     return carryList;
 }
 
-void Plateforme::moveCarriedCharacters(const std::vector<CollisionRect*>& characters, Vector2 deltaMove, Vector2 newCenter) {
+void Plateforme::moveCarriedObjects(const std::vector<CollisionRect*>& objects, Vector2 deltaMove, Vector2 newCenter) {
     Rectangle surf = body_->getSurface();
     
-    for (auto* rect : characters) {
+    for (auto* rect : objects) {
         Rectangle cr = rect->getSurface();
         rect->setCoord({ cr.x + deltaMove.x, cr.y + deltaMove.y });
         
+        // Special character handling (snapping + gravity reset)
         Character* ch = dynamic_cast<Character*>(rect->getFather());
         if (ch) {
             Rectangle newR = rect->getSurface();
@@ -230,22 +227,6 @@ Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
 void Plateforme::routine() {
     BasicEnt::routine();
     
-    // Check collisions for KillComponent (spikes)
-    // We manually check for overlap because onCollision might not trigger
-    // if the physics engine prevents deep interpenetration for solids.
-    if (killComponent_) {
-        Rectangle surf = body_->getSurface();
-        // Expand slightly to catch touching characters
-        Rectangle killZone = { surf.x - 1, surf.y - 1, surf.width + 2, surf.height + 2 };
-        
-        for (auto* other : CollisionRect::query(killZone)) {
-            if (other == body_) continue;
-            if (CheckCollisionRecs(killZone, other->getSurface())) {
-                killComponent_->onCollision(other->getFather());
-            }
-        }
-    }
-    
     // Only move if platform is enabled
     if (!enabled_) return;
     
@@ -262,9 +243,9 @@ void Plateforme::routine() {
         return;
     }
 
-    // Find characters riding on the platform before movement
+    // Find objects riding on the platform before movement
     Rectangle platformSurface = body_->getSurface();
-    auto ridingCharacters = findRidingCharacters(platformSurface);
+    auto ridingObjects = findRidingObjects(platformSurface);
 
     // Calculate new position
     Vector2 newCenter = calculateMovement(currentCenter, deltaTime);
@@ -276,8 +257,8 @@ void Plateforme::routine() {
         body_->setCoord({ newCenter.x - surf.width/2.0f, newCenter.y - surf.height/2.0f });
     }
 
-    // Move carried characters
-    moveCarriedCharacters(ridingCharacters, deltaMove, newCenter);
+    // Move carried objects
+    moveCarriedObjects(ridingObjects, deltaMove, newCenter);
     
     lastCenter_ = newCenter;
 }

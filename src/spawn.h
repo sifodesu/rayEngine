@@ -86,7 +86,6 @@ struct InteractionConfig {
     std::optional<bool> enabled;
     std::optional<PortalDirection> direction;
     std::optional<bool> forceGravity; // Portal forces gravity direction on player
-    std::optional<bool> isKill;
     std::optional<bool> isLoop;
     std::optional<std::string> behavior;
 };

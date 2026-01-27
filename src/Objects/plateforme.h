@@ -4,7 +4,7 @@
 #include <raylib.h> // ensure Vector2
 
 #include "adiComponent.h"
-#include "killComponent.h"
+
 
 class Plateforme : public BasicEnt {
 public:
@@ -33,8 +33,9 @@ private:
     // Helper methods for cleaner code organization
     Vector2 getCurrentCenter() const;
     Vector2 getCurrentTarget() const;
-    std::vector<CollisionRect*> findRidingCharacters(const Rectangle& platformSurface) const;
-    void moveCarriedCharacters(const std::vector<CollisionRect*>& characters, Vector2 deltaMove, Vector2 newCenter);
+    // Generic object transport
+    std::vector<CollisionRect*> findRidingObjects(const Rectangle& platformSurface) const;
+    void moveCarriedObjects(const std::vector<CollisionRect*>& objects, Vector2 deltaMove, Vector2 newCenter);
     
     // Movement logic
     Vector2 calculateMovement(Vector2 currentCenter, double deltaTime);
@@ -60,7 +61,6 @@ private:
     // Interaction state
     bool enabled_ = true; // whether platform should move
     AdiComponent* adiComponent_ = nullptr; // Component pour être triggerable
-    KillComponent* killComponent_ = nullptr; // New KillComponent member
 
     Behavior behavior_ = PING_PONG; // Default behavior
 }; // Plateforme

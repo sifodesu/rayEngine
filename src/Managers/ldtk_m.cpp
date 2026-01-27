@@ -186,11 +186,7 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
             d.entityType = stringToEntityType(val);
             
             // Check for specific behaviors/flags in the Type enum
-            if (val == "kill") {
-                d.interaction.isKill = true;
-            } else {
-                 d.typeDetail = val; // fallback
-            }
+             d.typeDetail = val; // fallback
         }
         else if (fid == "solid") {
             if (!d.physics.collision) d.physics.collision = CollisionDesc{};
