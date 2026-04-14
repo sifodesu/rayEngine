@@ -6,4 +6,4 @@
 #define SAVE_FILE_PATH "save.json"
 
 #define NATIVE_RES_WIDTH  320
-#define NATIVE_RES_HEIGHT  240
+#define NATIVE_RES_HEIGHT  192

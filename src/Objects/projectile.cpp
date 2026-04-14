@@ -20,13 +20,10 @@ Projectile::~Projectile() {
 }
 
 void Projectile::routine() {
-    // BasicEnt routine handles sprite animation
     BasicEnt::routine();
-    // RigidBody handles movement automatically via its own routine called by Object_m/BasicEnt?
-    // Wait, BasicEnt::routine DOES NOT call body_->routine() loop?
-    // Let's check BasicEnt::routine.
+
     if (auto* rb = dynamic_cast<RigidBody*>(body_)) {
-        rb->routine(); // Manually call physics update if BasicEnt doesn't
+        rb->routine();
     }
 
     double dt = Clock::getLap();
@@ -36,10 +33,6 @@ void Projectile::routine() {
         return;
     }
 
-    // Collision checks for self-destruction/kill
-    // Although RigidBody handles physics collisions (stopping at walls),
-    // we need to detect the hit to destroy the projectile.
-    
     Rectangle surf = body_->getSurface();
     std::vector<CollisionRect*> collisions = CollisionRect::query(surf, true);
     for (auto* other : collisions) {

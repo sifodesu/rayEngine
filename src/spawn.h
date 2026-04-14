@@ -20,8 +20,6 @@ enum class EntityType {
 
 // Helper function to convert string to EntityType
 inline EntityType stringToEntityType(const std::string& typeStr) {
-    if (typeStr == "Character")
-        return EntityType::Character;
     if (typeStr == "tile") return EntityType::Tile;
     if (typeStr == "basic") return EntityType::Basic;
     if (typeStr == "Character") return EntityType::Character;

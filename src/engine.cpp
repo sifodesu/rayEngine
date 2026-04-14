@@ -93,7 +93,7 @@ void Engine::render()
             return a < b;
         }
 
-        return layerA > layerB;
+        return layerA < layerB;
     };
     std::set<CollisionRect*, decltype(comp)> sorted_bodies;
     std::vector<CollisionRect*> to_render = CollisionRect::query(Raycam_m::getRayCam().getRect());
