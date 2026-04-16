@@ -424,7 +424,7 @@ void Character::respawn() {
     if (body_) {
         body_->setCoord(respawnPos_);
         body_->setSpeed({0,0});
-        jumps_ = 1; // reset on respawn
+        jumps_ = 0; // reset on respawn
         dashCooldownLeft_ = 0; // dash immediately available on respawn
     }
 }

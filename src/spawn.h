@@ -10,6 +10,7 @@ enum class EntityType {
     Character,
     Portal,
     Plateforme,
+    FriablePlatform,
     Checkpoint,
     Kill,
     Projectile,
@@ -25,6 +26,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Character") return EntityType::Character;
     if (typeStr == "Portal") return EntityType::Portal;
     if (typeStr == "Plateforme") return EntityType::Plateforme;
+    if (typeStr == "FriablePlatform") return EntityType::FriablePlatform;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;
     if (typeStr == "Kill") return EntityType::Kill;
     if (typeStr == "Projectile") return EntityType::Projectile;
@@ -86,6 +88,7 @@ struct InteractionConfig {
     std::optional<bool> forceGravity; // Portal forces gravity direction on player
     std::optional<bool> isLoop;
     std::optional<std::string> behavior;
+    std::optional<float> breakTime; // seconds
 };
 
 struct LdtkMetadata {

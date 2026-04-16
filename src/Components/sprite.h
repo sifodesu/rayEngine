@@ -19,6 +19,10 @@ public:
     bool getFlipY() const { return flipY_; }
     void setRotation(float rotation) { rotation_ = rotation; } // rotation in degrees
     float getRotation() const { return rotation_; }
+    int getFrameCount() const { return (int)frameRects_.size(); }
+    void resetAnimation();
+    void setForcedUniformFrameDuration(float seconds);
+    void clearForcedUniformFrameDuration();
     void freeze(bool value) {
         is_frozen_ = value;
     }
@@ -35,6 +39,8 @@ private:
     bool is_frozen_{false};
     float time_acc_{0.0f};
     int current_frame_{0};
+    bool forceUniformDuration_{false};
+    float forcedUniformDuration_{0.1f};
 
     // Flipping
     bool flipX_{false};

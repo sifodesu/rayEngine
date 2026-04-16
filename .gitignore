@@ -58,3 +58,4 @@ save.json
 /.github
 /.cache
 .clang-format
+.codex

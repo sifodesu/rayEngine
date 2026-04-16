@@ -3,6 +3,7 @@
 #include "texture_m.h"
 #include "spawn.h"
 #include <cmath>
+#include <algorithm>
 
 Sprite::Sprite(const std::string& filename, Rectangle rect)
     : filename_(filename), tint_(WHITE) {
@@ -31,7 +32,13 @@ void Sprite::routine() {
     float dt = static_cast<float>(Clock::getLap());
     size_t frameCount = frameRects_.size();
     if (frameCount > 1) {
-        if (!frameDurations_.empty() && frameDurations_.size() == frameCount) {
+        if (forceUniformDuration_) {
+            time_acc_ += dt;
+            while (time_acc_ >= forcedUniformDuration_) {
+                time_acc_ -= forcedUniformDuration_;
+                current_frame_ = (current_frame_ + 1) % (int)frameCount;
+            }
+        } else if (!frameDurations_.empty() && frameDurations_.size() == frameCount) {
             time_acc_ += dt;
             while (time_acc_ > frameDurations_[current_frame_]) {
                 time_acc_ -= frameDurations_[current_frame_];
@@ -45,6 +52,20 @@ void Sprite::routine() {
             }
         }
     }
+}
+
+void Sprite::resetAnimation() {
+    time_acc_ = 0.0f;
+    current_frame_ = 0;
+}
+
+void Sprite::setForcedUniformFrameDuration(float seconds) {
+    forceUniformDuration_ = true;
+    forcedUniformDuration_ = std::max(seconds, 0.001f);
+}
+
+void Sprite::clearForcedUniformFrameDuration() {
+    forceUniformDuration_ = false;
 }
 
 void Sprite::draw(Vector2 pos) {
