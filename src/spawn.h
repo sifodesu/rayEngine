@@ -95,6 +95,7 @@ struct InteractionConfig {
     std::optional<float> fireInterval; // seconds
     std::optional<float> projectileSpeed; // pixels per second
     std::optional<std::string> projectileSprite; // sprite key/file name
+    std::optional<int> maxRipple; // max ricochets on solid surfaces
 };
 
 struct LdtkMetadata {

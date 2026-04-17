@@ -17,6 +17,7 @@ private:
     float fireInterval_ = 1.0f;
     float projectileSpeed_ = 160.0f;
     std::string projectileSprite_ = "bullet.png";
+    int maxRipple_ = 0;
     float fireCooldown_ = 0.0f;
     bool hasDirection_ = false;
     Vector2 fireDirection_{1.0f, 0.0f};

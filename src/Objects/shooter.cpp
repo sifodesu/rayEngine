@@ -11,6 +11,7 @@ Shooter::Shooter(const SpawnData& data) : BasicEnt(data) {
     fireInterval_ = std::max(data.interaction.fireInterval.value_or(1.0f), 0.01f);
     projectileSpeed_ = std::max(data.interaction.projectileSpeed.value_or(160.0f), 1.0f);
     projectileSprite_ = data.interaction.projectileSprite.value_or("bullet.png");
+    maxRipple_ = std::max(data.interaction.maxRipple.value_or(0), 0);
     if (projectileSprite_.empty()) projectileSprite_ = "bullet.png";
 
     hasDirection_ = initializeDirectionFromPoint(data);
@@ -65,6 +66,7 @@ void Shooter::spawnProjectile() {
     projectileData.entityType = EntityType::Projectile;
     projectileData.layer = layer_;
     projectileData.sourceObjectId = id_;
+    projectileData.interaction.maxRipple = maxRipple_;
 
     SpriteDesc spriteDesc;
     if (auto meta = Sprite_m::get(projectileSprite_)) {

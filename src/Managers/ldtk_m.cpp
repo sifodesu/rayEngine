@@ -285,6 +285,11 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 d.interaction.projectileSprite = f["__value"].get<string>();
             }
         }
+        else if (fid == "maxRipple") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.maxRipple = f["__value"].get<int>();
+            }
+        }
         else if (fid == "linkId") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 if (f["__value"].is_object() && f["__value"].contains("entityIid")) {
