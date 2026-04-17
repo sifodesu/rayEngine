@@ -260,9 +260,29 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 d.interaction.enabled = f["__value"].get<bool>();
             }
         }
+        else if (fid == "killOnCol") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.killOnCol = f["__value"].get<bool>();
+            }
+        }
         else if (fid == "breakTime") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 d.interaction.breakTime = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "fireInterval") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.fireInterval = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "projectileSpeed") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.projectileSpeed = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "projectileSprite") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.projectileSprite = f["__value"].get<string>();
             }
         }
         else if (fid == "linkId") {

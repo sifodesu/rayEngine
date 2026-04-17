@@ -23,6 +23,24 @@ void RigidBody::setSpeed(Vector2 speed) {
 Vector2 RigidBody::getSpeed() {
     return speed_;
 }
+
+void RigidBody::registerSweepContact(CollisionRect* body) {
+    if (!body || body == this) return;
+    for (CollisionRect* existing : sweepContacts_) {
+        if (existing == body) return;
+    }
+    sweepContacts_.push_back(body);
+}
+
+void RigidBody::addSweepContacts(const Rectangle& probeRect) {
+    std::vector<CollisionRect*> candidates = CollisionRect::query(probeRect);
+    for (CollisionRect* body : candidates) {
+        if (!body || body == this) continue;
+        if (!CheckCollisionRecs(probeRect, body->getSurface())) continue;
+        registerSweepContact(body);
+    }
+}
+
 void RigidBody::fixSpeed() {
     if (!solid_) return;
 
@@ -35,6 +53,7 @@ void RigidBody::fixSpeed() {
         probeRect.width += 0.1f;
     }
     if (speed_.x != 0.0f) {
+        addSweepContacts(probeRect);
         for (CollisionRect* body : CollisionRect::query(probeRect, true)) {
             if (body->isSolid() && (body->getId() != pool_id_)) { speed_.x = 0.0f; break; }
         }
@@ -49,6 +68,7 @@ void RigidBody::fixSpeed() {
         probeRect.height += 0.1f;
     }
     if (speed_.y != 0.0f) {
+        addSweepContacts(probeRect);
         for (CollisionRect* body : CollisionRect::query(probeRect, true)) {
             if (body->isSolid() && (body->getId() != pool_id_)) { speed_.y = 0.0f; break; }
         }
@@ -57,6 +77,7 @@ void RigidBody::fixSpeed() {
 
 void RigidBody::routine() {
     float delta = (float)Clock::getLap();
+    sweepContacts_.clear();
     
     if (delta > 0.2)
         return;
@@ -112,6 +133,7 @@ void RigidBody::routine() {
             Rectangle next = lastFree;
             next.x += unitDir.x * advance;
             next.y += unitDir.y * advance;
+            addSweepContacts(next);
 
             if (collides(next)) {
                 break; // stop right before collision
@@ -127,5 +149,3 @@ void RigidBody::routine() {
     speed_.x += acceleration_ * delta * speed_.x;
     speed_.y += acceleration_ * delta * speed_.y;
 }
-
-

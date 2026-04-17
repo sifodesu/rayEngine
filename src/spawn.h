@@ -11,6 +11,7 @@ enum class EntityType {
     Portal,
     Plateforme,
     FriablePlatform,
+    Shooter,
     Checkpoint,
     Kill,
     Projectile,
@@ -27,6 +28,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Portal") return EntityType::Portal;
     if (typeStr == "Plateforme") return EntityType::Plateforme;
     if (typeStr == "FriablePlatform") return EntityType::FriablePlatform;
+    if (typeStr == "Shooter") return EntityType::Shooter;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;
     if (typeStr == "Kill") return EntityType::Kill;
     if (typeStr == "Projectile") return EntityType::Projectile;
@@ -84,11 +86,15 @@ struct InteractionConfig {
     std::optional<std::string> dialog;
     std::optional<std::vector<Vector2>> pathPoints;
     std::optional<bool> enabled;
+    std::optional<bool> killOnCol;
     std::optional<PortalDirection> direction;
     std::optional<bool> forceGravity; // Portal forces gravity direction on player
     std::optional<bool> isLoop;
     std::optional<std::string> behavior;
     std::optional<float> breakTime; // seconds
+    std::optional<float> fireInterval; // seconds
+    std::optional<float> projectileSpeed; // pixels per second
+    std::optional<std::string> projectileSprite; // sprite key/file name
 };
 
 struct LdtkMetadata {
@@ -101,6 +107,7 @@ struct SpawnData {
     int id{0};
     EntityType entityType{EntityType::Basic};
     std::string typeDetail; // e.g., "upgrade_speed", "upgrade_jump" for subtypes
+    std::optional<int> sourceObjectId; // runtime-only owner id (not from LDtk)
     int layer{0};
     std::optional<SpriteDesc> sprite;
     PhysicsConfig physics;

@@ -13,6 +13,7 @@ public:
     void routine();
     void draw();
     Rectangle getRect() { return body_->getSurface(); }
+    CollisionRect* getCollisionBody() override { return body_; }
     void addSpeedBoost(float factor) { speedMultiplier_ += factor; }
     void addDashBoost(float factor) { dashMultiplier_ += factor; }
     void setDashCooldownMs(int ms) { dashCooldown_ = ms / 1000.0; }

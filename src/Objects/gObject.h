@@ -8,16 +8,23 @@
 
 class AdiComponent;
 class LinkableComponent;
+class KillComponent;
+class CollisionRect;
 
 class GObject {
 public:
-    explicit GObject(const int id) : id_(id), to_delete_(false), layer_(0) {}
-    virtual ~GObject() {}
+    explicit GObject(const int id);
+    virtual ~GObject();
     virtual void routine() {}
     virtual void trigger() {}
     virtual void draw() {}
     virtual void onCollision(GObject*) {}
     virtual Rectangle getRect() { return Rectangle{0.0f, 0.0f, 1.0f, 1.0f}; }
+    virtual CollisionRect* getCollisionBody() { return nullptr; }
+
+    void setKillOnCollision(bool enabled);
+    void applyKillOnCollision(GObject* other);
+    bool hasKillOnCollision() const { return killOnCol_; }
     
     // Méthode virtuelle pour récupérer l'AdiComponent (si présent)
     virtual std::optional<AdiComponent*> getAdiComponent() { return std::nullopt; }
@@ -29,4 +36,8 @@ public:
     // int x, y;
     bool to_delete_;
     int layer_;
+
+protected:
+    bool killOnCol_ = false;
+    KillComponent* killOnColComponent_ = nullptr;
 };

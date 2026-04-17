@@ -14,4 +14,5 @@ private:
     KillComponent* killComponent_;
     float lifetime_ = 5.0f; // Seconds before self-destruct
     float age_ = 0.0f;
+    int sourceObjectId_ = -1; // ignore collisions with shooter that spawned this projectile
 };

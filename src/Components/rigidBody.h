@@ -28,6 +28,7 @@ public:
     void setAcceleration(double acc);
     Vector2 getSpeed();
     void routine();
+    const std::vector<CollisionRect*>& getSweepContacts() const { return sweepContacts_; }
     // Gravity acceleration accessor (named mass_ internally)
     double getMass() const { return mass_; }
     void setMass(double m) { mass_ = m; }
@@ -46,6 +47,9 @@ private:
 
     bool gravityEnabled_;
     GravityDirection gravityDirection_;
+    std::vector<CollisionRect*> sweepContacts_;
 
     void fixSpeed();    // set to 0 if collision ahead
+    void addSweepContacts(const Rectangle& probeRect);
+    void registerSweepContact(CollisionRect* body);
 };

@@ -17,6 +17,7 @@ public:
     void draw();
     void routine();
     Rectangle getRect() { return body_->getSurface(); }
+    CollisionRect* getCollisionBody() override { return body_; }
     
     CollisionRect *body_;
 

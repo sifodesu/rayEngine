@@ -13,6 +13,7 @@
 #include "receptacle.h"
 #include "plateforme.h"
 #include "friablePlatform.h"
+#include "shooter.h"
 #include "portal.h"
 #include "projectile.h"
 
@@ -64,6 +65,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
         case EntityType::FriablePlatform:
             obj = std::make_unique<FriablePlatform>(data);
             break;
+        case EntityType::Shooter:
+            obj = std::make_unique<Shooter>(data);
+            break;
         case EntityType::Portal:
             obj = std::make_unique<Portal>(data);
             break;
@@ -71,6 +75,7 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             return nullptr;
     }
     obj->layer_ = data.layer;
+    obj->setKillOnCollision(data.interaction.killOnCol.value_or(false));
     GObject* raw = obj.get();
     if (data.entityType == EntityType::Tile)
         level_tiles_.emplace(data.id, std::move(obj));
@@ -115,6 +120,23 @@ void Object_m::routine()
         }
     }
 
+    // Apply kill rules from rigidbody swept contacts (pre-correction physics contacts)
+    for (auto& [id, obj] : level_ents_) {
+        CollisionRect* body = obj->getCollisionBody();
+        if (!body) continue;
+        RigidBody* rigid = dynamic_cast<RigidBody*>(body);
+        if (!rigid) continue;
+
+        for (CollisionRect* otherBody : rigid->getSweepContacts()) {
+            if (!otherBody) continue;
+            GObject* other = otherBody->getFather();
+            if (!other || other == obj.get()) continue;
+
+            obj->applyKillOnCollision(other);
+            other->applyKillOnCollision(obj.get());
+        }
+    }
+
     // Dispatch collisions for objects within camera view
     {
         auto camRect = Raycam_m::getRayCam().getRect();
@@ -133,7 +155,9 @@ void Object_m::routine()
                 GObject* b = bBody->getFather();
                 if (!a || !b || a == b) continue;
                 a->onCollision(b);
+                a->applyKillOnCollision(b);
                 b->onCollision(a);
+                b->applyKillOnCollision(a);
             }
         }
     }

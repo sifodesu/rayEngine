@@ -119,8 +119,8 @@
 			"doc": null,
 			"uiColor": null,
 			"gridSize": 8,
-			"guideGridWid": 0,
-			"guideGridHei": 0,
+			"guideGridWid": 320,
+			"guideGridHei": 192,
 			"displayOpacity": 1,
 			"inactiveOpacity": 1,
 			"hideInList": false,
@@ -136,7 +136,7 @@
 			"excludedTags": [],
 			"autoTilesKilledByOtherLayerUid": null,
 			"uiFilterTags": [],
-			"useAsyncRender": false,
+			"useAsyncRender": true,
 			"intGridValues": [
 				{ "value": 1, "identifier": "Wall", "color": "#63C74D", "tile": null, "groupUid": 0 },
 				{ "value": 2, "identifier": "Spikes", "color": "#FF0044", "tile": null, "groupUid": 0 }
@@ -1482,6 +1482,46 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7001,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -1549,6 +1589,46 @@
 					"defaultOverride": {
 						"id": "V_String",
 						"params": ["Checkpoint"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7002,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
 					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
@@ -1708,6 +1788,46 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7003,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -1818,6 +1938,46 @@
 					"autoChainRef": true,
 					"allowOutOfLevelRef": true,
 					"allowedRefs": "Any",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7004,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
@@ -2131,6 +2291,46 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7005,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -2324,6 +2524,393 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7006,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				}
+			]
+		},
+		{
+			"identifier": "Shooter",
+			"uid": 6000,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 8,
+			"height": 8,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.08,
+			"lineOpacity": 0,
+			"hollow": false,
+			"color": "#81B29A",
+			"renderMode": "Tile",
+			"showName": true,
+			"tilesetId": 20,
+			"tileRenderMode": "Cover",
+			"tileRect": { "tilesetUid": 20, "x": 96, "y": 136, "w": 8, "h": 8 },
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": [
+				{
+					"identifier": "solid",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 6001,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ true ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "sprite",
+					"doc": null,
+					"__type": "String",
+					"uid": 6002,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["gateway.png"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Type",
+					"doc": null,
+					"__type": "LocalEnum.Type",
+					"uid": 6003,
+					"type": "F_Enum(41)",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["Shooter"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "Point",
+					"doc": null,
+					"__type": "Array<Point>",
+					"uid": 6004,
+					"type": "F_Point",
+					"isArray": true,
+					"canBeNull": true,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "PointPath",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": true,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "fireInterval",
+					"doc": null,
+					"__type": "Float",
+					"uid": 6005,
+					"type": "F_Float",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": { "id": "V_Float", "params": [1] },
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "projectileSpeed",
+					"doc": null,
+					"__type": "Float",
+					"uid": 6006,
+					"type": "F_Float",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": { "id": "V_Float", "params": [160] },
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "projectileSprite",
+					"doc": null,
+					"__type": "String",
+					"uid": 6007,
+					"type": "F_String",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_String",
+						"params": ["bullet.png"]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7007,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -2483,6 +3070,46 @@
 					"doc": null,
 					"__type": "Bool",
 					"uid": 259,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7008,
 					"type": "F_Bool",
 					"isArray": false,
 					"canBeNull": false,
@@ -2707,6 +3334,46 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7009,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		},
@@ -2889,6 +3556,46 @@
 					"regex": null,
 					"acceptFileTypes": null,
 					"defaultOverride": null,
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7010,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
 					"textLanguageMode": null,
 					"symmetricalRef": false,
 					"autoChainRef": true,
@@ -3087,6 +3794,46 @@
 					"allowedRefsEntityUid": null,
 					"allowedRefTags": [],
 					"tilesetUid": null
+				},
+				{
+					"identifier": "killOnCol",
+					"doc": null,
+					"__type": "Bool",
+					"uid": 7011,
+					"type": "F_Bool",
+					"isArray": false,
+					"canBeNull": false,
+					"arrayMinLength": null,
+					"arrayMaxLength": null,
+					"editorDisplayMode": "Hidden",
+					"editorDisplayScale": 1,
+					"editorDisplayPos": "Above",
+					"editorLinkStyle": "StraightArrow",
+					"editorDisplayColor": null,
+					"editorAlwaysShow": false,
+					"editorShowInWorld": true,
+					"editorCutLongValues": true,
+					"editorTextSuffix": null,
+					"editorTextPrefix": null,
+					"useForSmartColor": false,
+					"exportToToc": false,
+					"searchable": false,
+					"min": null,
+					"max": null,
+					"regex": null,
+					"acceptFileTypes": null,
+					"defaultOverride": {
+						"id": "V_Bool",
+						"params": [ false ]
+					},
+					"textLanguageMode": null,
+					"symmetricalRef": false,
+					"autoChainRef": true,
+					"allowOutOfLevelRef": true,
+					"allowedRefs": "OnlySame",
+					"allowedRefsEntityUid": null,
+					"allowedRefTags": [],
+					"tilesetUid": null
 				}
 			]
 		}
@@ -3114,6 +3861,7 @@
 				{ "enumValueId": "Receptacle", "tileIds": [] },
 				{ "enumValueId": "Plateforme", "tileIds": [] },
 				{ "enumValueId": "FriablePlatform", "tileIds": [] },
+				{ "enumValueId": "Shooter", "tileIds": [] },
 				{ "enumValueId": "Portal", "tileIds": [] }
 			],
 			"customData": [],
@@ -3228,6 +3976,7 @@
 				{ "enumValueId": "Receptacle", "tileIds": [] },
 				{ "enumValueId": "Plateforme", "tileIds": [] },
 				{ "enumValueId": "FriablePlatform", "tileIds": [] },
+				{ "enumValueId": "Shooter", "tileIds": [] },
 				{ "enumValueId": "Portal", "tileIds": [] }
 			],
 			"customData": [],
@@ -3247,6 +3996,7 @@
 			{ "id": "Receptacle", "tileRect": null, "color": 7552569 },
 			{ "id": "Plateforme", "tileRect": null, "color": 4073265 },
 			{ "id": "FriablePlatform", "tileRect": null, "color": 12356863 },
+			{ "id": "Shooter", "tileRect": null, "color": 8502280 },
 			{ "id": "Portal", "tileRect": null, "color": 16690740 }
 		], "iconTilesetUid": 20, "externalRelPath": null, "externalFileChecksum": null, "tags": [] },
 		{ "identifier": "Gw_dir", "uid": 185, "values": [
@@ -3304,7 +4054,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Chara",
-							"__grid": [650,234],
+							"__grid": [451,175],
 							"__pivot": [0,0],
 							"__tags": ["chara"],
 							"__tile": { "tilesetUid": 22, "x": 0, "y": 0, "w": 24, "h": 36 },
@@ -3313,14 +4063,15 @@
 							"width": 10,
 							"height": 14,
 							"defUid": 21,
-							"px": [5200,1872],
+							"px": [3608,1400],
 							"fieldInstances": [
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "chara", "__tile": null, "defUid": 57, "realEditorValues": [] },
-								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Character", "__tile": null, "defUid": 63, "realEditorValues": [] }
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Character", "__tile": null, "defUid": 63, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7001, "realEditorValues": [] }
 							],
-							"__worldX": 5200,
-							"__worldY": 1872
+							"__worldX": 3608,
+							"__worldY": 1400
 						}
 					]
 				},
@@ -3360,7 +4111,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2360,704],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2360,
 							"__worldY": 704
 						},
@@ -3376,7 +4130,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2648,712],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2648,
 							"__worldY": 712
 						},
@@ -3392,7 +4149,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2944,680],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2944,
 							"__worldY": 680
 						},
@@ -3408,7 +4168,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3312,728],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3312,
 							"__worldY": 728
 						},
@@ -3424,7 +4187,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3064,792],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3064,
 							"__worldY": 792
 						},
@@ -3440,7 +4206,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2936,976],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2936,
 							"__worldY": 976
 						},
@@ -3456,7 +4225,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3352,1096],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3352,
 							"__worldY": 1096
 						},
@@ -3472,7 +4244,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2848,1024],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2848,
 							"__worldY": 1024
 						},
@@ -3488,7 +4263,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3448,1280],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3448,
 							"__worldY": 1280
 						},
@@ -3504,7 +4282,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2280,632],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2280,
 							"__worldY": 632
 						},
@@ -3520,7 +4301,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3728,424],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3728,
 							"__worldY": 424
 						},
@@ -3536,7 +4320,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2448,1112],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2448,
 							"__worldY": 1112
 						},
@@ -3552,7 +4339,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2344,1064],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2344,
 							"__worldY": 1064
 						},
@@ -3568,7 +4358,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2496,928],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2496,
 							"__worldY": 928
 						},
@@ -3584,7 +4377,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2856,1480],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2856,
 							"__worldY": 1480
 						},
@@ -3600,7 +4396,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3568,792],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3568,
 							"__worldY": 792
 						},
@@ -3616,7 +4415,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3592,632],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3592,
 							"__worldY": 632
 						},
@@ -3632,7 +4434,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3816,1400],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3816,
 							"__worldY": 1400
 						},
@@ -3648,7 +4453,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4144,1456],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4144,
 							"__worldY": 1456
 						},
@@ -3664,7 +4472,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4464,1440],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4464,
 							"__worldY": 1440
 						},
@@ -3680,7 +4491,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4664,1496],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4664,
 							"__worldY": 1496
 						},
@@ -3696,7 +4510,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4464,1840],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4464,
 							"__worldY": 1840
 						},
@@ -3712,7 +4529,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2848,448],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2848,
 							"__worldY": 448
 						},
@@ -3728,7 +4548,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2544,408],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2544,
 							"__worldY": 408
 						},
@@ -3744,7 +4567,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2288,344],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2288,
 							"__worldY": 344
 						},
@@ -3760,7 +4586,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1936,512],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1936,
 							"__worldY": 512
 						},
@@ -3776,7 +4605,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2224,208],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2224,
 							"__worldY": 208
 						},
@@ -3792,7 +4624,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2616,208],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2616,
 							"__worldY": 208
 						},
@@ -3808,7 +4643,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2784,160],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2784,
 							"__worldY": 160
 						},
@@ -3824,7 +4662,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4192,688],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4192,
 							"__worldY": 688
 						},
@@ -3840,7 +4681,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5336,640],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5336,
 							"__worldY": 640
 						},
@@ -3856,7 +4700,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5736,624],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5736,
 							"__worldY": 624
 						},
@@ -3872,7 +4719,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5840,704],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5840,
 							"__worldY": 704
 						},
@@ -3888,7 +4738,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5616,520],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5616,
 							"__worldY": 520
 						},
@@ -3904,7 +4757,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5768,840],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5768,
 							"__worldY": 840
 						},
@@ -3920,7 +4776,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [6056,976],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 6056,
 							"__worldY": 976
 						},
@@ -3936,7 +4795,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5840,1128],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5840,
 							"__worldY": 1128
 						},
@@ -3952,7 +4814,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5672,1016],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5672,
 							"__worldY": 1016
 						},
@@ -3968,7 +4833,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5568,1024],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5568,
 							"__worldY": 1024
 						},
@@ -3984,7 +4852,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5416,928],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5416,
 							"__worldY": 928
 						},
@@ -4000,7 +4871,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5544,1504],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5544,
 							"__worldY": 1504
 						},
@@ -4016,7 +4890,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5376,1648],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5376,
 							"__worldY": 1648
 						},
@@ -4032,7 +4909,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5240,1504],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5240,
 							"__worldY": 1504
 						},
@@ -4048,7 +4928,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [5104,1872],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 5104,
 							"__worldY": 1872
 						},
@@ -4074,7 +4957,8 @@
 								{ "__identifier": "enabled", "__type": "Bool", "__value": true, "__tile": null, "defUid": 162, "realEditorValues": [] },
 								{ "__identifier": "canBeTriggered", "__type": "Bool", "__value": false, "__tile": null, "defUid": 172, "realEditorValues": [] },
 								{ "__identifier": "canReceiveAdi", "__type": "Bool", "__value": false, "__tile": null, "defUid": 173, "realEditorValues": [] },
-								{ "__identifier": "loop", "__type": "Bool", "__value": false, "__tile": null, "defUid": 265, "realEditorValues": [] }
+								{ "__identifier": "loop", "__type": "Bool", "__value": false, "__tile": null, "defUid": 265, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7005, "realEditorValues": [] }
 							],
 							"__worldX": 4592,
 							"__worldY": 1872
@@ -4103,7 +4987,8 @@
 									"params": ["b11092e0-21a0-11f1-8847-9bd3e2f33ea3"]
 								}] },
 								{ "__identifier": "Gw_dir", "__type": "LocalEnum.Gw_dir", "__value": "UP", "__tile": { "tilesetUid": 207, "x": 0, "y": 40, "w": 8, "h": 8 }, "defUid": 186, "realEditorValues": [] },
-								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] }
+								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7008, "realEditorValues": [] }
 							],
 							"__worldX": 3536,
 							"__worldY": 1536
@@ -4135,7 +5020,8 @@
 									"id": "V_String",
 									"params": ["DOWN"]
 								}] },
-								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] }
+								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7008, "realEditorValues": [] }
 							],
 							"__worldX": 3216,
 							"__worldY": 1336
@@ -4152,7 +5038,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4728,784],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4728,
 							"__worldY": 784
 						},
@@ -4168,7 +5057,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [4328,1640],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 4328,
 							"__worldY": 1640
 						},
@@ -4184,7 +5076,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2896,200],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2896,
 							"__worldY": 200
 						},
@@ -4200,7 +5095,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2904,248],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2904,
 							"__worldY": 248
 						},
@@ -4216,7 +5114,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2912,264],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2912,
 							"__worldY": 264
 						},
@@ -4232,7 +5133,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2904,280],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2904,
 							"__worldY": 280
 						},
@@ -4248,7 +5152,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2912,296],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2912,
 							"__worldY": 296
 						},
@@ -4264,7 +5171,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2904,312],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2904,
 							"__worldY": 312
 						},
@@ -4280,7 +5190,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2912,328],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2912,
 							"__worldY": 328
 						},
@@ -4296,7 +5209,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2904,344],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2904,
 							"__worldY": 344
 						},
@@ -4312,7 +5228,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2920,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2920,
 							"__worldY": 352
 						},
@@ -4328,7 +5247,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2936,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2936,
 							"__worldY": 360
 						},
@@ -4344,7 +5266,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2952,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2952,
 							"__worldY": 352
 						},
@@ -4360,7 +5285,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2968,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2968,
 							"__worldY": 360
 						},
@@ -4376,7 +5304,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2984,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2984,
 							"__worldY": 352
 						},
@@ -4392,7 +5323,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3000,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3000,
 							"__worldY": 360
 						},
@@ -4408,7 +5342,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3016,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3016,
 							"__worldY": 352
 						},
@@ -4424,7 +5361,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3032,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3032,
 							"__worldY": 360
 						},
@@ -4440,7 +5380,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3048,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3048,
 							"__worldY": 352
 						},
@@ -4456,7 +5399,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3064,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3064,
 							"__worldY": 360
 						},
@@ -4472,7 +5418,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3080,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3080,
 							"__worldY": 352
 						},
@@ -4488,7 +5437,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3096,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3096,
 							"__worldY": 360
 						},
@@ -4504,7 +5456,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3112,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3112,
 							"__worldY": 352
 						},
@@ -4520,7 +5475,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3128,360],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3128,
 							"__worldY": 360
 						},
@@ -4536,7 +5494,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3144,352],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3144,
 							"__worldY": 352
 						},
@@ -4552,7 +5513,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3160,344],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3160,
 							"__worldY": 344
 						},
@@ -4568,7 +5532,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3168,328],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3168,
 							"__worldY": 328
 						},
@@ -4584,7 +5551,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3160,312],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3160,
 							"__worldY": 312
 						},
@@ -4600,7 +5570,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3168,296],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3168,
 							"__worldY": 296
 						},
@@ -4616,7 +5589,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3160,280],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3160,
 							"__worldY": 280
 						},
@@ -4632,7 +5608,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3168,264],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3168,
 							"__worldY": 264
 						},
@@ -4648,7 +5627,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [3160,248],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 3160,
 							"__worldY": 248
 						},
@@ -4664,7 +5646,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1904,208],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1904,
 							"__worldY": 208
 						},
@@ -4680,7 +5665,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1656,432],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1656,
 							"__worldY": 432
 						},
@@ -4696,7 +5684,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1760,608],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1760,
 							"__worldY": 608
 						},
@@ -4712,7 +5703,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1544,928],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1544,
 							"__worldY": 928
 						},
@@ -4728,7 +5722,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1240,1112],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1240,
 							"__worldY": 1112
 						},
@@ -4744,7 +5741,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [648,1008],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 648,
 							"__worldY": 1008
 						},
@@ -4760,7 +5760,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1208,1200],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1208,
 							"__worldY": 1200
 						},
@@ -4776,7 +5779,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [616,1248],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 616,
 							"__worldY": 1248
 						},
@@ -4792,7 +5798,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2248,1688],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2248,
 							"__worldY": 1688
 						},
@@ -4808,7 +5817,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1880,1632],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1880,
 							"__worldY": 1632
 						},
@@ -4824,7 +5836,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1768,1840],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1768,
 							"__worldY": 1840
 						},
@@ -4840,7 +5855,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1664,1744],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1664,
 							"__worldY": 1744
 						},
@@ -4856,7 +5874,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2856,1288],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2856,
 							"__worldY": 1288
 						},
@@ -4872,7 +5893,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2344,1280],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2344,
 							"__worldY": 1280
 						},
@@ -4888,7 +5912,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2296,1176],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2296,
 							"__worldY": 1176
 						},
@@ -4904,7 +5931,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [2576,1480],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 2576,
 							"__worldY": 1480
 						},
@@ -4920,7 +5950,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1584,1240],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1584,
 							"__worldY": 1240
 						},
@@ -4936,7 +5969,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1648,1312],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1648,
 							"__worldY": 1312
 						},
@@ -4952,7 +5988,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [1264,1392],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 1264,
 							"__worldY": 1392
 						},
@@ -4968,7 +6007,10 @@
 							"height": 16,
 							"defUid": 37,
 							"px": [536,1416],
-							"fieldInstances": [{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] }],
+							"fieldInstances": [
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
+							],
 							"__worldX": 536,
 							"__worldY": 1416
 						},
@@ -4988,7 +6030,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2508,
 							"__worldY": 1008
@@ -5009,7 +6052,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2508,
 							"__worldY": 1040
@@ -5030,7 +6074,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2508,
 							"__worldY": 1072
@@ -5051,7 +6096,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2592,
 							"__worldY": 995
@@ -5072,7 +6118,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3088,
 							"__worldY": 1016
@@ -5093,7 +6140,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2800,
 							"__worldY": 1224
@@ -5114,7 +6162,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 1792,
 							"__worldY": 552
@@ -5135,7 +6184,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 1616,
 							"__worldY": 640
@@ -5156,7 +6206,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 1648,
 							"__worldY": 672
@@ -5177,7 +6228,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 1680,
 							"__worldY": 704
@@ -5198,7 +6250,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2064,
 							"__worldY": 456
@@ -5219,7 +6272,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2248,
 							"__worldY": 1208
@@ -5240,7 +6294,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2256,
 							"__worldY": 1272
@@ -5261,7 +6316,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 1336,
 							"__worldY": 1224
@@ -5282,7 +6338,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 784,
 							"__worldY": 1296
@@ -5303,7 +6360,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 512,
 							"__worldY": 1272
@@ -5324,7 +6382,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 456,
 							"__worldY": 1248
@@ -5345,7 +6404,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 400,
 							"__worldY": 1224
@@ -5366,7 +6426,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 248,
 							"__worldY": 1208
@@ -5387,7 +6448,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 136,
 							"__worldY": 1256
@@ -5408,7 +6470,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 24,
 							"__worldY": 1304
@@ -5429,7 +6492,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2064,
 							"__worldY": 1869
@@ -5450,7 +6514,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2067,
 							"__worldY": 1792
@@ -5471,7 +6536,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2160,
 							"__worldY": 1821
@@ -5492,7 +6558,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3368,
 							"__worldY": 1480
@@ -5513,7 +6580,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3368,
 							"__worldY": 1432
@@ -5534,7 +6602,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3368,
 							"__worldY": 1424
@@ -5555,7 +6624,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 5234,
 							"__worldY": 1872
@@ -5576,7 +6646,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 5456,
 							"__worldY": 1008
@@ -5597,7 +6668,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3608,
 							"__worldY": 728
@@ -5618,7 +6690,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3640,
 							"__worldY": 728
@@ -5639,7 +6712,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3672,
 							"__worldY": 728
@@ -5660,7 +6734,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3096,
 							"__worldY": 112
@@ -5681,7 +6756,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3128,
 							"__worldY": 112
@@ -5702,7 +6778,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3096,
 							"__worldY": 32
@@ -5723,7 +6800,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3128,
 							"__worldY": 32
@@ -5744,7 +6822,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 3160,
 							"__worldY": 32
@@ -5765,7 +6844,8 @@
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 5001, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "platfri", "__tile": null, "defUid": 5002, "realEditorValues": [] },
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "FriablePlatform", "__tile": null, "defUid": 5003, "realEditorValues": [] },
-								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] }
+								{ "__identifier": "breakTime", "__type": "Float", "__value": 1, "__tile": null, "defUid": 5004, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7006, "realEditorValues": [] }
 							],
 							"__worldX": 2952,
 							"__worldY": 56
@@ -5794,7 +6874,8 @@
 									"params": ["6f22d4e0-21a0-11f1-ade0-f96e504822d9"]
 								}] },
 								{ "__identifier": "Gw_dir", "__type": "LocalEnum.Gw_dir", "__value": "UP", "__tile": { "tilesetUid": 207, "x": 0, "y": 40, "w": 8, "h": 8 }, "defUid": 186, "realEditorValues": [] },
-								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] }
+								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 259, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7008, "realEditorValues": [] }
 							],
 							"__worldX": 2592,
 							"__worldY": 1536
@@ -5823,10 +6904,73 @@
 									"params": ["66d60b90-21a0-11f1-ade0-47056c1bf80f"]
 								}] },
 								{ "__identifier": "Gw_dir", "__type": "LocalEnum.Gw_dir", "__value": "DOWN", "__tile": { "tilesetUid": 207, "x": 0, "y": 32, "w": 8, "h": 8 }, "defUid": 245, "realEditorValues": [] },
-								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 260, "realEditorValues": [] }
+								{ "__identifier": "Force_gravity", "__type": "Bool", "__value": false, "__tile": null, "defUid": 260, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7009, "realEditorValues": [] }
 							],
 							"__worldX": 2592,
 							"__worldY": 1144
+						},
+						{
+							"__identifier": "Shooter",
+							"__grid": [460,176],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 20, "x": 96, "y": 136, "w": 8, "h": 8 },
+							"__smartColor": "#81B29A",
+							"iid": "fcfb9f70-21a0-11f1-b190-6d692c2d45d2",
+							"width": 8,
+							"height": 8,
+							"defUid": 6000,
+							"px": [3680,1408],
+							"fieldInstances": [
+								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 6001, "realEditorValues": [] },
+								{ "__identifier": "sprite", "__type": "String", "__value": "gateway.png", "__tile": null, "defUid": 6002, "realEditorValues": [] },
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Shooter", "__tile": null, "defUid": 6003, "realEditorValues": [] },
+								{ "__identifier": "Point", "__type": "Array<Point>", "__value": [{ "cx": 458, "cy": 173 }], "__tile": null, "defUid": 6004, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["458,173"]
+								}] },
+								{ "__identifier": "fireInterval", "__type": "Float", "__value": 1, "__tile": null, "defUid": 6005, "realEditorValues": [] },
+								{ "__identifier": "projectileSpeed", "__type": "Float", "__value": 160, "__tile": null, "defUid": 6006, "realEditorValues": [] },
+								{ "__identifier": "projectileSprite", "__type": "String", "__value": "bullet.png", "__tile": null, "defUid": 6007, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": true, "__tile": null, "defUid": 7007, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 3680,
+							"__worldY": 1408
+						},
+						{
+							"__identifier": "Plateforme",
+							"__grid": [296,138],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": { "tilesetUid": 20, "x": 48, "y": 16, "w": 24, "h": 8 },
+							"__smartColor": "#D77643",
+							"iid": "6f22be70-21a0-11f1-9e69-35c2ab2c26f1",
+							"width": 8,
+							"height": 8,
+							"defUid": 78,
+							"px": [2368,1104],
+							"fieldInstances": [
+								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 79, "realEditorValues": [] },
+								{ "__identifier": "Point", "__type": "Array<Point>", "__value": [{ "cx": 296, "cy": 140 }], "__tile": null, "defUid": 80, "realEditorValues": [{
+									"id": "V_String",
+									"params": ["296,140"]
+								}] },
+								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Plateforme", "__tile": null, "defUid": 81, "realEditorValues": [] },
+								{ "__identifier": "enabled", "__type": "Bool", "__value": true, "__tile": null, "defUid": 162, "realEditorValues": [] },
+								{ "__identifier": "canBeTriggered", "__type": "Bool", "__value": false, "__tile": null, "defUid": 172, "realEditorValues": [] },
+								{ "__identifier": "canReceiveAdi", "__type": "Bool", "__value": false, "__tile": null, "defUid": 173, "realEditorValues": [] },
+								{ "__identifier": "loop", "__type": "Bool", "__value": false, "__tile": null, "defUid": 265, "realEditorValues": [] },
+								{ "__identifier": "killOnCol", "__type": "Bool", "__value": true, "__tile": null, "defUid": 7005, "realEditorValues": [{
+									"id": "V_Bool",
+									"params": [ true ]
+								}] }
+							],
+							"__worldX": 2368,
+							"__worldY": 1104
 						}
 					]
 				},
