@@ -16,6 +16,7 @@
 #include "shooter.h"
 #include "portal.h"
 #include "projectile.h"
+#include "modelEnt.h"
 
 using namespace std;
 
@@ -40,6 +41,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::Character:
             obj = std::make_unique<Character>(data);
+            break;
+        case EntityType::Model3D:
+            obj = std::make_unique<ModelEnt>(data);
             break;
         case EntityType::UpgradePickup:
             obj = std::make_unique<UpgradePickup>(data);

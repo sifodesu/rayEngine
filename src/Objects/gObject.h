@@ -18,6 +18,8 @@ public:
     virtual void routine() {}
     virtual void trigger() {}
     virtual void draw() {}
+    virtual void draw3D() {}
+    virtual bool is3DRenderable() const { return false; }
     virtual void onCollision(GObject*) {}
     virtual Rectangle getRect() { return Rectangle{0.0f, 0.0f, 1.0f, 1.0f}; }
     virtual CollisionRect* getCollisionBody() { return nullptr; }

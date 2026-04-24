@@ -1,6 +1,8 @@
 #pragma once
 #define LDTK_PATH    "./Data/Ldtk/"
 #define TEXTURES_PATH "./Data/Textures/"
+#define MODELS_PATH "./Data/Models/"
+#define SHADERS_PATH "./Data/Shaders/"
 #define POLICES_PATH  "./Data/Polices/"
 #define MUSICS_PATH "./Data/Musics/"
 #define SAVE_FILE_PATH "save.json"

@@ -12,7 +12,7 @@ foreach(header ${headers})
     include_directories(${dir})
 endforeach()
 
-file(GLOB_RECURSE CPPS "src/*.cpp")
+file(GLOB_RECURSE CPPS CONFIGURE_DEPENDS "src/*.cpp")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 

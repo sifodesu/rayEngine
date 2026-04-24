@@ -176,9 +176,44 @@ vector<string> parseCommaSeparatedIds(const string& input) {
     return result;
 }
 
+bool parseHexColor(const string& hex, Color& out) {
+    if (hex.size() != 7 && hex.size() != 9) return false;
+    if (hex[0] != '#') return false;
+
+    auto fromHex = [](char c) -> int {
+        if (c >= '0' && c <= '9') return c - '0';
+        if (c >= 'a' && c <= 'f') return 10 + (c - 'a');
+        if (c >= 'A' && c <= 'F') return 10 + (c - 'A');
+        return -1;
+    };
+
+    auto parseByte = [&](size_t i, unsigned char& dst) -> bool {
+        int hi = fromHex(hex[i]);
+        int lo = fromHex(hex[i + 1]);
+        if (hi < 0 || lo < 0) return false;
+        dst = static_cast<unsigned char>((hi << 4) | lo);
+        return true;
+    };
+
+    Color c{WHITE};
+    if (!parseByte(1, c.r)) return false;
+    if (!parseByte(3, c.g)) return false;
+    if (!parseByte(5, c.b)) return false;
+    c.a = 255;
+    if (hex.size() == 9 && !parseByte(7, c.a)) return false;
+    out = c;
+    return true;
+}
+
 void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int worldX, int worldY) {
     if (!inst.contains("fieldInstances")) 
         return;
+
+    auto ensureModelDesc = [&]() -> ModelDesc& {
+        if (!d.model.has_value()) d.model = ModelDesc{};
+        return *d.model;
+    };
+
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
         if (fid == "Type") {
@@ -220,6 +255,69 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
             
             if (!loaded) {
                 d.sprite->filename = key;
+            }
+        }
+        else if (fid == "model" || fid == "modelPath") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().modelFile = f["__value"].get<string>();
+            }
+        }
+        else if (fid == "primitive") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().primitive = stringToModelPrimitive(f["__value"].get<string>());
+            }
+        }
+        else if (fid == "modelRotX") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().rotation.x = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelRotY") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().rotation.y = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelRotZ") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().rotation.z = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelScaleX") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().scale.x = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelScaleY") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().scale.y = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelScaleZ") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().scale.z = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "modelTint") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                Color parsed = WHITE;
+                if (parseHexColor(f["__value"].get<string>(), parsed)) {
+                    ensureModelDesc().tint = parsed;
+                }
+            }
+        }
+        else if (fid == "spinX" || fid == "spinSpeedX") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().spin.x = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "spinY" || fid == "spinSpeedY") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().spin.y = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "spinZ" || fid == "spinSpeedZ") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureModelDesc().spin.z = f["__value"].get<float>();
             }
         }
         else if (fid == "flipX") {

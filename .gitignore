@@ -50,7 +50,9 @@ rayEngine
 *.tiled-session
 toolchain.cmake
 /Data/Ldtk/*/simplified
-/Data/Shaders
+/Data/Shaders/*
+!/Data/Shaders/model_lit.vs
+!/Data/Shaders/model_lit.fs
 /Data/Ldtk/ldtk_test/backups
 /examples
 imgui.ini

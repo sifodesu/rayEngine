@@ -1,4 +1,8 @@
+#include <map>
 #include <set>
+#include <string>
+#include <vector>
+
 #include "engine.h"
 #include "raylib.h"
 #include "clock.h"
@@ -13,13 +17,32 @@
 #include "shader_m.h"
 #include "collisionRect.h"
 #include "sprite_m.h"
-#include <string>
+#include "model_m.h"
+#include "rlgl.h"
 #include "rlImGui.h"
 #include "imgui_layer.h"
 #include "save_manager.h"
 
+namespace {
+
 // Debug visualization state
-static bool showCollisionBoxes = false;
+bool showCollisionBoxes = false;
+
+struct LayerBucket {
+    std::vector<GObject*> twod;
+    std::vector<GObject*> threed;
+};
+
+void clearDepthBufferOnly()
+{
+    rlDrawRenderBatchActive();
+    rlEnableDepthMask();
+    rlColorMask(false, false, false, false);
+    rlClearScreenBuffers();
+    rlColorMask(true, true, true, true);
+}
+
+} // namespace
 
 Engine::Engine()
 {
@@ -36,6 +59,7 @@ Engine::Engine()
 
     Raycam_m::init();
     Texture_m::load();
+    Model_m::load();
     Sprite_m::load();
     Sound_m::load();
     InputMap::init();
@@ -60,9 +84,7 @@ void Engine::game_loop()
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});
             Object_m::routine();
             Raycam_m::getRayCam().routine();
-            BeginMode2D(Raycam_m::getCam());
-                render();
-            EndMode2D();
+            render();
         Shader_m::end();
 
         BeginDrawing();
@@ -100,18 +122,75 @@ void Engine::render()
     
     for (CollisionRect* body : to_render) sorted_bodies.insert(body);
 
+    std::map<int, LayerBucket> layers;
+
     for (CollisionRect* body : sorted_bodies) {
-        body->getFather()->draw();
-        if (showCollisionBoxes) {
+        GObject* obj = body->getFather();
+        if (!obj) continue;
+
+        if (obj->is3DRenderable()) {
+            layers[obj->layer_].threed.push_back(obj);
+        } else {
+            layers[obj->layer_].twod.push_back(obj);
+        }
+    }
+
+    bool in2D = false;
+    bool in3D = false;
+    bool rendered3DLayer = false;
+
+    auto begin2D = [&]() {
+        if (in2D) return;
+        if (in3D) {
+            EndMode3D();
+            in3D = false;
+        }
+        BeginMode2D(Raycam_m::getCam());
+        in2D = true;
+    };
+
+    auto begin3D = [&]() {
+        if (in3D) return;
+        if (in2D) {
+            EndMode2D();
+            in2D = false;
+        }
+        BeginMode3D(Raycam_m::getCam3D());
+        in3D = true;
+    };
+
+    for (auto& [layer, bucket] : layers) {
+        if (!bucket.twod.empty()) {
+            begin2D();
+            for (GObject* obj : bucket.twod) obj->draw();
+        }
+
+        if (!bucket.threed.empty()) {
+            begin3D();
+            if (rendered3DLayer) {
+                clearDepthBufferOnly();
+            }
+            for (GObject* obj : bucket.threed) obj->draw3D();
+            rendered3DLayer = true;
+        }
+    }
+
+    if (showCollisionBoxes) {
+        begin2D();
+        for (CollisionRect* body : sorted_bodies) {
             DrawRectangleRec(body->getSurface(), Fade(RED, 0.3));
         }
     }
+
+    if (in3D) EndMode3D();
+    if (in2D) EndMode2D();
 }
 
 Engine::~Engine()
 {
     Shader_m::unload();
     Texture_m::unload();
+    Model_m::unload();
     Object_m::unload();
     rlImGuiShutdown();
     CloseWindow();

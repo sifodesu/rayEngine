@@ -8,6 +8,7 @@ enum class EntityType {
     Tile,
     Basic,
     Character,
+    Model3D,
     Portal,
     Plateforme,
     FriablePlatform,
@@ -25,6 +26,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "tile") return EntityType::Tile;
     if (typeStr == "basic") return EntityType::Basic;
     if (typeStr == "Character") return EntityType::Character;
+    if (typeStr == "Model3D") return EntityType::Model3D;
     if (typeStr == "Portal") return EntityType::Portal;
     if (typeStr == "Plateforme") return EntityType::Plateforme;
     if (typeStr == "FriablePlatform") return EntityType::FriablePlatform;
@@ -36,6 +38,21 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Receptacle") return EntityType::Receptacle;
     if (typeStr.rfind("upgrade_", 0) == 0) return EntityType::UpgradePickup;
     return EntityType::Basic; // default fallback
+}
+
+enum class ModelPrimitive {
+    Cube,
+    Sphere,
+    Cylinder,
+    Plane
+};
+
+inline ModelPrimitive stringToModelPrimitive(const std::string& primitiveStr) {
+    if (primitiveStr == "Cube" || primitiveStr == "cube") return ModelPrimitive::Cube;
+    if (primitiveStr == "Sphere" || primitiveStr == "sphere") return ModelPrimitive::Sphere;
+    if (primitiveStr == "Cylinder" || primitiveStr == "cylinder") return ModelPrimitive::Cylinder;
+    if (primitiveStr == "Plane" || primitiveStr == "plane") return ModelPrimitive::Plane;
+    return ModelPrimitive::Cube;
 }
 
 struct SpriteDesc {
@@ -104,6 +121,15 @@ struct LdtkMetadata {
     std::optional<std::vector<std::string>> targetIds;
 };
 
+struct ModelDesc {
+    std::string modelFile{};
+    ModelPrimitive primitive{ModelPrimitive::Cube};
+    Vector3 rotation{0.0f, 0.0f, 0.0f}; // degrees (XYZ Euler)
+    Vector3 scale{1.0f, 1.0f, 1.0f};
+    Vector3 spin{0.0f, 0.0f, 0.0f}; // degrees per second
+    Color tint{WHITE};
+};
+
 struct SpawnData {
     int id{0};
     EntityType entityType{EntityType::Basic};
@@ -111,6 +137,7 @@ struct SpawnData {
     std::optional<int> sourceObjectId; // runtime-only owner id (not from LDtk)
     int layer{0};
     std::optional<SpriteDesc> sprite;
+    std::optional<ModelDesc> model;
     PhysicsConfig physics;
     InteractionConfig interaction;
     LdtkMetadata ldtk;
