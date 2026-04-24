@@ -235,10 +235,12 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         else if (fid == "sprite") {
             string key = f["__value"].get<string>();
             if (!d.sprite) d.sprite = SpriteDesc{};
+            bool wasGlitched = d.sprite->glitched;
             
             auto tryLoad = [&](const std::string& k) { 
                 if (auto meta = Sprite_m::get(k)) { 
                     *d.sprite = *meta; 
+                    d.sprite->glitched = wasGlitched;
                     return true; 
                 } 
                 return false; 
@@ -330,6 +332,17 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
             if (f.contains("__value") && !f["__value"].is_null()) {
                 if (!d.sprite) d.sprite = SpriteDesc{};
                 d.sprite->flipY = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "glitched") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                bool glitched = f["__value"].get<bool>();
+                if (glitched) {
+                    if (!d.sprite) d.sprite = SpriteDesc{};
+                    d.sprite->glitched = true;
+                } else if (d.sprite) {
+                    d.sprite->glitched = false;
+                }
             }
         }
         else if (fid == "Dialog") {
@@ -549,7 +562,8 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer,
     
     // Fill entity data from LDtk fields
     fillEntityFields(e, d, layerGridSize, worldX, worldY);
-    if (!d.sprite.has_value()) 
+    SpriteDesc defaultSprite;
+    if (!d.sprite.has_value() || (d.sprite->filename == defaultSprite.filename && d.sprite->frameRects.empty()))
         fillEntityTile(e, tilesetInfo, d);
     
     // Setup collision box

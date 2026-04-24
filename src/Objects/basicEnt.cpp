@@ -28,3 +28,8 @@ void BasicEnt::routine()
 {
     sprite_->routine();
 }
+
+void BasicEnt::collectDebugSprites(std::vector<Sprite*>& sprites)
+{
+    if (sprite_) sprites.push_back(sprite_);
+}

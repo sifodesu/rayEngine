@@ -16,6 +16,7 @@
 #include "upgradeRegistry.h"
 #include "shader_m.h"
 #include "collisionRect.h"
+#include "sprite.h"
 #include "sprite_m.h"
 #include "model_m.h"
 #include "rlgl.h"
@@ -57,6 +58,13 @@ Engine::Engine()
     
     InitAudioDevice();
 
+    loadGameContent();
+
+    rlImGuiSetup(true);
+}
+
+void Engine::loadGameContent()
+{
     Raycam_m::init();
     Texture_m::load();
     Model_m::load();
@@ -67,16 +75,36 @@ Engine::Engine()
     Ldtk_m::loadLevel("ldtk_test.ldtk");
     // SaveManager::load(); // load save file (if exists)
     // SaveManager::applyToWorld(); // move player to saved checkpoint
+    Shader_m::load();
+    Sprite::resetGlitchParams();
+    showCollisionBoxes = false;
+}
 
-    rlImGuiSetup(true);
+void Engine::unloadGameContent()
+{
+    Object_m::unload();
+    Shader_m::unload();
+    Sprite_m::unload();
+    Model_m::unload();
+    Texture_m::unload();
+    Sound_m::unload();
+    Ldtk_m::clearIdMapping();
+}
 
-    // Shader_m::load();
+void Engine::reloadGame()
+{
+    unloadGameContent();
+    loadGameContent();
 }
 
 void Engine::game_loop()
 {
     while (!WindowShouldClose()) {
         Clock::lap();
+
+        if (IsKeyPressed(KEY_R)) {
+            reloadGame();
+        }
 
         Shader_m::routine();
 
@@ -103,7 +131,7 @@ void Engine::game_loop()
 
 void Engine::render()
 {
-    if (IsKeyPressed(KEY_R)) {
+    if (IsKeyPressed(KEY_C)) {
         showCollisionBoxes = !showCollisionBoxes;
     }
     
@@ -188,10 +216,7 @@ void Engine::render()
 
 Engine::~Engine()
 {
-    Shader_m::unload();
-    Texture_m::unload();
-    Model_m::unload();
-    Object_m::unload();
+    unloadGameContent();
     rlImGuiShutdown();
     CloseWindow();
 }

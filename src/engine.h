@@ -9,5 +9,8 @@ public:
     ~Engine();
 
 private:
+    void loadGameContent();
+    void unloadGameContent();
+    void reloadGame();
     void render();
 };

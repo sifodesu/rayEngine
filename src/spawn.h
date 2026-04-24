@@ -60,6 +60,7 @@ struct SpriteDesc {
     Color tint{WHITE};
     bool flipX{false};
     bool flipY{false};
+    bool glitched{false};
     std::vector<Rectangle> frameRects;
     std::vector<float> frameDurations;
     float defaultFrameDuration{0.2f};

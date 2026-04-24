@@ -21,6 +21,7 @@ void Texture_m::load(std::string path) {
 void Texture_m::unload() {
     for (auto& [name, tex] : textures)
         UnloadTexture(tex);
+    textures.clear();
 }
 
 Texture2D Texture_m::getTexture(std::string filename) {

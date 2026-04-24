@@ -1,6 +1,7 @@
 #include <iostream>
 #include "sprite.h"
 #include "texture_m.h"
+#include "shader_m.h"
 #include "spawn.h"
 #include <cmath>
 #include <algorithm>
@@ -17,6 +18,7 @@ Sprite::Sprite(const SpriteDesc& desc)
     sprite_sheet_ = Texture_m::getTexture(filename_);
     flipX_ = desc.flipX;
     flipY_ = desc.flipY;
+    glitched_ = desc.glitched;
     // Copy explicit frames (new system only)
     frameRects_ = desc.frameRects;
     frameDurations_ = desc.frameDurations;
@@ -25,6 +27,68 @@ Sprite::Sprite(const SpriteDesc& desc)
         // Fallback: single frame at origin if nothing specified
         frameRects_.push_back({0,0,(float)sprite_sheet_.width,(float)sprite_sheet_.height});
     }
+}
+
+SpriteGlitchParams& Sprite::glitchParams() {
+    static SpriteGlitchParams params;
+    return params;
+}
+
+void Sprite::resetGlitchParams() {
+    glitchParams() = SpriteGlitchParams{};
+}
+
+bool Sprite::beginGlitchShader(Rectangle src) {
+    if (!glitched_ || !Shader_m::has("glitch") || sprite_sheet_.width <= 0 || sprite_sheet_.height <= 0) {
+        return false;
+    }
+
+    Shader shader = Shader_m::get("glitch");
+    SpriteGlitchParams& params = glitchParams();
+
+    float srcX2 = src.x + src.width;
+    float srcY2 = src.y + src.height;
+    float uvMin[2] = {
+        std::min(src.x, srcX2) / (float)sprite_sheet_.width,
+        std::min(src.y, srcY2) / (float)sprite_sheet_.height
+    };
+    float uvMax[2] = {
+        std::max(src.x, srcX2) / (float)sprite_sheet_.width,
+        std::max(src.y, srcY2) / (float)sprite_sheet_.height
+    };
+    float frameSize[2] = {
+        std::max(std::fabs(src.width), 1.0f),
+        std::max(std::fabs(src.height), 1.0f)
+    };
+    float time = (float)GetTime();
+
+    int loc = GetShaderLocation(shader, "time");
+    if (loc >= 0) SetShaderValue(shader, loc, &time, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "intensity");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.intensity, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "speed");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.speed, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "pixelShift");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.pixelShift, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "colorShift");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.colorShift, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "orientationJitter");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.orientationJitter, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "blockFlip");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.blockFlip, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "bandFrequency");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.bandFrequency, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "seed");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.seed, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "frameUvMin");
+    if (loc >= 0) SetShaderValue(shader, loc, uvMin, SHADER_UNIFORM_VEC2);
+    loc = GetShaderLocation(shader, "frameUvMax");
+    if (loc >= 0) SetShaderValue(shader, loc, uvMax, SHADER_UNIFORM_VEC2);
+    loc = GetShaderLocation(shader, "frameSizePx");
+    if (loc >= 0) SetShaderValue(shader, loc, frameSize, SHADER_UNIFORM_VEC2);
+
+    BeginShaderMode(shader);
+    return true;
 }
 
 void Sprite::routine() {
@@ -89,7 +153,10 @@ void Sprite::draw(Vector2 pos) {
         src.y += src.height; // shift to the bottom edge
         src.height = -src.height;
     }
+
+    bool shaderActive = beginGlitchShader(src);
     DrawTextureRec(sprite_sheet_, src, pos, tint_);
+    if (shaderActive) EndShaderMode();
 }
 
 void Sprite::draw(Rectangle targetRect) {
@@ -123,5 +190,7 @@ void Sprite::draw(Rectangle targetRect) {
     Rectangle rotatedTarget = targetRect;
     rotatedTarget.x += origin.x; // Offset to center
     rotatedTarget.y += origin.y;
+    bool shaderActive = beginGlitchShader(src);
     DrawTexturePro(sprite_sheet_, src, rotatedTarget, origin, rotation_, tint_);
+    if (shaderActive) EndShaderMode();
 }

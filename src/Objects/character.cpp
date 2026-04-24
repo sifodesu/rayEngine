@@ -21,6 +21,11 @@ Character::Character(const SpawnData& data) : GObject(data.id) {
     Raycam_m::setTarget(body_, true);
     if (auto s = Sprite_m::get("chara_idle")) anims_["idle"] = new Sprite(*s); else anims_["idle"] = new Sprite(SpriteDesc{});
     if (auto s = Sprite_m::get("chara_walk")) anims_["walk"] = new Sprite(*s); else anims_["walk"] = new Sprite(SpriteDesc{});
+    if (data.sprite && data.sprite->glitched) {
+        for (auto& [name, sprite] : anims_) {
+            if (sprite) sprite->setGlitched(true);
+        }
+    }
     current_anim_ = anims_["idle"];
     
     // Store original hitbox dimensions
@@ -418,6 +423,12 @@ void Character::draw() {
     };
     
     current_anim_->draw(spriteRect);
+}
+
+void Character::collectDebugSprites(std::vector<Sprite*>& sprites) {
+    for (auto& [name, sprite] : anims_) {
+        if (sprite) sprites.push_back(sprite);
+    }
 }
 
 void Character::respawn() {

@@ -18,6 +18,7 @@ public:
     void routine();
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }
+    void collectDebugSprites(std::vector<Sprite*>& sprites) override;
     
     CollisionRect *body_;
 

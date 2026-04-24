@@ -44,8 +44,10 @@ void Shader_m::load(const std::filesystem::path& dir) {
     ping_[0] = LoadRenderTexture(lastW_, lastH_);
     ping_[1] = LoadRenderTexture(lastW_, lastH_);
     for (auto &pr : collect()) {
-        const char* vs = pr.second.vs.empty()? nullptr : pr.second.vs.string().c_str();
-        const char* fs = pr.second.fs.string().c_str();
+        std::string vsPath = pr.second.vs.empty() ? std::string{} : pr.second.vs.string();
+        std::string fsPath = pr.second.fs.empty() ? std::string{} : pr.second.fs.string();
+        const char* vs = vsPath.empty() ? nullptr : vsPath.c_str();
+        const char* fs = fsPath.empty() ? nullptr : fsPath.c_str();
         Shader sh = LoadShader(vs, fs);
         if (sh.id) shaders_[pr.first] = sh;
     }

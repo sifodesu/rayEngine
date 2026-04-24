@@ -19,6 +19,7 @@ void Sound_m::unload() {
     for (auto& [name, snd] : sounds) {
         UnloadMusicStream(snd);
     }
+    sounds.clear();
 }
 
 Music Sound_m::getSound(std::string filename) {

@@ -12,6 +12,7 @@
 #include "Managers/raycam_m.h"
 #include "Objects/character.h"
 #include "Objects/modelEnt.h"
+#include "Components/sprite.h"
 
 namespace ImGuiLayer {
 
@@ -37,6 +38,38 @@ static std::vector<ModelEnt*> findVisibleModelEnts() {
     }
 
     return models;
+}
+
+struct VisibleGlitchedObject {
+    GObject* object = nullptr;
+    int spriteCount = 0;
+};
+
+static std::vector<VisibleGlitchedObject> findVisibleGlitchedObjects() {
+    std::vector<VisibleGlitchedObject> objects;
+    std::set<int> seenIds;
+
+    const Rectangle cameraRect = Raycam_m::getRayCam().getRect();
+    for (CollisionRect* body : CollisionRect::query(cameraRect)) {
+        if (!body) continue;
+
+        GObject* object = body->getFather();
+        if (!object || object->is3DRenderable() || !seenIds.insert(object->id_).second) continue;
+
+        std::vector<Sprite*> sprites;
+        object->collectDebugSprites(sprites);
+
+        int glitchedCount = 0;
+        for (Sprite* sprite : sprites) {
+            if (sprite && sprite->isGlitched()) ++glitchedCount;
+        }
+
+        if (glitchedCount > 0) {
+            objects.push_back({ object, glitchedCount });
+        }
+    }
+
+    return objects;
 }
 
 static void drawVector3Control(const char* label, Vector3& value, float speed, float minValue, float maxValue) {
@@ -139,6 +172,43 @@ static void drawVisibleModelWindow() {
     ImGui::End();
 }
 
+static void drawGlitchSpriteWindow() {
+    if (!ImGui::Begin("Glitch Sprites visibles")) {
+        ImGui::End();
+        return;
+    }
+
+    std::vector<VisibleGlitchedObject> objects = findVisibleGlitchedObjects();
+    ImGui::Text("Camera actuelle: %d objet(s)", static_cast<int>(objects.size()));
+
+    SpriteGlitchParams& params = Sprite::glitchParams();
+    ImGui::Separator();
+    ImGui::SliderFloat("Intensite", &params.intensity, 0.0f, 4.0f, "%.2f");
+    ImGui::SliderFloat("Vitesse", &params.speed, 0.0f, 8.0f, "%.2f");
+    ImGui::SliderFloat("Pixel shift", &params.pixelShift, 0.0f, 12.0f, "%.2f");
+    ImGui::SliderFloat("RGB shift", &params.colorShift, 0.0f, 8.0f, "%.2f");
+    ImGui::SliderFloat("Jitter orientation", &params.orientationJitter, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Flip blocs 8x8", &params.blockFlip, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Frequence bandes", &params.bandFrequency, 1.0f, 48.0f, "%.1f");
+    ImGui::DragFloat("Seed", &params.seed, 0.1f, -10000.0f, 10000.0f, "%.1f");
+    if (ImGui::Button("Reset glitch")) {
+        Sprite::resetGlitchParams();
+    }
+
+    ImGui::Separator();
+    if (objects.empty()) {
+        ImGui::TextUnformatted("Aucun sprite glitched visible.");
+        ImGui::End();
+        return;
+    }
+
+    for (const VisibleGlitchedObject& item : objects) {
+        ImGui::Text("Objet #%d - %d sprite(s)", item.object->id_, item.spriteCount);
+    }
+
+    ImGui::End();
+}
+
 void BeginFrame() { rlImGuiBegin(); }
 void EndFrame() { rlImGuiEnd(); }
 
@@ -165,6 +235,7 @@ void DrawWindows() {
     ImGui::End();
 
     drawVisibleModelWindow();
+    drawGlitchSpriteWindow();
 }
 
 } // namespace ImGuiLayer

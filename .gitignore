@@ -53,6 +53,7 @@ toolchain.cmake
 /Data/Shaders/*
 !/Data/Shaders/model_lit.vs
 !/Data/Shaders/model_lit.fs
+!/Data/Shaders/glitch.fs
 /Data/Ldtk/ldtk_test/backups
 /examples
 imgui.ini
