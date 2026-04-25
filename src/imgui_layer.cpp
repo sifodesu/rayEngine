@@ -10,6 +10,7 @@
 #include "Components/collisionRect.h"
 #include "Managers/object_m.h" // adjust include path if differs in project
 #include "Managers/raycam_m.h"
+#include "Managers/shader_m.h"
 #include "Objects/character.h"
 #include "Objects/modelEnt.h"
 #include "Components/sprite.h"
@@ -209,6 +210,63 @@ static void drawGlitchSpriteWindow() {
     ImGui::End();
 }
 
+static void drawCRTWindow() {
+    static const char* saveStatus = "";
+
+    if (!ImGui::Begin("CRT Debug")) {
+        ImGui::End();
+        return;
+    }
+
+    Shader_m::CRTParams& params = Shader_m::crtParams();
+    ImGui::SliderFloat("Courbure", &params.curvature, 0.0f, 0.45f, "%.3f");
+    ImGui::SliderFloat("Vignette", &params.vignette, 0.0f, 1.4f, "%.2f");
+    ImGui::SliderFloat("Bord doux", &params.edgeSoftness, 0.0f, 0.18f, "%.3f");
+    ImGui::SliderFloat("Glow", &params.glow, 0.0f, 2.4f, "%.2f");
+    ImGui::SliderFloat("Dot mask", &params.dotMask, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Flou dots", &params.dotBlur, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Bleed", &params.bleed, 0.0f, 2.5f, "%.2f");
+    ImGui::SliderFloat("Dot grid size", &params.dotGridSize, 0.5f, 8.0f, "%.2f");
+    bool hexGrid = params.hexGrid >= 0.5f;
+    if (ImGui::Checkbox("Hexagonal grid", &hexGrid)) {
+        params.hexGrid = hexGrid ? 1.0f : 0.0f;
+    }
+    ImGui::SliderFloat("Decalage lignes", &params.alternateLineShift, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Scanlines", &params.scanline, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Aberration RGB", &params.chromaticAberration, 0.0f, 3.0f, "%.2f");
+    ImGui::SliderFloat("Luminosite", &params.brightness, 0.25f, 2.25f, "%.2f");
+    ImGui::SeparatorText("CRTSim");
+    ImGui::SliderFloat("Sharpness", &params.sharpness, 0.0f, 1.5f, "%.2f");
+    ImGui::SliderFloat("Persistence", &params.persistence, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("NTSC artifacts", &params.ntscArtifacts, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Overscan", &params.overscan, 0.75f, 1.35f, "%.2f");
+    ImGui::SliderFloat("Saturation", &params.saturation, 0.0f, 2.5f, "%.2f");
+    ImGui::SliderFloat("Mask brightness", &params.maskBrightness, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Mask opacity", &params.maskOpacity, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Mask scale", &params.maskScale, 0.25f, 8.0f, "%.2f");
+    ImGui::SliderFloat("Bloom intensity", &params.bloomIntensity, 0.0f, 2.0f, "%.2f");
+    ImGui::SliderFloat("Bloom spread", &params.bloomSpread, 0.0f, 0.12f, "%.3f");
+    ImGui::SliderFloat("Bloom power", &params.bloomPower, 0.25f, 4.0f, "%.2f");
+
+    if (ImGui::Button("Save parameters")) {
+        saveStatus = Shader_m::saveCRTParams() ? "Saved crt_params.json" : "Save failed";
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Load parameters")) {
+        saveStatus = Shader_m::loadCRTParams() ? "Loaded crt_params.json" : "Load failed";
+    }
+    if (saveStatus[0] != '\0') {
+        ImGui::TextUnformatted(saveStatus);
+    }
+
+    if (ImGui::Button("Reset CRT")) {
+        Shader_m::resetCRTParams();
+        saveStatus = "";
+    }
+
+    ImGui::End();
+}
+
 void BeginFrame() { rlImGuiBegin(); }
 void EndFrame() { rlImGuiEnd(); }
 
@@ -236,6 +294,7 @@ void DrawWindows() {
 
     drawVisibleModelWindow();
     drawGlitchSpriteWindow();
+    drawCRTWindow();
 }
 
 } // namespace ImGuiLayer

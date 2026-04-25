@@ -118,6 +118,7 @@ void Engine::game_loop()
         BeginDrawing();
             ClearBackground(BLACK);
             // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
+            if (Shader_m::has("crt")) Shader_m::addFullscreen("crt");
             Shader_m::present();
             DrawFPS(10, 10);
 

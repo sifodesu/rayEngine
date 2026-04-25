@@ -1,18 +1,136 @@
 #include "shader_m.h"
 #include "raycam_m.h"
 #include <algorithm>
+#include <fstream>
+#include <nlohmann/json.hpp>
 #include "definitions.h"
+
+using json = nlohmann::json;
 
 std::unordered_map<std::string, Shader> Shader_m::shaders_;
 std::filesystem::path Shader_m::dir_;
 RenderTexture2D Shader_m::sceneRT_{};
+RenderTexture2D Shader_m::postRT_{};
 RenderTexture2D Shader_m::prevSceneRT_{};
 RenderTexture2D Shader_m::ping_[2] = {};
+Texture2D Shader_m::crtMaskTexture_{};
+Texture2D Shader_m::crtArtifactsTexture_{};
 int Shader_m::pingIndex_ = 0;
 int Shader_m::lastW_ = 0;
 int Shader_m::lastH_ = 0;
+int Shader_m::lastScreenW_ = 0;
+int Shader_m::lastScreenH_ = 0;
 std::vector<Shader_m::Pass> Shader_m::queue_;
 std::unordered_map<std::string, std::filesystem::file_time_type> Shader_m::fileTimes_;
+
+namespace {
+constexpr const char* CRT_PARAMS_PATH = "crt_params.json";
+bool crtParamsLoaded = false;
+
+float readFloat(const json& j, const char* key, float fallback) {
+    if (!j.contains(key) || !j[key].is_number()) return fallback;
+    return j[key].get<float>();
+}
+} // namespace
+
+Shader_m::CRTParams& Shader_m::crtParams() {
+    static CRTParams params;
+    return params;
+}
+
+void Shader_m::resetCRTParams() {
+    crtParams() = CRTParams{};
+}
+
+bool Shader_m::saveCRTParams() {
+    const CRTParams& params = crtParams();
+    json j = {
+        {"curvature", params.curvature},
+        {"vignette", params.vignette},
+        {"edgeSoftness", params.edgeSoftness},
+        {"glow", params.glow},
+        {"dotMask", params.dotMask},
+        {"dotBlur", params.dotBlur},
+        {"bleed", params.bleed},
+        {"dotGridSize", params.dotGridSize},
+        {"hexGrid", params.hexGrid},
+        {"alternateLineShift", params.alternateLineShift},
+        {"scanline", params.scanline},
+        {"chromaticAberration", params.chromaticAberration},
+        {"brightness", params.brightness},
+        {"sharpness", params.sharpness},
+        {"persistence", params.persistence},
+        {"ntscArtifacts", params.ntscArtifacts},
+        {"overscan", params.overscan},
+        {"saturation", params.saturation},
+        {"maskBrightness", params.maskBrightness},
+        {"maskOpacity", params.maskOpacity},
+        {"maskScale", params.maskScale},
+        {"bloomIntensity", params.bloomIntensity},
+        {"bloomSpread", params.bloomSpread},
+        {"bloomPower", params.bloomPower},
+    };
+
+    std::ofstream f(CRT_PARAMS_PATH, std::ios::trunc);
+    if (!f.good()) return false;
+    f << j.dump(2);
+    return f.good();
+}
+
+bool Shader_m::loadCRTParams() {
+    std::ifstream f(CRT_PARAMS_PATH);
+    if (!f.good()) return false;
+
+    try {
+        json j;
+        f >> j;
+        CRTParams& params = crtParams();
+        params.curvature = readFloat(j, "curvature", params.curvature);
+        params.vignette = readFloat(j, "vignette", params.vignette);
+        params.edgeSoftness = readFloat(j, "edgeSoftness", params.edgeSoftness);
+        params.glow = readFloat(j, "glow", params.glow);
+        params.dotMask = readFloat(j, "dotMask", params.dotMask);
+        params.dotBlur = readFloat(j, "dotBlur", params.dotBlur);
+        params.bleed = readFloat(j, "bleed", params.bleed);
+        params.dotGridSize = readFloat(j, "dotGridSize", params.dotGridSize);
+        params.hexGrid = readFloat(j, "hexGrid", params.hexGrid);
+        params.alternateLineShift = readFloat(j, "alternateLineShift", params.alternateLineShift);
+        params.scanline = readFloat(j, "scanline", params.scanline);
+        params.chromaticAberration = readFloat(j, "chromaticAberration", params.chromaticAberration);
+        params.brightness = readFloat(j, "brightness", params.brightness);
+        params.sharpness = readFloat(j, "sharpness", params.sharpness);
+        params.persistence = readFloat(j, "persistence", params.persistence);
+        params.ntscArtifacts = readFloat(j, "ntscArtifacts", params.ntscArtifacts);
+        params.overscan = readFloat(j, "overscan", params.overscan);
+        params.saturation = readFloat(j, "saturation", params.saturation);
+        params.maskBrightness = readFloat(j, "maskBrightness", params.maskBrightness);
+        params.maskOpacity = readFloat(j, "maskOpacity", params.maskOpacity);
+        params.maskScale = readFloat(j, "maskScale", params.maskScale);
+        params.bloomIntensity = readFloat(j, "bloomIntensity", params.bloomIntensity);
+        params.bloomSpread = readFloat(j, "bloomSpread", params.bloomSpread);
+        params.bloomPower = readFloat(j, "bloomPower", params.bloomPower);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
+static RenderTexture2D loadPointRenderTexture(int width, int height) {
+    RenderTexture2D target = LoadRenderTexture(width, height);
+    if (target.id) {
+        SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
+    }
+    return target;
+}
+
+static Texture2D loadCrtSimTexture(const std::filesystem::path& path, int filter) {
+    Texture2D tex = LoadTexture(path.string().c_str());
+    if (tex.id) {
+        SetTextureFilter(tex, filter);
+        SetTextureWrap(tex, TEXTURE_WRAP_REPEAT);
+    }
+    return tex;
+}
 
 // Helper: collect shader pairs
 std::vector<std::pair<std::string, Shader_m::ShaderPair>> Shader_m::collect() {
@@ -36,13 +154,23 @@ std::vector<std::pair<std::string, Shader_m::ShaderPair>> Shader_m::collect() {
 
 void Shader_m::load(const std::filesystem::path& dir) {
     dir_ = dir;
+    if (!crtParamsLoaded) {
+        loadCRTParams();
+        crtParamsLoaded = true;
+    }
     unload();
     lastW_ = NATIVE_RES_WIDTH;
     lastH_ = NATIVE_RES_HEIGHT;
-    sceneRT_ = LoadRenderTexture(lastW_, lastH_);
-    prevSceneRT_ = LoadRenderTexture(lastW_, lastH_);
-    ping_[0] = LoadRenderTexture(lastW_, lastH_);
-    ping_[1] = LoadRenderTexture(lastW_, lastH_);
+    lastScreenW_ = std::max(GetScreenWidth(), 1);
+    lastScreenH_ = std::max(GetScreenHeight(), 1);
+    sceneRT_ = loadPointRenderTexture(lastW_, lastH_);
+    postRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    prevSceneRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    ping_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    ping_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    const std::filesystem::path crtSimBin = dir_ / "CRTSim" / "CRTSim" / "bin";
+    crtMaskTexture_ = loadCrtSimTexture(crtSimBin / "mask.bmp", TEXTURE_FILTER_BILINEAR);
+    crtArtifactsTexture_ = loadCrtSimTexture(crtSimBin / "artifacts.bmp", TEXTURE_FILTER_POINT);
     for (auto &pr : collect()) {
         std::string vsPath = pr.second.vs.empty() ? std::string{} : pr.second.vs.string();
         std::string fsPath = pr.second.fs.empty() ? std::string{} : pr.second.fs.string();
@@ -56,8 +184,11 @@ void Shader_m::load(const std::filesystem::path& dir) {
 
 void Shader_m::unload() {
     if (sceneRT_.id) { UnloadRenderTexture(sceneRT_); sceneRT_.id = 0; }
+    if (postRT_.id) { UnloadRenderTexture(postRT_); postRT_.id = 0; }
     if (prevSceneRT_.id) { UnloadRenderTexture(prevSceneRT_); prevSceneRT_.id = 0; }
     for (auto &r : ping_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
+    if (crtMaskTexture_.id) { UnloadTexture(crtMaskTexture_); crtMaskTexture_.id = 0; }
+    if (crtArtifactsTexture_.id) { UnloadTexture(crtArtifactsTexture_); crtArtifactsTexture_.id = 0; }
     for (auto &kv : shaders_) if (kv.second.id) UnloadShader(kv.second);
     shaders_.clear();
     queue_.clear();
@@ -72,15 +203,25 @@ Shader Shader_m::get(const std::string& name) { auto it = shaders_.find(name); r
 void Shader_m::ensureTargets() {
     int w = NATIVE_RES_WIDTH;
     int h = NATIVE_RES_HEIGHT;
-    if (w==lastW_ && h==lastH_) return;
-    if (sceneRT_.id) UnloadRenderTexture(sceneRT_);
+    int sw = std::max(GetScreenWidth(), 1);
+    int sh = std::max(GetScreenHeight(), 1);
+
+    if (w != lastW_ || h != lastH_) {
+        if (sceneRT_.id) UnloadRenderTexture(sceneRT_);
+        sceneRT_ = loadPointRenderTexture(w,h);
+        lastW_ = w; lastH_ = h;
+    }
+
+    if (sw == lastScreenW_ && sh == lastScreenH_ && postRT_.id && prevSceneRT_.id && ping_[0].id && ping_[1].id) return;
+
+    if (postRT_.id) UnloadRenderTexture(postRT_);
     if (prevSceneRT_.id) UnloadRenderTexture(prevSceneRT_);
     for (auto &r: ping_) if (r.id) UnloadRenderTexture(r);
-    sceneRT_ = LoadRenderTexture(w,h);
-    prevSceneRT_ = LoadRenderTexture(w,h);
-    ping_[0] = LoadRenderTexture(w,h);
-    ping_[1] = LoadRenderTexture(w,h);
-    lastW_ = w; lastH_ = h;
+    postRT_ = loadPointRenderTexture(sw,sh);
+    prevSceneRT_ = loadPointRenderTexture(sw,sh);
+    ping_[0] = loadPointRenderTexture(sw,sh);
+    ping_[1] = loadPointRenderTexture(sw,sh);
+    lastScreenW_ = sw; lastScreenH_ = sh;
 }
 
 void Shader_m::begin() { ensureTargets(); BeginTextureMode(sceneRT_); }
@@ -101,36 +242,123 @@ void Shader_m::addWorldArea(const std::string& shader, Rectangle& worldRect) {
 
 void Shader_m::swapPing() { pingIndex_ ^= 1; }
 
+static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
+
+void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Texture2D source) {
+    float time = (float)GetTime();
+    float resolution[2] = { (float)source.width, (float)source.height };
+    Rectangle display = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, source.width, source.height);
+    float nativeResolution[2] = { (float)NATIVE_RES_WIDTH, (float)NATIVE_RES_HEIGHT };
+    float displayRect[4] = { display.x, display.y, display.width, display.height };
+
+    int loc = GetShaderLocation(shader, "time");
+    if (loc >= 0) SetShaderValue(shader, loc, &time, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "resolution");
+    if (loc >= 0) SetShaderValue(shader, loc, resolution, SHADER_UNIFORM_VEC2);
+    loc = GetShaderLocation(shader, "nativeResolution");
+    if (loc >= 0) SetShaderValue(shader, loc, nativeResolution, SHADER_UNIFORM_VEC2);
+    loc = GetShaderLocation(shader, "displayRect");
+    if (loc >= 0) SetShaderValue(shader, loc, displayRect, SHADER_UNIFORM_VEC4);
+
+    if (name != "crt") return;
+
+    CRTParams& params = crtParams();
+    loc = GetShaderLocation(shader, "curvature");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.curvature, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "vignette");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.vignette, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "edgeSoftness");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.edgeSoftness, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "glow");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.glow, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "dotMask");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.dotMask, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "dotBlur");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.dotBlur, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "bleed");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.bleed, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "dotGridSize");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.dotGridSize, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "hexGrid");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.hexGrid, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "alternateLineShift");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.alternateLineShift, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "scanline");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.scanline, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "chromaticAberration");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.chromaticAberration, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "brightness");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.brightness, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "sharpness");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.sharpness, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "persistence");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.persistence, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "ntscArtifacts");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.ntscArtifacts, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "overscan");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.overscan, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "saturation");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.saturation, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "maskBrightness");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.maskBrightness, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "maskOpacity");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.maskOpacity, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "maskScale");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.maskScale, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "bloomIntensity");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomIntensity, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "bloomSpread");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomSpread, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "bloomPower");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomPower, SHADER_UNIFORM_FLOAT);
+    if (crtMaskTexture_.id) {
+        loc = GetShaderLocation(shader, "shadowMaskTexture");
+        if (loc >= 0) SetShaderValueTexture(shader, loc, crtMaskTexture_);
+    }
+    if (crtArtifactsTexture_.id) {
+        loc = GetShaderLocation(shader, "ntscArtifactTexture");
+        if (loc >= 0) SetShaderValueTexture(shader, loc, crtArtifactsTexture_);
+    }
+}
+
 static void drawFullscreenTexture(Texture2D tex) {
     DrawTextureRec(tex, {0,0,(float)tex.width, -(float)tex.height}, {0,0}, WHITE);
 }
 
-// Draw the given texture scaled to the window with integer, centered letterboxing
-// Keeps pixel-perfect scaling from native render size to current window size
-static void drawToScreenLetterboxed(Texture2D tex) {
-    int sw = GetScreenWidth();
-    int sh = GetScreenHeight();
-    int nw = tex.width;
-    int nh = tex.height;
-    if (nw <= 0 || nh <= 0 || sw <= 0 || sh <= 0) return;
+static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH) {
+    if (srcW <= 0 || srcH <= 0 || targetW <= 0 || targetH <= 0) return {0,0,0,0};
 
-    int scaleX = sw / nw;
-    int scaleY = sh / nh;
+    int scaleX = targetW / srcW;
+    int scaleY = targetH / srcH;
     int scale = std::max(1, std::min(scaleX, scaleY));
 
-    int dw = nw * scale;
-    int dh = nh * scale;
-    int dx = (sw - dw) / 2;
-    int dy = (sh - dh) / 2;
+    int dw = srcW * scale;
+    int dh = srcH * scale;
+    int dx = (targetW - dw) / 2;
+    int dy = (targetH - dh) / 2;
 
-    Rectangle src{0, 0, (float)nw, -(float)nh}; // flip vertically
-    Rectangle dst{(float)dx, (float)dy, (float)dw, (float)dh};
+    return {(float)dx, (float)dy, (float)dw, (float)dh};
+}
+
+static void drawTextureLetterboxed(Texture2D tex, int targetW, int targetH) {
+    Rectangle src{0, 0, (float)tex.width, -(float)tex.height}; // flip vertically
+    Rectangle dst = getLetterboxRect(tex.width, tex.height, targetW, targetH);
     DrawTexturePro(tex, src, dst, {0,0}, 0.0f, WHITE);
 }
 
-static bool clampToScreen(Rectangle &r) {
-    int W = NATIVE_RES_WIDTH;
-    int H = NATIVE_RES_HEIGHT;
+static Rectangle nativeRectToPostScaled(Rectangle r, Texture2D postTex) {
+    Rectangle dst = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, postTex.width, postTex.height);
+    float scaleX = dst.width / (float)NATIVE_RES_WIDTH;
+    float scaleY = dst.height / (float)NATIVE_RES_HEIGHT;
+    return {
+        dst.x + r.x * scaleX,
+        dst.y + r.y * scaleY,
+        r.width * scaleX,
+        r.height * scaleY
+    };
+}
+
+static bool clampToBounds(Rectangle &r, int W, int H) {
     float x2 = r.x + r.width;
     float y2 = r.y + r.height;
     if (r.x < 0) r.x = 0;
@@ -142,8 +370,8 @@ static bool clampToScreen(Rectangle &r) {
     return r.width > 0 && r.height > 0;
 }
 
-Texture2D Shader_m::applyQueue() {
-    Texture2D current = sceneRT_.texture;          // Start with captured scene
+Texture2D Shader_m::applyQueue(Texture2D base) {
+    Texture2D current = base;                      // Start with post-scaled scene
     for (auto &pass : queue_) {                    // Iterate each queued pass sequentially
         RenderTexture2D &dst = ping_[pingIndex_^1]; // Select the destination RT (the "next" ping target)
         BeginTextureMode(dst);                     // Begin drawing into destination
@@ -153,6 +381,7 @@ Texture2D Shader_m::applyQueue() {
                     if (has(pass.shader)) {
                         Shader sh = get(pass.shader);
                         BeginShaderMode(sh);
+                        uploadPassUniforms(sh, pass.shader, current);
                         if (prevSceneRT_.id) {
                             int loc = GetShaderLocation(sh, "prevTexture");
                             if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
@@ -169,12 +398,13 @@ Texture2D Shader_m::applyQueue() {
                     if (has(pass.shader)) {
                         Shader sh = get(pass.shader);
                         BeginShaderMode(sh);
+                        uploadPassUniforms(sh, pass.shader, current);
                         if (prevSceneRT_.id) {
                             int loc = GetShaderLocation(sh, "prevTexture");
                             if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
                         }
-                        Rectangle r = pass.rect; // already in screen coordinates
-                        if (r.width > 0 && r.height > 0 && clampToScreen(r)) {
+                        Rectangle r = nativeRectToPostScaled(pass.rect, current);
+                        if (r.width > 0 && r.height > 0 && clampToBounds(r, current.width, current.height)) {
                             BeginScissorMode((int)r.x, (int)r.y, (int)r.width, (int)r.height);
                                 DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
                             EndScissorMode();
@@ -192,10 +422,11 @@ Texture2D Shader_m::applyQueue() {
                         Vector2 br = GetWorldToScreen2D({pass.rect.x+pass.rect.width, pass.rect.y+pass.rect.height}, cam);
                         if (br.x < tl.x) std::swap(br.x, tl.x);
                         if (br.y < tl.y) std::swap(br.y, tl.y);
-                        Rectangle sr{tl.x, tl.y, br.x - tl.x, br.y - tl.y};
-                        if (sr.width > 0 && sr.height > 0 && clampToScreen(sr)) {
+                        Rectangle sr = nativeRectToPostScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
+                        if (sr.width > 0 && sr.height > 0 && clampToBounds(sr, current.width, current.height)) {
                             Shader sh = get(pass.shader);
                             BeginShaderMode(sh);
+                            uploadPassUniforms(sh, pass.shader, current);
                             if (prevSceneRT_.id) {
                                 int loc = GetShaderLocation(sh, "prevTexture");
                                 if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
@@ -220,13 +451,20 @@ Texture2D Shader_m::applyQueue() {
 }
 
 void Shader_m::present() {
-    Texture2D outTex = queue_.empty()? sceneRT_.texture : applyQueue();
-    // Draw to backbuffer, scaled to window with letterboxing
-    drawToScreenLetterboxed(outTex);
+    ensureTargets();
+
+    BeginTextureMode(postRT_);
+        ClearBackground(BLACK);
+        drawTextureLetterboxed(sceneRT_.texture, postRT_.texture.width, postRT_.texture.height);
+    EndTextureMode();
+
+    Texture2D outTex = queue_.empty()? postRT_.texture : applyQueue(postRT_.texture);
+    // Post-process output is already in final window resolution.
+    drawFullscreenTexture(outTex);
     // After presenting, keep copy as prev for persistence
     if (prevSceneRT_.id) {
         BeginTextureMode(prevSceneRT_);
-            // Copy 1:1 into prev texture (same native resolution)
+            // Copy 1:1 into prev texture (same post-scaled resolution)
             drawFullscreenTexture(outTex);
         EndTextureMode();
     }

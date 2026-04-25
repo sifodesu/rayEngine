@@ -8,6 +8,33 @@
 
 class Shader_m {
 public:
+    struct CRTParams {
+        float curvature{0.0f};
+        float vignette{0.0f};
+        float edgeSoftness{0.0f};
+        float glow{0.0f};
+        float dotMask{0.0f};
+        float dotBlur{0.82f};
+        float bleed{0.0f};
+        float dotGridSize{1.0f};
+        float hexGrid{0.0f};
+        float alternateLineShift{0.5f};
+        float scanline{0.0f};
+        float chromaticAberration{0.0f};
+        float brightness{1.0f};
+        float sharpness{0.0f};
+        float persistence{0.0f};
+        float ntscArtifacts{0.0f};
+        float overscan{1.0f};
+        float saturation{1.0f};
+        float maskBrightness{0.0f};
+        float maskOpacity{0.0f};
+        float maskScale{1.0f};
+        float bloomIntensity{0.0f};
+        float bloomSpread{0.025f};
+        float bloomPower{2.0f};
+    };
+
     static void load(const std::filesystem::path& dir = std::filesystem::path("Data")/"Shaders");
     static void unload();
     static void reload();
@@ -24,6 +51,10 @@ public:
 
     static bool has(const std::string& name);
     static Shader get(const std::string& name);
+    static CRTParams& crtParams();
+    static void resetCRTParams();
+    static bool saveCRTParams();
+    static bool loadCRTParams();
 
 private:
     struct ShaderPair { std::filesystem::path vs; std::filesystem::path fs; };
@@ -32,10 +63,14 @@ private:
     static std::unordered_map<std::string, Shader> shaders_;
     static std::filesystem::path dir_;
     static RenderTexture2D sceneRT_;
-    static RenderTexture2D prevSceneRT_; // previous presented frame (for persistence shaders)
+    static RenderTexture2D postRT_;
+    static RenderTexture2D prevSceneRT_; // previous presented post-scaled frame (for persistence shaders)
     static RenderTexture2D ping_[2];
+    static Texture2D crtMaskTexture_;
+    static Texture2D crtArtifactsTexture_;
     static int pingIndex_;
     static int lastW_, lastH_;
+    static int lastScreenW_, lastScreenH_;
     static std::vector<Pass> queue_;
 
     // Hot reload
@@ -46,6 +81,7 @@ private:
     // Internal helpers
     static void ensureTargets();
     static void swapPing();
-    static Texture2D applyQueue();
+    static void uploadPassUniforms(Shader shader, const std::string& name, Texture2D source);
+    static Texture2D applyQueue(Texture2D base);
     static std::vector<std::pair<std::string, ShaderPair>> collect();
 };
