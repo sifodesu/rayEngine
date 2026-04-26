@@ -1,4 +1,5 @@
 #include <map>
+#include <algorithm>
 #include <set>
 #include <string>
 #include <vector>
@@ -16,6 +17,7 @@
 #include "upgradeRegistry.h"
 #include "shader_m.h"
 #include "collisionRect.h"
+#include "portal.h"
 #include "sprite.h"
 #include "sprite_m.h"
 #include "model_m.h"
@@ -30,7 +32,7 @@ namespace {
 bool showCollisionBoxes = false;
 
 struct LayerBucket {
-    std::vector<GObject*> twod;
+    std::vector<CollisionRect*> twod;
     std::vector<GObject*> threed;
 };
 
@@ -160,7 +162,7 @@ void Engine::render()
         if (obj->is3DRenderable()) {
             layers[obj->layer_].threed.push_back(obj);
         } else {
-            layers[obj->layer_].twod.push_back(obj);
+            layers[obj->layer_].twod.push_back(body);
         }
     }
 
@@ -191,7 +193,20 @@ void Engine::render()
     for (auto& [layer, bucket] : layers) {
         if (!bucket.twod.empty()) {
             begin2D();
-            for (GObject* obj : bucket.twod) obj->draw();
+            std::vector<Portal*> portals;
+            for (CollisionRect* body : bucket.twod) {
+                GObject* obj = body->getFather();
+                if (!obj) continue;
+
+                if (body->isRenderProxy() || Portal::isEntityInTransit(obj)) continue;
+                if (Portal* portal = dynamic_cast<Portal*>(obj)) {
+                    portals.push_back(portal);
+                    continue;
+                }
+                obj->draw();
+            }
+            Portal::drawTransitsForLayer(layer);
+            for (Portal* portal : portals) portal->draw();
         }
 
         if (!bucket.threed.empty()) {

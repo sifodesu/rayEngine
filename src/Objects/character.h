@@ -12,6 +12,7 @@ public:
     explicit Character(const SpawnData& data);
     void routine();
     void draw();
+    void drawAtBody(Rectangle bodyRect) override;
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }
     void collectDebugSprites(std::vector<Sprite*>& sprites) override;
@@ -77,4 +78,6 @@ private:
     GravityDirection lastGravityDir_ = GravityDirection::DOWN;
     
     void updateHitboxRotation();
+    void updateSpriteRotation();
+    Rectangle spriteRectForBody(Rectangle bodyRect) const;
 };

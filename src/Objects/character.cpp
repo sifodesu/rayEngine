@@ -391,7 +391,7 @@ void Character::routine() {
     }
 }
 
-void Character::draw() {
+void Character::updateSpriteRotation() {
     // Set sprite rotation based on gravity direction
     if (body_) {
         RigidBody* rigidBody = dynamic_cast<RigidBody*>(body_);
@@ -412,17 +412,30 @@ void Character::draw() {
             }
         }
     }
-    
+}
+
+Rectangle Character::spriteRectForBody(Rectangle bodyRect) const {
     // Create sprite rectangle with original dimensions (not rotated hitbox)
-    Vector2 center = body_->getCenterCoord();
-    Rectangle spriteRect = {
+    Vector2 center = {
+        bodyRect.x + bodyRect.width / 2.0f,
+        bodyRect.y + bodyRect.height / 2.0f
+    };
+    return Rectangle{
         center.x - originalHitboxDims_.x / 2.0f,
         center.y - originalHitboxDims_.y / 2.0f,
         originalHitboxDims_.x,
         originalHitboxDims_.y
     };
-    
-    current_anim_->draw(spriteRect);
+}
+
+void Character::draw() {
+    updateSpriteRotation();
+    current_anim_->draw(spriteRectForBody(body_->getSurface()));
+}
+
+void Character::drawAtBody(Rectangle bodyRect) {
+    updateSpriteRotation();
+    current_anim_->draw(spriteRectForBody(bodyRect));
 }
 
 void Character::collectDebugSprites(std::vector<Sprite*>& sprites) {
@@ -441,6 +454,11 @@ void Character::respawn() {
 }
 
 void Character::separateFromCollisions() {
+    if (Portal::isEntityInTransit(this)) {
+        Portal::separateTransitCollisions(this, body_);
+        return;
+    }
+
     Rectangle myRect = body_->getSurface();
     const float separationStep = 0.5f;
     const int maxAttempts = 20;
@@ -451,6 +469,7 @@ void Character::separateFromCollisions() {
         
         for (CollisionRect* other : CollisionRect::query(myRect, true)) {
             if (!other->isSolid() || other->getId() == body_->getId()) continue;
+            if (Portal::shouldIgnoreTransitCollision(this, other)) continue;
             
             Rectangle otherRect = other->getSurface();
             if (!CheckCollisionRecs(myRect, otherRect)) continue;
@@ -511,8 +530,13 @@ bool Character::isOnGround() const {
             probe.x += 0.1f; // Check right
             break;
     }
+
+    if (Portal::isEntityInTransit(const_cast<Character*>(this))) {
+        return Portal::isTransitProbeBlocked(const_cast<Character*>(this), body_, probe);
+    }
     
     for (CollisionRect* other : CollisionRect::query(probe, true)) {
+        if (Portal::shouldIgnoreTransitCollision(const_cast<Character*>(this), other)) continue;
         if (other->isSolid() && (other->getId() != body_->getId()))
             return true;
     }

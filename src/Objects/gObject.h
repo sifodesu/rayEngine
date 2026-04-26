@@ -19,6 +19,7 @@ public:
     virtual void routine() {}
     virtual void trigger() {}
     virtual void draw() {}
+    virtual void drawAtBody(Rectangle) { draw(); }
     virtual void draw3D() {}
     virtual bool is3DRenderable() const { return false; }
     virtual void onCollision(GObject*) {}

@@ -81,7 +81,7 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
     obj->layer_ = data.layer;
     obj->setKillOnCollision(data.interaction.killOnCol.value_or(false));
     GObject* raw = obj.get();
-    if (data.entityType == EntityType::Tile)
+    if (data.entityType == EntityType::Tile || data.isTileInstance)
         level_tiles_.emplace(data.id, std::move(obj));
     else
         level_ents_.emplace(data.id, std::move(obj));
@@ -124,6 +124,8 @@ void Object_m::routine()
         }
     }
 
+    Portal::updateTransits();
+
     // Apply kill rules from rigidbody swept contacts (pre-correction physics contacts)
     for (auto& [id, obj] : level_ents_) {
         CollisionRect* body = obj->getCollisionBody();
@@ -158,6 +160,8 @@ void Object_m::routine()
                 GObject* a = aBody->getFather();
                 GObject* b = bBody->getFather();
                 if (!a || !b || a == b) continue;
+                if (!aBody->isRenderProxy() && Portal::isEntityInTransit(a)) continue;
+                if (!bBody->isRenderProxy() && Portal::isEntityInTransit(b)) continue;
                 a->onCollision(b);
                 a->applyKillOnCollision(b);
                 b->onCollision(a);
@@ -174,12 +178,15 @@ void Object_m::routine()
 
 void Object_m::unload()
 {
+    Portal::clearTransits();
+    Portal::releaseAllDisabledTiles();
     level_ents_.clear();
     level_tiles_.clear();
 }
 
 void Object_m::clearTiles()
 {
+    Portal::releaseAllDisabledTiles();
     // Safely destroy tiles and let CollisionRect dtor remove from quadtree
     level_tiles_.clear();
 }

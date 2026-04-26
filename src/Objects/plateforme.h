@@ -30,12 +30,19 @@ public:
     }
 
 private:
+    struct CarriedObject {
+        CollisionRect* body = nullptr;
+        Vector2 offset{0.0f, 0.0f};
+        bool targetSide = false;
+    };
+
     // Helper methods for cleaner code organization
     Vector2 getCurrentCenter() const;
     Vector2 getCurrentTarget() const;
     // Generic object transport
-    std::vector<CollisionRect*> findRidingObjects(const Rectangle& platformSurface) const;
-    void moveCarriedObjects(const std::vector<CollisionRect*>& objects, Vector2 deltaMove, Vector2 newCenter);
+    std::vector<CarriedObject> findRidingObjects() const;
+    void attachCarriedObjects(const std::vector<CarriedObject>& objects);
+    void rememberCarriedObjects(const std::vector<CarriedObject>& objects);
     
     // Movement logic
     Vector2 calculateMovement(Vector2 currentCenter, double deltaTime);
@@ -57,6 +64,7 @@ private:
     // Axis-specific accumulators for pixel-perfect movement
     float accX_ = 0.0f;
     float accY_ = 0.0f;
+    std::vector<int> carriedOwnerIds_;
     
     // Interaction state
     bool enabled_ = true; // whether platform should move

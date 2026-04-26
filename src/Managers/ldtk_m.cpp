@@ -117,6 +117,7 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy,
                int px, int py, int layer, const string& typeStr = "") {
     SpawnData d;
     d.id = Object_m::genID();
+    d.isTileInstance = true;
     
     // Use provided type or default to Tile
     if (!typeStr.empty()) {

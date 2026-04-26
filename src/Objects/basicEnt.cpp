@@ -24,6 +24,11 @@ void BasicEnt::draw()
     sprite_->draw(body_->getSurface());
 }
 
+void BasicEnt::drawAtBody(Rectangle bodyRect)
+{
+    sprite_->draw(bodyRect);
+}
+
 void BasicEnt::routine()
 {
     sprite_->routine();

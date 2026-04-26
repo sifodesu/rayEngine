@@ -15,6 +15,7 @@ public:
     explicit BasicEnt(const SpawnData& data);
     ~BasicEnt();
     void draw();
+    void drawAtBody(Rectangle bodyRect) override;
     void routine();
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }

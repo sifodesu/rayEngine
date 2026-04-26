@@ -3,7 +3,47 @@
 #include "character.h"
 #include "collisionRect.h"
 #include "adiComponent.h"
-#include "adiComponent.h"
+#include "object_m.h"
+#include "portal.h"
+#include <cmath>
+
+namespace {
+
+bool canBeCarriedByPlatform(CollisionRect* rect, const Plateforme* platform) {
+    if (!rect || rect->isRenderProxy()) return false;
+
+    GObject* owner = rect->getFather();
+    if (!owner || owner == platform) return false;
+    if (dynamic_cast<Portal*>(owner)) return false;
+
+    return Object_m::level_ents_.find(owner->id_) != Object_m::level_ents_.end() ||
+           Object_m::level_tiles_.find(owner->id_) != Object_m::level_tiles_.end();
+}
+
+bool isTileBody(CollisionRect* rect) {
+    GObject* owner = rect ? rect->getFather() : nullptr;
+    return owner && Object_m::level_tiles_.find(owner->id_) != Object_m::level_tiles_.end();
+}
+
+void moveBodyThroughPortals(
+    GObject* owner,
+    CollisionRect* body,
+    Vector2 deltaMove
+) {
+    if (!owner || !body) return;
+    if (fabsf(deltaMove.x) <= 0.0001f && fabsf(deltaMove.y) <= 0.0001f) return;
+
+    Rectangle fromRect = body->getSurface();
+    Rectangle toRect = fromRect;
+    toRect.x += deltaMove.x;
+    toRect.y += deltaMove.y;
+
+    Portal::prepareMovement(owner, body, fromRect, toRect);
+    body->setSurface(toRect);
+    Portal::syncTransit(owner);
+}
+
+}
 
 
 Plateforme::Plateforme(const SpawnData& data) : BasicEnt(data) {
@@ -72,59 +112,120 @@ Vector2 Plateforme::getCurrentTarget() const {
     return waypoints_[idx];
 }
 
-std::vector<CollisionRect*> Plateforme::findRidingObjects(const Rectangle& platformSurface) const {
-    std::vector<CollisionRect*> carryList;
-    Rectangle topProbe = platformSurface;
-    topProbe.y -= 2.0f;            // small margin above
-    topProbe.height = 4.0f;        // probe just above + a bit inside the platform
+std::vector<Plateforme::CarriedObject> Plateforme::findRidingObjects() const {
+    std::vector<CarriedObject> carryList;
+    std::vector<Rectangle> platformSurfaces;
+    platformSurfaces.push_back(body_->getSurface());
+    bool platformInTransit = Portal::isEntityInTransit(const_cast<Plateforme*>(this));
 
-    for (auto* rect : CollisionRect::query(topProbe)) {
-        if (!rect || rect == body_) continue;
-        
-        // We no longer strict-filter for Characters only.
-        // Any physical object resting on us should move.
-        // Optional: filter out non-movable objects if we had a "static" flag,
-        // but for now we assume collisionRects are movable if they are effectively on top.
-        
-        Rectangle objRect = rect->getSurface();
-        float objBottom = objRect.y + objRect.height;
-        float platTop = platformSurface.y;
-        
-        // Check if object is standing on platform
-        bool onPlatform = (objBottom >= platTop - 1.0f && objBottom <= platTop + 2.0f &&
-                          objRect.x < platformSurface.x + platformSurface.width &&
-                          objRect.x + objRect.width > platformSurface.x);
-        
-        if (onPlatform) {
-            carryList.push_back(rect);
+    if (auto targetSurface = Portal::getTransitTargetSurface(const_cast<Plateforme*>(this))) {
+        platformSurfaces.push_back(*targetSurface);
+    }
+
+    auto alreadyCarried = [&](CollisionRect* rect) {
+        for (const CarriedObject& carried : carryList) {
+            if (carried.body == rect) return true;
+        }
+        return false;
+    };
+
+    auto wasAlreadyCarried = [&](CollisionRect* rect) {
+        GObject* owner = rect ? rect->getFather() : nullptr;
+        if (!owner) return false;
+
+        for (int carriedId : carriedOwnerIds_) {
+            if (carriedId == owner->id_) return true;
+        }
+        return false;
+    };
+
+    for (size_t surfaceIndex = 0; surfaceIndex < platformSurfaces.size(); ++surfaceIndex) {
+        Rectangle platformSurface = platformSurfaces[surfaceIndex];
+        Rectangle topProbe = platformSurface;
+        topProbe.y -= 2.0f;
+        topProbe.height = 4.0f;
+
+        for (auto* rect : CollisionRect::query(topProbe)) {
+            if (!rect || rect == body_) continue;
+            if (alreadyCarried(rect)) continue;
+            if (!canBeCarriedByPlatform(rect, this)) continue;
+            if (platformInTransit && isTileBody(rect) && !wasAlreadyCarried(rect)) continue;
+
+            Rectangle objRect = rect->getSurface();
+            float objBottom = objRect.y + objRect.height;
+            float platTop = platformSurface.y;
+
+            bool onPlatform = (objBottom >= platTop - 1.0f && objBottom <= platTop + 2.0f &&
+                               objRect.x < platformSurface.x + platformSurface.width &&
+                               objRect.x + objRect.width > platformSurface.x);
+
+            if (onPlatform) {
+                carryList.push_back(CarriedObject{
+                    rect,
+                    {objRect.x - platformSurface.x, objRect.y - platformSurface.y},
+                    surfaceIndex > 0
+                });
+            }
         }
     }
     return carryList;
 }
 
-void Plateforme::moveCarriedObjects(const std::vector<CollisionRect*>& objects, Vector2 deltaMove, Vector2 newCenter) {
-    Rectangle surf = body_->getSurface();
-    
-    for (auto* rect : objects) {
-        Rectangle cr = rect->getSurface();
-        rect->setCoord({ cr.x + deltaMove.x, cr.y + deltaMove.y });
-        
-        // Special character handling (snapping + gravity reset)
+void Plateforme::rememberCarriedObjects(const std::vector<CarriedObject>& objects) {
+    carriedOwnerIds_.clear();
+
+    for (const CarriedObject& carried : objects) {
+        GObject* owner = carried.body ? carried.body->getFather() : nullptr;
+        if (!owner) continue;
+
+        bool alreadyTracked = false;
+        for (int carriedId : carriedOwnerIds_) {
+            if (carriedId == owner->id_) {
+                alreadyTracked = true;
+                break;
+            }
+        }
+        if (!alreadyTracked) carriedOwnerIds_.push_back(owner->id_);
+    }
+}
+
+void Plateforme::attachCarriedObjects(const std::vector<CarriedObject>& objects) {
+    Rectangle sourceSurface = body_->getSurface();
+    std::optional<Rectangle> targetSurface = Portal::getTransitTargetSurface(this);
+
+    for (const CarriedObject& carried : objects) {
+        CollisionRect* rect = carried.body;
+        if (!canBeCarriedByPlatform(rect, this)) continue;
+
+        Rectangle platformSurface = carried.targetSide && targetSurface.has_value()
+            ? *targetSurface
+            : sourceSurface;
+
+        Rectangle newR = rect->getSurface();
+        newR.x = platformSurface.x + carried.offset.x;
+        newR.y = platformSurface.y + carried.offset.y;
+
+        Rectangle supportPoint{
+            newR.x + newR.width / 2.0f,
+            newR.y + newR.height - 0.5f,
+            1.0f,
+            1.0f
+        };
+        if (!carried.targetSide &&
+            targetSurface.has_value() &&
+            !Portal::isTransitSourceVisible(this, supportPoint)) {
+            if (auto targetRect = Portal::transformTransitRect(this, newR)) {
+                newR = *targetRect;
+            }
+        }
+
+        Portal::cancelTransit(rect->getFather());
+        rect->setSurface(newR);
+
         Character* ch = dynamic_cast<Character*>(rect->getFather());
         if (ch) {
-            Rectangle newR = rect->getSurface();
-            float platTop = newCenter.y - surf.height/2.0f;
-            float diff = (newR.y + newR.height) - platTop; // feet - platTop
-            
-            // Snap feet to platform and stop vertical movement
-            if (diff >= -0.6f && diff <= 2.0f) {
-                float desiredY = platTop - newR.height;
-                if (fabsf(newR.y - desiredY) > 0.01f) {
-                    rect->setCoord({ newR.x, desiredY });
-                }
-                Vector2 sp = ch->body_->getSpeed();
-                if (sp.y != 0.0f) ch->body_->setSpeed({ sp.x, 0.0f });
-            }
+            Vector2 sp = ch->body_->getSpeed();
+            if (sp.y != 0.0f) ch->body_->setSpeed({ sp.x, 0.0f });
         }
     }
 }
@@ -243,9 +344,7 @@ void Plateforme::routine() {
         return;
     }
 
-    // Find objects riding on the platform before movement
-    Rectangle platformSurface = body_->getSurface();
-    auto ridingObjects = findRidingObjects(platformSurface);
+    auto ridingObjects = findRidingObjects();
 
     // Calculate new position
     Vector2 newCenter = calculateMovement(currentCenter, deltaTime);
@@ -253,12 +352,11 @@ void Plateforme::routine() {
 
     // Apply movement to platform
     if (fabsf(deltaMove.x) > 0.0001f || fabsf(deltaMove.y) > 0.0001f) {
-        Rectangle surf = body_->getSurface();
-        body_->setCoord({ newCenter.x - surf.width/2.0f, newCenter.y - surf.height/2.0f });
+        moveBodyThroughPortals(this, body_, deltaMove);
     }
 
-    // Move carried objects
-    moveCarriedObjects(ridingObjects, deltaMove, newCenter);
+    attachCarriedObjects(ridingObjects);
+    rememberCarriedObjects(ridingObjects);
     
     lastCenter_ = newCenter;
 }

@@ -26,6 +26,8 @@ public:
     }
     void setSolid(bool solid) { solid_ = solid; }
     bool isSolid() { return solid_; }
+    void setRenderProxy(bool renderProxy) { renderProxy_ = renderProxy; }
+    bool isRenderProxy() const { return renderProxy_; }
     void add()
     {
         if (!in_quadtree_) {
@@ -52,6 +54,7 @@ protected:
     static std::map<int, CollisionRect*> pool;
     Rectangle surface_;
     bool solid_;
+    bool renderProxy_ = false;
     int pool_id_;
     bool in_quadtree_;  // Track if this object is currently in the quadtree
     quadNode stored_node_;  // Store the exact node that was added to the quadtree
