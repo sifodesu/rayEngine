@@ -4,9 +4,7 @@ in vec2 fragTexCoord;
 in vec4 fragColor;
 
 uniform sampler2D texture0;
-uniform sampler2D prevTexture;
 uniform sampler2D shadowMaskTexture;
-uniform sampler2D ntscArtifactTexture;
 uniform vec4 colDiffuse;
 
 uniform float time;
@@ -26,17 +24,21 @@ uniform float alternateLineShift;
 uniform float scanline;
 uniform float chromaticAberration;
 uniform float brightness;
-uniform float sharpness;
-uniform float persistence;
-uniform float ntscArtifacts;
 uniform float overscan;
+uniform float pixelRatio;
+uniform float dimming;
 uniform float saturation;
 uniform float maskBrightness;
 uniform float maskOpacity;
 uniform float maskScale;
-uniform float bloomIntensity;
-uniform float bloomSpread;
-uniform float bloomPower;
+uniform float frameEnabled;
+uniform float reflectionScalar;
+uniform float diffuseBrightness;
+uniform float specBrightness;
+uniform float specPower;
+uniform float fresnelBrightness;
+uniform vec3 lightPos;
+uniform vec4 frameColor;
 
 out vec4 finalColor;
 
@@ -45,33 +47,18 @@ float sdRoundBox(vec2 p, vec2 b, float r) {
     return length(max(q, vec2(0.0))) + min(max(q.x, q.y), 0.0) - r;
 }
 
-vec4 sampleSafe(vec2 uv) {
-    if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) {
-        return vec4(0.0);
-    }
-    return texture(texture0, uv);
-}
-
-vec4 samplePrevSafe(vec2 uv) {
-    if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) {
-        return vec4(0.0);
-    }
-    return texture(prevTexture, uv);
-}
-
 float luma(vec3 color) {
     return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
-vec3 brightPart(vec3 color) {
-    float luma = max(max(color.r, color.g), color.b);
-    return color * smoothstep(0.22, 0.92, luma);
+vec4 sampleSafe(vec2 uv) {
+    if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) return vec4(0.0);
+    return texture(texture0, uv);
 }
 
-vec3 colorPow(vec3 color, float powerValue) {
-    float actualLuma = max(luma(color), 0.0001);
-    vec3 actualColor = color / actualLuma;
-    return actualColor * pow(actualLuma, max(powerValue, 0.0001));
+vec3 brightPart(vec3 color) {
+    float bright = max(max(color.r, color.g), color.b);
+    return color * smoothstep(0.22, 0.92, bright);
 }
 
 vec2 nativeToUv(vec2 nativePx) {
@@ -103,44 +90,7 @@ vec3 applyPhosphorGrid(vec3 color, vec2 cell) {
     return mix(color, phosphor, phosphorAmount());
 }
 
-vec4 sampleCrtSimComposite(vec2 uv) {
-    vec2 nativeStep = max((displayRect.zw / max(nativeResolution, vec2(1.0))) / max(resolution, vec2(1.0)),
-                          1.0 / max(resolution, vec2(1.0)));
-    vec2 sourcePx = uv * resolution;
-    vec2 nativePx = ((sourcePx - displayRect.xy) / max(displayRect.zw, vec2(1.0))) * nativeResolution;
-    vec2 artifactUv = nativePx / vec2(256.0, 224.0);
-    vec3 artifact = texture(ntscArtifactTexture, artifactUv).rgb;
-
-    vec4 left = sampleSafe(uv - vec2(nativeStep.x, 0.0));
-    vec4 local = sampleSafe(uv);
-    vec4 right = sampleSafe(uv + vec2(nativeStep.x, 0.0));
-    vec3 tunedArtifact = artifact * clamp(ntscArtifacts, 0.0, 1.0);
-    local.rgb = clamp(local.rgb + ((left.rgb - local.rgb) + (right.rgb - local.rgb)) * tunedArtifact, 0.0, 1.0);
-
-    float localLuma = luma(local.rgb);
-    float offset = 0.0;
-    vec4 neighborLeft = sampleSafe(uv - vec2(nativeStep.x * 1.0, 0.0));
-    vec4 neighborRight = sampleSafe(uv + vec2(nativeStep.x * 1.0, 0.0));
-    offset += ((localLuma - luma(neighborLeft.rgb)) + (localLuma - luma(neighborRight.rgb))) * 1.0;
-    neighborLeft = sampleSafe(uv - vec2(nativeStep.x * 2.0, 0.0));
-    neighborRight = sampleSafe(uv + vec2(nativeStep.x * 2.0, 0.0));
-    offset += ((localLuma - luma(neighborLeft.rgb)) + (localLuma - luma(neighborRight.rgb))) * -0.3162277;
-    neighborLeft = sampleSafe(uv - vec2(nativeStep.x * 3.0, 0.0));
-    neighborRight = sampleSafe(uv + vec2(nativeStep.x * 3.0, 0.0));
-    offset += ((localLuma - luma(neighborLeft.rgb)) + (localLuma - luma(neighborRight.rgb))) * 0.1;
-    local.rgb = clamp(local.rgb + offset * sharpness * mix(vec3(1.0), artifact, clamp(ntscArtifacts, 0.0, 1.0)), 0.0, 1.0);
-
-    float temporalBleed = clamp(bleed, 0.0, 1.0);
-    vec3 prevLeft = samplePrevSafe(uv - vec2(nativeStep.x, 0.0)).rgb;
-    vec3 prevLocal = samplePrevSafe(uv).rgb;
-    vec3 prevRight = samplePrevSafe(uv + vec2(nativeStep.x, 0.0)).rgb;
-    vec3 persisted = (prevLocal + (prevLeft + prevRight) * temporalBleed) / (1.0 + temporalBleed * 2.0);
-    local.rgb = max(local.rgb, persisted * clamp(persistence, 0.0, 1.0));
-
-    return local;
-}
-
-vec4 sampleNativeRawSourceDot(vec2 cell) {
+vec4 sampleNativeSourceDot(vec2 cell) {
     float rowShift = mod(cell.y, 2.0) * alternateLineShift;
     vec2 nativeCenter = vec2(
         (cell.x + 0.5 + rowShift) * gridSize(),
@@ -149,23 +99,8 @@ vec4 sampleNativeRawSourceDot(vec2 cell) {
     return sampleSafe(nativeToUv(nativeCenter));
 }
 
-vec4 sampleNativeCompositeSourceDot(vec2 cell) {
-    float rowShift = mod(cell.y, 2.0) * alternateLineShift;
-    vec2 nativeCenter = vec2(
-        (cell.x + 0.5 + rowShift) * gridSize(),
-        (cell.y + 0.5) * gridSize() * gridYPitch()
-    );
-    return sampleCrtSimComposite(nativeToUv(nativeCenter));
-}
-
 vec4 sampleNativeRawDot(vec2 cell) {
-    vec4 sampleValue = sampleNativeRawSourceDot(cell);
-    sampleValue.rgb = applyPhosphorGrid(sampleValue.rgb, cell);
-    return sampleValue;
-}
-
-vec4 sampleNativeDot(vec2 cell) {
-    vec4 sampleValue = sampleNativeCompositeSourceDot(cell);
+    vec4 sampleValue = sampleNativeSourceDot(cell);
     sampleValue.rgb = applyPhosphorGrid(sampleValue.rgb, cell);
     return sampleValue;
 }
@@ -183,7 +118,7 @@ vec3 sampleRgbPhosphors(vec2 cell, vec2 local) {
             vec2 offset = vec2(float(x), float(y));
             vec2 sourceCell = cell + offset;
             vec3 channel = phosphorChannel(sourceCell);
-            vec3 source = sampleNativeCompositeSourceDot(sourceCell).rgb;
+            vec3 source = sampleNativeSourceDot(sourceCell).rgb;
             float energy = dot(source, channel);
             vec2 d = local - offset;
             float core = exp(-dot(d, d) / coreRadius2);
@@ -196,7 +131,7 @@ vec3 sampleRgbPhosphors(vec2 cell, vec2 local) {
 }
 
 vec3 samplePhosphorBleed(vec2 cell, vec2 local) {
-    float radius = mix(0.34, 1.35, clamp(dotBlur, 0.0, 1.0)) + bleed * 0.30;
+    float radius = mix(0.34, 1.45, clamp(dotBlur, 0.0, 1.0)) + bleed * 0.34;
     float radius2 = max(radius * radius, 0.0001);
     vec3 sum = vec3(0.0);
     float weightSum = 0.0;
@@ -214,6 +149,23 @@ vec3 samplePhosphorBleed(vec2 cell, vec2 local) {
     return sum / max(weightSum, 0.0001);
 }
 
+vec3 frameLighting(vec2 centered, float frameBand) {
+    vec3 light = normalize(lightPos);
+    vec3 normal = normalize(vec3(centered * vec2(0.7, 0.9), 1.0));
+    vec3 view = vec3(0.0, 0.0, 1.0);
+    vec3 halfVec = normalize(light + view);
+
+    float diffuse = max(dot(normal, light), 0.0) * diffuseBrightness;
+    float spec = pow(max(dot(normal, halfVec), 0.0), max(specPower, 0.001)) * specBrightness;
+    float fresnel = pow(max(1.0 - dot(view, normal), 0.0), 2.0) * fresnelBrightness;
+    float reflected = smoothstep(0.92, 0.1, length(centered - vec2(0.2, -0.35))) * reflectionScalar;
+
+    vec3 base = frameColor.rgb;
+    vec3 tint = vec3(0.175, 0.15, 0.2) * diffuse;
+    vec3 highlight = vec3(0.25) * spec + vec3(0.45, 0.4, 0.5) * fresnel + vec3(0.9, 0.8, 0.65) * reflected;
+    return (base + tint + highlight) * frameBand;
+}
+
 void main() {
     vec2 uv = fragTexCoord;
     vec2 centered = uv * 2.0 - 1.0;
@@ -222,8 +174,10 @@ void main() {
     vec2 warpedCentered = centered * (1.0 + curvature * r2);
     vec2 sourceUv = warpedCentered * 0.5 + 0.5;
     sourceUv = (sourceUv - vec2(0.5)) / max(overscan, 0.001) + vec2(0.5);
+    sourceUv.y = (sourceUv.y - 0.5) * max(pixelRatio, 0.001) + 0.5;
+
     float insideSource = step(0.0, sourceUv.x) * step(0.0, sourceUv.y) * step(sourceUv.x, 1.0) * step(sourceUv.y, 1.0);
-    vec4 source = sampleCrtSimComposite(sourceUv);
+    vec4 source = sampleSafe(sourceUv);
 
     vec2 sourcePx = sourceUv * resolution;
     vec2 nativePx = ((sourcePx - displayRect.xy) / max(displayRect.zw, vec2(1.0))) * nativeResolution;
@@ -231,23 +185,23 @@ void main() {
     float rowShift = mod(floor(dotPx.y), 2.0) * alternateLineShift;
     vec2 shiftedDotPx = dotPx - vec2(rowShift, 0.0);
     vec2 cell = floor(shiftedDotPx);
-    vec4 base = sampleNativeDot(cell);
-
     vec2 pixelLocal = fract(shiftedDotPx) - vec2(0.5);
+
     float dist = length(pixelLocal);
     float dotEffect = clamp(max(max(dotMask, min(glow, 1.0)), min(bleed, 1.0)), 0.0, 1.0);
+    vec4 base = sampleNativeRawDot(cell);
     vec3 phosphor = samplePhosphorBleed(cell, pixelLocal);
     vec3 color = mix(source.rgb, mix(base.rgb, phosphor, clamp(bleed, 0.0, 1.0)), dotEffect);
     float rgbPhosphorAmount = phosphorAmount() * clamp(dotMask, 0.0, 1.0);
     color = mix(color, sampleRgbPhosphors(cell, pixelLocal), rgbPhosphorAmount);
 
-    float core = 1.0 - smoothstep(0.12, mix(0.62, 0.92, dotBlur), dist);
-    float halo = exp(-dist * dist * mix(6.2, 1.55, dotBlur));
-    float wideHalo = exp(-dist * dist * mix(2.8, 0.72, dotBlur));
-    float roundPixel = clamp(core * 0.58 + halo * 0.70 + wideHalo * bleed * 0.26, 0.0, 1.55);
+    float core = 1.0 - smoothstep(0.12, mix(0.62, 0.96, dotBlur), dist);
+    float halo = exp(-dist * dist * mix(6.2, 1.45, dotBlur));
+    float wideHalo = exp(-dist * dist * mix(2.8, 0.62, dotBlur));
+    float roundPixel = clamp(core * 0.50 + halo * 0.72 + wideHalo * bleed * 0.34, 0.0, 1.65);
     float aperture = mix(1.0, roundPixel * 1.03, clamp(dotMask, 0.0, 1.0));
     aperture = mix(aperture, 1.0, rgbPhosphorAmount);
-    float scan = 1.0 - scanline * (0.5 + 0.5 * cos((nativePx.y + 0.15 * sin(time * 1.7)) * 6.2831853));
+    float scan = 1.0 - scanline * (0.5 + 0.5 * cos(nativePx.y * 6.2831853));
 
     vec3 bloom = vec3(0.0);
     bloom += brightPart(sampleNativeRawDot(cell + vec2( 1.0,  0.0)).rgb) * 1.15;
@@ -262,6 +216,7 @@ void main() {
     bloom += brightPart(sampleNativeRawDot(cell + vec2( 0.0, -2.0)).rgb) * 0.42;
     bloom += brightPart(sampleNativeRawDot(cell + vec2( 4.0,  0.0)).rgb) * 0.24;
     bloom += brightPart(sampleNativeRawDot(cell + vec2(-4.0,  0.0)).rgb) * 0.24;
+
     vec2 radialCell = normalize(centered + vec2(0.0001)) * chromaticAberration;
     vec3 chromaGlow;
     chromaGlow.r = brightPart(sampleNativeRawDot(cell + round(radialCell * vec2(1.25, 0.75))).rgb).r;
@@ -282,18 +237,7 @@ void main() {
     float glass = 1.0 - vignette * smoothstep(0.12, 1.35, r2);
     color *= glass;
     color += vec3(0.10, 0.075, 0.06) * smoothstep(1.05, 0.05, length(centered - vec2(0.18, -0.24))) * glow * 0.10;
-
-    vec2 bloomScale = vec2(bloomSpread * (resolution.y / max(resolution.x, 1.0)), bloomSpread);
-    vec3 screenBloom = vec3(0.0);
-    screenBloom += brightPart(sampleSafe(sourceUv).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.000000,  1.000000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.000000, -1.000000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2(-0.866025,  0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2(-0.866025, -0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.866025,  0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.866025, -0.500000) * bloomScale).rgb);
-    screenBloom *= 1.0 / 7.0;
-    color += colorPow(screenBloom, bloomPower) * bloomIntensity;
+    color *= mix(1.0, 0.72, clamp(dimming, 0.0, 1.0));
 
     float grayscale = luma(color);
     color = mix(vec3(grayscale), color, saturation);
@@ -303,9 +247,18 @@ void main() {
     float tubeMask = mix(1.0, rawTubeMask, step(0.0001, edgeSoftness));
 
     color *= brightness;
-
     color = clamp(color, vec3(0.0), vec3(1.0));
-    float alpha = mix(source.a, base.a, dotEffect) * tubeMask * insideSource;
-    vec4 crtColor = vec4(color * colDiffuse.rgb * fragColor.rgb, alpha * colDiffuse.a * fragColor.a);
-    finalColor = mix(vec4(0.0, 0.0, 0.0, colDiffuse.a * fragColor.a), crtColor, insideSource * tubeMask);
+
+    float screenMask = insideSource * tubeMask;
+    vec4 crtColor = vec4(color * colDiffuse.rgb * fragColor.rgb, source.a * colDiffuse.a * fragColor.a);
+    vec4 outputColor = mix(vec4(0.0, 0.0, 0.0, colDiffuse.a * fragColor.a), crtColor, screenMask);
+
+    float outerFrame = 1.0 - smoothstep(0.0, 0.035, sdRoundBox(centered, vec2(0.985, 0.935), 0.24));
+    float innerFrameCut = 1.0 - smoothstep(-0.01, 0.035, sdRoundBox(centered, vec2(0.925, 0.875), 0.19));
+    float frameBand = clamp(outerFrame - innerFrameCut, 0.0, 1.0) * clamp(frameEnabled, 0.0, 1.0);
+    vec3 frameRgb = frameLighting(centered, frameBand);
+    outputColor.rgb = mix(outputColor.rgb, clamp(frameRgb, vec3(0.0), vec3(1.0)), frameBand);
+    outputColor.a = max(outputColor.a, frameBand * frameColor.a * colDiffuse.a * fragColor.a);
+
+    finalColor = outputColor;
 }

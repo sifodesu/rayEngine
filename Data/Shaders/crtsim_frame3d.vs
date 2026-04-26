@@ -1,0 +1,33 @@
+#version 330
+
+in vec3 vertexPosition;
+in vec2 vertexTexCoord;
+in vec2 vertexTexCoord2;
+in vec3 vertexNormal;
+in vec4 vertexColor;
+
+uniform mat4 mvp;
+uniform mat4 matModel;
+uniform vec3 camPos;
+uniform vec3 lightPos;
+
+out vec2 fragTexCoord;
+out vec4 fragColor;
+out float fragBlend;
+out vec3 fragNormal;
+out vec3 fragCamDir;
+out vec3 fragLightDir;
+
+void main() {
+    vec3 worldPos = vec3(matModel * vec4(vertexPosition, 1.0));
+    mat3 normalMatrix = transpose(inverse(mat3(matModel)));
+
+    fragTexCoord = vertexTexCoord;
+    fragColor = vertexColor;
+    fragBlend = vertexTexCoord2.x;
+    fragNormal = normalize(normalMatrix * vertexNormal);
+    fragCamDir = camPos - worldPos;
+    fragLightDir = lightPos - worldPos;
+
+    gl_Position = mvp * vec4(vertexPosition, 1.0);
+}
