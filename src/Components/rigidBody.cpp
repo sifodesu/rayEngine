@@ -25,12 +25,12 @@ Vector2 RigidBody::getSpeed() {
     return speed_;
 }
 
-void RigidBody::registerSweepContact(CollisionRect* body) {
-    if (!body || body == this) return;
-    for (CollisionRect* existing : sweepContacts_) {
-        if (existing == body) return;
+void RigidBody::registerSweepContactOwner(GObject* owner) {
+    if (!owner || owner == father_) return;
+    for (GObject* existing : sweepContactOwners_) {
+        if (existing == owner) return;
     }
-    sweepContacts_.push_back(body);
+    sweepContactOwners_.push_back(owner);
 }
 
 void RigidBody::addSweepContacts(const Rectangle& probeRect) {
@@ -38,7 +38,9 @@ void RigidBody::addSweepContacts(const Rectangle& probeRect) {
     for (CollisionRect* body : candidates) {
         if (!body || body == this) continue;
         if (!CheckCollisionRecs(probeRect, body->getSurface())) continue;
-        registerSweepContact(body);
+        // Portal transit proxy bodies can be destroyed before Object_m consumes
+        // swept contacts, so keep the stable owner instead of the body pointer.
+        registerSweepContactOwner(body->getFather());
     }
 }
 
@@ -74,7 +76,7 @@ void RigidBody::fixSpeed() {
 
 void RigidBody::routine() {
     float delta = (float)Clock::getLap();
-    sweepContacts_.clear();
+    sweepContactOwners_.clear();
     discontinuousMovement_ = false;
     
     if (delta > 0.2)

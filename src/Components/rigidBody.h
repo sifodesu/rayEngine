@@ -29,7 +29,7 @@ public:
     Vector2 getSpeed();
     void routine();
     bool hadDiscontinuousMovement() const { return discontinuousMovement_; }
-    const std::vector<CollisionRect*>& getSweepContacts() const { return sweepContacts_; }
+    const std::vector<GObject*>& getSweepContactOwners() const { return sweepContactOwners_; }
     // Gravity acceleration accessor (named mass_ internally)
     double getMass() const { return mass_; }
     void setMass(double m) { mass_ = m; }
@@ -49,9 +49,9 @@ private:
     bool gravityEnabled_;
     GravityDirection gravityDirection_;
     bool discontinuousMovement_ = false;
-    std::vector<CollisionRect*> sweepContacts_;
+    std::vector<GObject*> sweepContactOwners_;
 
     void fixSpeed();    // set to 0 if collision ahead
     void addSweepContacts(const Rectangle& probeRect);
-    void registerSweepContact(CollisionRect* body);
+    void registerSweepContactOwner(GObject* owner);
 };

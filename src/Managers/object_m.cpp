@@ -133,9 +133,7 @@ void Object_m::routine()
         RigidBody* rigid = dynamic_cast<RigidBody*>(body);
         if (!rigid) continue;
 
-        for (CollisionRect* otherBody : rigid->getSweepContacts()) {
-            if (!otherBody) continue;
-            GObject* other = otherBody->getFather();
+        for (GObject* other : rigid->getSweepContactOwners()) {
             if (!other || other == obj.get()) continue;
 
             obj->applyKillOnCollision(other);
