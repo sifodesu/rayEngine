@@ -1,5 +1,6 @@
 #include "raycam.h"
 #include "rigidBody.h"
+#include "portal.h"
 #include "raymath.h"
 #include <cmath>
 #include "definitions.h"
@@ -28,6 +29,11 @@ Rectangle Raycam::getRect() {
 void Raycam::routine() {
     if (to_follow_) {
         auto coords = to_follow_->getCenterCoord();
+        if (GObject* followed = to_follow_->getFather()) {
+            if (auto visibleCenter = Portal::getTransitVisibleCenter(followed)) {
+                coords = *visibleCenter;
+            }
+        }
         if (level_bound_) {
             // Snap camera to the native res grid so the view's top-left is the grid's top-left
             const float cellW = NATIVE_RES_WIDTH;

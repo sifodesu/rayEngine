@@ -488,7 +488,7 @@ void applyExitState(PortalTransit& transit, GObject* entity, CollisionRect* enti
 
     RigidBody* rigidBody = dynamic_cast<RigidBody*>(entityBody);
     if (rigidBody) {
-        rigidBody->setSpeed(rotateVectorBetweenFrames(rigidBody->getSpeed(), *sourceFrame, *targetFrame));
+        Vector2 speed = rotateVectorBetweenFrames(rigidBody->getSpeed(), *sourceFrame, *targetFrame);
         if (transit.target->forcesGravity() && transit.target->getDirection().has_value()) {
             switch (*transit.target->getDirection()) {
                 case PortalDirection::UP:
@@ -505,6 +505,7 @@ void applyExitState(PortalTransit& transit, GObject* entity, CollisionRect* enti
                     break;
             }
         }
+        rigidBody->setSpeed(speed);
     }
 }
 
@@ -529,23 +530,24 @@ void applyCarriedExitState(PortalTransit& transit, CollisionRect* carriedBody) {
     RigidBody* rigidBody = dynamic_cast<RigidBody*>(carriedBody);
     if (!rigidBody) return;
 
-    rigidBody->setSpeed(rotateVectorBetweenFrames(rigidBody->getSpeed(), *sourceFrame, *targetFrame));
-    if (!transit.target->forcesGravity() || !transit.target->getDirection().has_value()) return;
-
-    switch (*transit.target->getDirection()) {
-        case PortalDirection::UP:
-            rigidBody->setGravityDirection(GravityDirection::UP);
-            break;
-        case PortalDirection::DOWN:
-            rigidBody->setGravityDirection(GravityDirection::DOWN);
-            break;
-        case PortalDirection::LEFT:
-            rigidBody->setGravityDirection(GravityDirection::LEFT);
-            break;
-        case PortalDirection::RIGHT:
-            rigidBody->setGravityDirection(GravityDirection::RIGHT);
-            break;
+    Vector2 speed = rotateVectorBetweenFrames(rigidBody->getSpeed(), *sourceFrame, *targetFrame);
+    if (transit.target->forcesGravity() && transit.target->getDirection().has_value()) {
+        switch (*transit.target->getDirection()) {
+            case PortalDirection::UP:
+                rigidBody->setGravityDirection(GravityDirection::UP);
+                break;
+            case PortalDirection::DOWN:
+                rigidBody->setGravityDirection(GravityDirection::DOWN);
+                break;
+            case PortalDirection::LEFT:
+                rigidBody->setGravityDirection(GravityDirection::LEFT);
+                break;
+            case PortalDirection::RIGHT:
+                rigidBody->setGravityDirection(GravityDirection::RIGHT);
+                break;
+        }
     }
+    rigidBody->setSpeed(speed);
 }
 
 } // namespace
@@ -1111,6 +1113,34 @@ std::optional<Rectangle> Portal::getTransitTargetSurface(GObject* entity) {
     return it->second.targetFullRect;
 }
 
+std::optional<Vector2> Portal::getTransitVisibleCenter(GObject* entity) {
+    if (!entity) return std::nullopt;
+
+    auto it = activeTransits.find(entity->id_);
+    if (it == activeTransits.end()) return std::nullopt;
+
+    const PortalTransit& transit = it->second;
+    std::optional<Rectangle> visibleRect;
+    float visibleArea = 0.0f;
+
+    auto pickVisibleRect = [&](std::optional<Rectangle> rect) {
+        if (!rect.has_value()) return;
+        float area = rect->width * rect->height;
+        if (area <= 0.0f || area < visibleArea) return;
+        visibleRect = rect;
+        visibleArea = area;
+    };
+
+    pickVisibleRect(transit.sourcePiece);
+    pickVisibleRect(transit.targetPiece);
+    if (!visibleRect.has_value()) return std::nullopt;
+
+    return Vector2{
+        visibleRect->x + visibleRect->width / 2.0f,
+        visibleRect->y + visibleRect->height / 2.0f
+    };
+}
+
 bool Portal::isTransitSourceVisible(GObject* entity, Rectangle rect) {
     if (!entity) return false;
 
@@ -1262,9 +1292,6 @@ bool Portal::performTeleportation(GObject* entity) {
     }
 
     entityBody->setSurface(newRect);
-    if (rigidBody) {
-        rigidBody->setSpeed(spd);
-    }
 
     if (rigidBody && linkedPortal->forceGravity_ && linkedPortal->direction_.has_value()) {
         switch (linkedPortal->direction_.value()) {
@@ -1281,6 +1308,9 @@ bool Portal::performTeleportation(GObject* entity) {
                 rigidBody->setGravityDirection(GravityDirection::RIGHT);
                 break;
         }
+    }
+    if (rigidBody) {
+        rigidBody->setSpeed(spd);
     }
 
     overlappingEntities_.insert(entity->id_);

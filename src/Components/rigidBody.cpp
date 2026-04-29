@@ -9,6 +9,7 @@ RigidBody::RigidBody(const CollisionDesc& col, const BodyDesc& body, GObject* fa
     : CollisionRect(col, father), speed_(body.speed), acceleration_(body.acceleration), 
       curve_(body.curve), mass_(body.gravityAcceleration),
       gravityEnabled_(true), gravityDirection_(GravityDirection::DOWN) {
+    applyMaxFallSpeed();
 }
 
 void RigidBody::setCurve(double curve) {
@@ -20,9 +21,59 @@ void RigidBody::setAcceleration(double acc) {
 
 void RigidBody::setSpeed(Vector2 speed) {
     speed_ = speed;
+    applyMaxFallSpeed();
 }
 Vector2 RigidBody::getSpeed() {
     return speed_;
+}
+
+void RigidBody::setGravityDirection(GravityDirection dir) {
+    gravityDirection_ = dir;
+    applyMaxFallSpeed();
+}
+
+void RigidBody::setMaxFallSpeedEnabled(bool enabled) {
+    maxFallSpeedEnabled_ = enabled;
+    applyMaxFallSpeed();
+}
+
+void RigidBody::setMaxFallSpeed(double speed) {
+    maxFallSpeed_ = std::max(1.0, speed);
+    applyMaxFallSpeed();
+}
+
+double RigidBody::getFallSpeedAlongGravity() const {
+    switch (gravityDirection_) {
+        case GravityDirection::DOWN:
+            return speed_.y;
+        case GravityDirection::UP:
+            return -speed_.y;
+        case GravityDirection::LEFT:
+            return -speed_.x;
+        case GravityDirection::RIGHT:
+            return speed_.x;
+    }
+    return 0.0;
+}
+
+void RigidBody::applyMaxFallSpeed() {
+    if (!maxFallSpeedEnabled_) return;
+    if (getFallSpeedAlongGravity() <= maxFallSpeed_) return;
+
+    switch (gravityDirection_) {
+        case GravityDirection::DOWN:
+            speed_.y = maxFallSpeed_;
+            break;
+        case GravityDirection::UP:
+            speed_.y = -maxFallSpeed_;
+            break;
+        case GravityDirection::LEFT:
+            speed_.x = -maxFallSpeed_;
+            break;
+        case GravityDirection::RIGHT:
+            speed_.x = maxFallSpeed_;
+            break;
+    }
 }
 
 void RigidBody::registerSweepContactOwner(GObject* owner) {
@@ -82,24 +133,27 @@ void RigidBody::routine() {
     if (delta > 0.2)
         return;
 
-    if (Portal::isEntityInTransit(father_)) {
+    bool inPortalTransit = Portal::isEntityInTransit(father_);
+    if (inPortalTransit) {
         Portal::separateTransitCollisions(father_, this);
     }
 
-    // Apply gravity if enabled
+    // Gravity must keep running through portal transit; otherwise traversal
+    // duration changes the height reached after exiting.
     if (gravityEnabled_) {
+        double gravityStep = mass_ * delta;
         switch (gravityDirection_) {
             case GravityDirection::DOWN:
-                speed_.y += mass_ * delta;
+                speed_.y += gravityStep;
                 break;
             case GravityDirection::UP:
-                speed_.y -= mass_ * delta;
+                speed_.y -= gravityStep;
                 break;
             case GravityDirection::LEFT:
-                speed_.x -= mass_ * delta;
+                speed_.x -= gravityStep;
                 break;
             case GravityDirection::RIGHT:
-                speed_.x += mass_ * delta;
+                speed_.x += gravityStep;
                 break;
         }
     }
@@ -110,6 +164,7 @@ void RigidBody::routine() {
     float tempX = std::cos(curve_ * delta) * speed_.x - std::sin(curve_ * delta) * speed_.y;
     float tempY = std::sin(curve_ * delta) * speed_.x + std::cos(curve_ * delta) * speed_.y;
     speed_ = { tempX, tempY };
+    applyMaxFallSpeed();
 
     fixSpeed();
 
@@ -146,4 +201,5 @@ void RigidBody::routine() {
     add();
     speed_.x += acceleration_ * delta * speed_.x;
     speed_.y += acceleration_ * delta * speed_.y;
+    applyMaxFallSpeed();
 }

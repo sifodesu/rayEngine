@@ -38,7 +38,11 @@ public:
     bool isGravityEnabled() const { return gravityEnabled_; }
     void setGravityEnabled(bool enabled) { gravityEnabled_ = enabled; }
     GravityDirection getGravityDirection() const { return gravityDirection_; }
-    void setGravityDirection(GravityDirection dir) { gravityDirection_ = dir; }
+    void setGravityDirection(GravityDirection dir);
+    bool isMaxFallSpeedEnabled() const { return maxFallSpeedEnabled_; }
+    void setMaxFallSpeedEnabled(bool enabled);
+    double getMaxFallSpeed() const { return maxFallSpeed_; }
+    void setMaxFallSpeed(double speed);
 
 private:
     Vector2 speed_;
@@ -48,10 +52,14 @@ private:
 
     bool gravityEnabled_;
     GravityDirection gravityDirection_;
+    bool maxFallSpeedEnabled_ = true;
+    double maxFallSpeed_ = 500.0;
     bool discontinuousMovement_ = false;
     std::vector<GObject*> sweepContactOwners_;
 
     void fixSpeed();    // set to 0 if collision ahead
     void addSweepContacts(const Rectangle& probeRect);
     void registerSweepContactOwner(GObject* owner);
+    double getFallSpeedAlongGravity() const;
+    void applyMaxFallSpeed();
 };

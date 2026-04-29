@@ -47,6 +47,7 @@ public:
     static void cancelTransit(GObject* entity);
     static std::optional<Rectangle> getTransitSourceSurface(GObject* entity);
     static std::optional<Rectangle> getTransitTargetSurface(GObject* entity);
+    static std::optional<Vector2> getTransitVisibleCenter(GObject* entity);
     static bool isTransitSourceVisible(GObject* entity, Rectangle rect);
     static std::optional<Rectangle> transformTransitRect(GObject* entity, Rectangle rect);
     static void releaseAllDisabledTiles();

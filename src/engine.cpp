@@ -23,6 +23,7 @@
 #include "model_m.h"
 #include "rlgl.h"
 #include "rlImGui.h"
+#include "imgui.h"
 #include "imgui_layer.h"
 #include "save_manager.h"
 
@@ -30,6 +31,7 @@ namespace {
 
 // Debug visualization state
 bool showCollisionBoxes = false;
+constexpr float IMGUI_SCALE = 2.0f;
 
 struct LayerBucket {
     std::vector<CollisionRect*> twod;
@@ -63,6 +65,8 @@ Engine::Engine()
     loadGameContent();
 
     rlImGuiSetup(true);
+    ImGui::GetStyle().ScaleAllSizes(IMGUI_SCALE);
+    ImGui::GetStyle().FontScaleMain = IMGUI_SCALE;
 }
 
 void Engine::loadGameContent()
