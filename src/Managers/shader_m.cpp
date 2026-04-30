@@ -12,10 +12,12 @@ std::filesystem::path Shader_m::dir_;
 RenderTexture2D Shader_m::sceneRT_{};
 RenderTexture2D Shader_m::postRT_{};
 RenderTexture2D Shader_m::prevSceneRT_{};
+RenderTexture2D Shader_m::phosphorRT_[2] = {};
 RenderTexture2D Shader_m::ping_[2] = {};
 Texture2D Shader_m::crtMaskTexture_{};
 Texture2D Shader_m::crtArtifactsTexture_{};
 int Shader_m::pingIndex_ = 0;
+int Shader_m::phosphorIndex_ = 0;
 int Shader_m::lastW_ = 0;
 int Shader_m::lastH_ = 0;
 int Shader_m::lastScreenW_ = 0;
@@ -60,6 +62,11 @@ bool Shader_m::saveCRTParams() {
         {"brightness", params.brightness},
         {"sharpness", params.sharpness},
         {"persistence", params.persistence},
+        {"phosphorTrail", params.phosphorTrail},
+        {"phosphorDecayR", params.phosphorDecayR},
+        {"phosphorDecayG", params.phosphorDecayG},
+        {"phosphorDecayB", params.phosphorDecayB},
+        {"phosphorSpread", params.phosphorSpread},
         {"ntscArtifacts", params.ntscArtifacts},
         {"overscan", params.overscan},
         {"saturation", params.saturation},
@@ -100,6 +107,11 @@ bool Shader_m::loadCRTParams() {
         params.brightness = readFloat(j, "brightness", params.brightness);
         params.sharpness = readFloat(j, "sharpness", params.sharpness);
         params.persistence = readFloat(j, "persistence", params.persistence);
+        params.phosphorTrail = readFloat(j, "phosphorTrail", params.phosphorTrail);
+        params.phosphorDecayR = readFloat(j, "phosphorDecayR", params.phosphorDecayR);
+        params.phosphorDecayG = readFloat(j, "phosphorDecayG", params.phosphorDecayG);
+        params.phosphorDecayB = readFloat(j, "phosphorDecayB", params.phosphorDecayB);
+        params.phosphorSpread = readFloat(j, "phosphorSpread", params.phosphorSpread);
         params.ntscArtifacts = readFloat(j, "ntscArtifacts", params.ntscArtifacts);
         params.overscan = readFloat(j, "overscan", params.overscan);
         params.saturation = readFloat(j, "saturation", params.saturation);
@@ -121,6 +133,13 @@ static RenderTexture2D loadPointRenderTexture(int width, int height) {
         SetTextureFilter(target.texture, TEXTURE_FILTER_POINT);
     }
     return target;
+}
+
+static void clearRenderTexture(RenderTexture2D target) {
+    if (!target.id) return;
+    BeginTextureMode(target);
+        ClearBackground(BLACK);
+    EndTextureMode();
 }
 
 static Texture2D loadCrtSimTexture(const std::filesystem::path& path, int filter) {
@@ -166,8 +185,14 @@ void Shader_m::load(const std::filesystem::path& dir) {
     sceneRT_ = loadPointRenderTexture(lastW_, lastH_);
     postRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     prevSceneRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorRT_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorRT_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     ping_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     ping_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorIndex_ = 0;
+    clearRenderTexture(prevSceneRT_);
+    clearRenderTexture(phosphorRT_[0]);
+    clearRenderTexture(phosphorRT_[1]);
     const std::filesystem::path crtSimBin = dir_ / "CRTSim" / "CRTSim" / "bin";
     crtMaskTexture_ = loadCrtSimTexture(crtSimBin / "mask.bmp", TEXTURE_FILTER_BILINEAR);
     crtArtifactsTexture_ = loadCrtSimTexture(crtSimBin / "artifacts.bmp", TEXTURE_FILTER_POINT);
@@ -186,6 +211,7 @@ void Shader_m::unload() {
     if (sceneRT_.id) { UnloadRenderTexture(sceneRT_); sceneRT_.id = 0; }
     if (postRT_.id) { UnloadRenderTexture(postRT_); postRT_.id = 0; }
     if (prevSceneRT_.id) { UnloadRenderTexture(prevSceneRT_); prevSceneRT_.id = 0; }
+    for (auto &r : phosphorRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     for (auto &r : ping_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     if (crtMaskTexture_.id) { UnloadTexture(crtMaskTexture_); crtMaskTexture_.id = 0; }
     if (crtArtifactsTexture_.id) { UnloadTexture(crtArtifactsTexture_); crtArtifactsTexture_.id = 0; }
@@ -212,15 +238,22 @@ void Shader_m::ensureTargets() {
         lastW_ = w; lastH_ = h;
     }
 
-    if (sw == lastScreenW_ && sh == lastScreenH_ && postRT_.id && prevSceneRT_.id && ping_[0].id && ping_[1].id) return;
+    if (sw == lastScreenW_ && sh == lastScreenH_ && postRT_.id && prevSceneRT_.id && phosphorRT_[0].id && phosphorRT_[1].id && ping_[0].id && ping_[1].id) return;
 
     if (postRT_.id) UnloadRenderTexture(postRT_);
     if (prevSceneRT_.id) UnloadRenderTexture(prevSceneRT_);
+    for (auto &r: phosphorRT_) if (r.id) UnloadRenderTexture(r);
     for (auto &r: ping_) if (r.id) UnloadRenderTexture(r);
     postRT_ = loadPointRenderTexture(sw,sh);
     prevSceneRT_ = loadPointRenderTexture(sw,sh);
+    phosphorRT_[0] = loadPointRenderTexture(sw,sh);
+    phosphorRT_[1] = loadPointRenderTexture(sw,sh);
     ping_[0] = loadPointRenderTexture(sw,sh);
     ping_[1] = loadPointRenderTexture(sw,sh);
+    phosphorIndex_ = 0;
+    clearRenderTexture(prevSceneRT_);
+    clearRenderTexture(phosphorRT_[0]);
+    clearRenderTexture(phosphorRT_[1]);
     lastScreenW_ = sw; lastScreenH_ = sh;
 }
 
@@ -246,6 +279,7 @@ static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
 
 void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Texture2D source) {
     float time = (float)GetTime();
+    float frameTime = std::clamp((float)GetFrameTime(), 1.0f / 240.0f, 1.0f / 24.0f);
     float resolution[2] = { (float)source.width, (float)source.height };
     Rectangle display = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, source.width, source.height);
     float nativeResolution[2] = { (float)NATIVE_RES_WIDTH, (float)NATIVE_RES_HEIGHT };
@@ -253,6 +287,8 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
 
     int loc = GetShaderLocation(shader, "time");
     if (loc >= 0) SetShaderValue(shader, loc, &time, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "frameTime");
+    if (loc >= 0) SetShaderValue(shader, loc, &frameTime, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "resolution");
     if (loc >= 0) SetShaderValue(shader, loc, resolution, SHADER_UNIFORM_VEC2);
     loc = GetShaderLocation(shader, "nativeResolution");
@@ -260,9 +296,10 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
     loc = GetShaderLocation(shader, "displayRect");
     if (loc >= 0) SetShaderValue(shader, loc, displayRect, SHADER_UNIFORM_VEC4);
 
-    if (name != "crt") return;
+    if (name != "crt" && name != "phosphor_state") return;
 
     CRTParams& params = crtParams();
+    float phosphorDecay[3] = { params.phosphorDecayR, params.phosphorDecayG, params.phosphorDecayB };
     loc = GetShaderLocation(shader, "curvature");
     if (loc >= 0) SetShaderValue(shader, loc, &params.curvature, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "vignette");
@@ -293,6 +330,12 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
     if (loc >= 0) SetShaderValue(shader, loc, &params.sharpness, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "persistence");
     if (loc >= 0) SetShaderValue(shader, loc, &params.persistence, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "phosphorTrail");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.phosphorTrail, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "phosphorDecay");
+    if (loc >= 0) SetShaderValue(shader, loc, phosphorDecay, SHADER_UNIFORM_VEC3);
+    loc = GetShaderLocation(shader, "phosphorSpread");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.phosphorSpread, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "ntscArtifacts");
     if (loc >= 0) SetShaderValue(shader, loc, &params.ntscArtifacts, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "overscan");
@@ -319,6 +362,40 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
         loc = GetShaderLocation(shader, "ntscArtifactTexture");
         if (loc >= 0) SetShaderValueTexture(shader, loc, crtArtifactsTexture_);
     }
+}
+
+void Shader_m::bindTemporalTextures(Shader shader, const std::string& name) {
+    Texture2D previousFrame = prevSceneRT_.texture;
+    if (prevSceneRT_.id) {
+        int loc = GetShaderLocation(shader, "prevTexture");
+        if (loc >= 0) SetShaderValueTexture(shader, loc, previousFrame);
+    }
+
+    if (name == "crt" && phosphorRT_[phosphorIndex_].id) {
+        int loc = GetShaderLocation(shader, "phosphorTexture");
+        if (loc >= 0) SetShaderValueTexture(shader, loc, phosphorRT_[phosphorIndex_].texture);
+    }
+}
+
+Texture2D Shader_m::updatePhosphorState(Texture2D source) {
+    if (!has("phosphor_state") || !phosphorRT_[0].id || !phosphorRT_[1].id) return source;
+
+    Shader shader = get("phosphor_state");
+    RenderTexture2D& prev = phosphorRT_[phosphorIndex_];
+    RenderTexture2D& dst = phosphorRT_[phosphorIndex_ ^ 1];
+
+    BeginTextureMode(dst);
+        ClearBackground(BLACK);
+        BeginShaderMode(shader);
+            uploadPassUniforms(shader, "phosphor_state", source);
+            int loc = GetShaderLocation(shader, "prevTexture");
+            if (loc >= 0) SetShaderValueTexture(shader, loc, prev.texture);
+            DrawTextureRec(source, {0,0,(float)source.width, -(float)source.height}, {0,0}, WHITE);
+        EndShaderMode();
+    EndTextureMode();
+
+    phosphorIndex_ ^= 1;
+    return phosphorRT_[phosphorIndex_].texture;
 }
 
 static void drawFullscreenTexture(Texture2D tex) {
@@ -382,10 +459,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                         Shader sh = get(pass.shader);
                         BeginShaderMode(sh);
                         uploadPassUniforms(sh, pass.shader, current);
-                        if (prevSceneRT_.id) {
-                            int loc = GetShaderLocation(sh, "prevTexture");
-                            if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
-                        }
+                        bindTemporalTextures(sh, pass.shader);
                     }
                     // Straight full-screen quad through the shader
                     DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
@@ -399,10 +473,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                         Shader sh = get(pass.shader);
                         BeginShaderMode(sh);
                         uploadPassUniforms(sh, pass.shader, current);
-                        if (prevSceneRT_.id) {
-                            int loc = GetShaderLocation(sh, "prevTexture");
-                            if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
-                        }
+                        bindTemporalTextures(sh, pass.shader);
                         Rectangle r = nativeRectToPostScaled(pass.rect, current);
                         if (r.width > 0 && r.height > 0 && clampToBounds(r, current.width, current.height)) {
                             BeginScissorMode((int)r.x, (int)r.y, (int)r.width, (int)r.height);
@@ -427,10 +498,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                             Shader sh = get(pass.shader);
                             BeginShaderMode(sh);
                             uploadPassUniforms(sh, pass.shader, current);
-                            if (prevSceneRT_.id) {
-                                int loc = GetShaderLocation(sh, "prevTexture");
-                                if (loc >= 0) SetShaderValueTexture(sh, loc, prevSceneRT_.texture);
-                            }
+                            bindTemporalTextures(sh, pass.shader);
                             BeginScissorMode((int)sr.x, (int)sr.y, (int)sr.width, (int)sr.height);
                                 DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
                             EndScissorMode();
@@ -458,10 +526,17 @@ void Shader_m::present() {
         drawTextureLetterboxed(sceneRT_.texture, postRT_.texture.width, postRT_.texture.height);
     EndTextureMode();
 
+    bool usesCrt = std::any_of(queue_.begin(), queue_.end(), [](const Pass& pass) {
+        return pass.shader == "crt";
+    });
+    if (usesCrt) {
+        updatePhosphorState(postRT_.texture);
+    }
+
     Texture2D outTex = queue_.empty()? postRT_.texture : applyQueue(postRT_.texture);
     // Post-process output is already in final window resolution.
     drawFullscreenTexture(outTex);
-    // After presenting, keep copy as prev for persistence
+    // After presenting, keep copy as prev for temporal shaders.
     if (prevSceneRT_.id) {
         BeginTextureMode(prevSceneRT_);
             // Copy 1:1 into prev texture (same post-scaled resolution)

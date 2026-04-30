@@ -4,7 +4,7 @@ in vec2 fragTexCoord;
 in vec4 fragColor;
 
 uniform sampler2D texture0;
-uniform sampler2D prevTexture;
+uniform sampler2D phosphorTexture;
 uniform sampler2D shadowMaskTexture;
 uniform sampler2D ntscArtifactTexture;
 uniform vec4 colDiffuse;
@@ -28,6 +28,7 @@ uniform float chromaticAberration;
 uniform float brightness;
 uniform float sharpness;
 uniform float persistence;
+uniform float phosphorTrail;
 uniform float ntscArtifacts;
 uniform float overscan;
 uniform float saturation;
@@ -52,11 +53,11 @@ vec4 sampleSafe(vec2 uv) {
     return texture(texture0, uv);
 }
 
-vec4 samplePrevSafe(vec2 uv) {
+vec4 samplePhosphorSafe(vec2 uv) {
     if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) {
         return vec4(0.0);
     }
-    return texture(prevTexture, uv);
+    return texture(phosphorTexture, uv);
 }
 
 float luma(vec3 color) {
@@ -118,12 +119,11 @@ vec4 sampleCrtSimComposite(vec2 uv) {
     offset += ((localLuma - luma(neighborLeft.rgb)) + (localLuma - luma(neighborRight.rgb))) * 0.1;
     local.rgb = clamp(local.rgb + offset * sharpness * mix(vec3(1.0), artifact, clamp(ntscArtifacts, 0.0, 1.0)), 0.0, 1.0);
 
-    float temporalBleed = clamp(bleed, 0.0, 1.0);
-    vec3 prevLeft = samplePrevSafe(uv - vec2(nativeStep.x, 0.0)).rgb;
-    vec3 prevLocal = samplePrevSafe(uv).rgb;
-    vec3 prevRight = samplePrevSafe(uv + vec2(nativeStep.x, 0.0)).rgb;
-    vec3 persisted = (prevLocal + (prevLeft + prevRight) * temporalBleed) / (1.0 + temporalBleed * 2.0);
-    local.rgb = max(local.rgb, persisted * clamp(persistence, 0.0, 1.0));
+    // The phosphor buffer is an excitation state: it has already decayed by
+    // color channel and quenched low light, so this is not frame persistence.
+    vec3 phosphorState = samplePhosphorSafe(uv).rgb;
+    float temporalAmount = clamp(max(phosphorTrail, persistence), 0.0, 1.0);
+    local.rgb = max(local.rgb, mix(local.rgb, phosphorState, temporalAmount));
 
     return local;
 }
@@ -146,6 +146,15 @@ vec4 sampleNativeDot(vec2 cell) {
     return sampleCrtSimComposite(nativeToUv(nativeCenter));
 }
 
+vec4 sampleNativePhosphorDot(vec2 cell) {
+    float rowShift = mod(cell.y, 2.0) * alternateLineShift;
+    vec2 nativeCenter = vec2(
+        (cell.x + 0.5 + rowShift) * gridSize(),
+        (cell.y + 0.5) * gridSize() * gridYPitch()
+    );
+    return samplePhosphorSafe(nativeToUv(nativeCenter));
+}
+
 vec3 samplePhosphorBleed(vec2 cell, vec2 local) {
     float radius = mix(0.34, 1.35, clamp(dotBlur, 0.0, 1.0)) + bleed * 0.30;
     float radius2 = max(radius * radius, 0.0001);
@@ -157,7 +166,7 @@ vec3 samplePhosphorBleed(vec2 cell, vec2 local) {
             vec2 offset = vec2(float(x), float(y));
             vec2 d = local - offset;
             float w = exp(-dot(d, d) / radius2);
-            sum += sampleNativeRawDot(cell + offset).rgb * w;
+            sum += sampleNativePhosphorDot(cell + offset).rgb * w;
             weightSum += w;
         }
     }
@@ -198,23 +207,23 @@ void main() {
     float scan = 1.0 - scanline * (0.5 + 0.5 * cos((nativePx.y + 0.15 * sin(time * 1.7)) * 6.2831853));
 
     vec3 bloom = vec3(0.0);
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 1.0,  0.0)).rgb) * 1.15;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2(-1.0,  0.0)).rgb) * 1.15;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 0.0,  1.0)).rgb) * 1.00;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 0.0, -1.0)).rgb) * 1.00;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 1.0,  1.0)).rgb) * 0.78;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2(-1.0, -1.0)).rgb) * 0.78;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 2.0,  0.0)).rgb) * 0.58;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2(-2.0,  0.0)).rgb) * 0.58;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 0.0,  2.0)).rgb) * 0.42;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 0.0, -2.0)).rgb) * 0.42;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2( 4.0,  0.0)).rgb) * 0.24;
-    bloom += brightPart(sampleNativeRawDot(cell + vec2(-4.0,  0.0)).rgb) * 0.24;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 1.0,  0.0)).rgb) * 1.15;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2(-1.0,  0.0)).rgb) * 1.15;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 0.0,  1.0)).rgb) * 1.00;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 0.0, -1.0)).rgb) * 1.00;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 1.0,  1.0)).rgb) * 0.78;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2(-1.0, -1.0)).rgb) * 0.78;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 2.0,  0.0)).rgb) * 0.58;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2(-2.0,  0.0)).rgb) * 0.58;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 0.0,  2.0)).rgb) * 0.42;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 0.0, -2.0)).rgb) * 0.42;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 4.0,  0.0)).rgb) * 0.24;
+    bloom += brightPart(sampleNativePhosphorDot(cell + vec2(-4.0,  0.0)).rgb) * 0.24;
     vec2 radialCell = normalize(centered + vec2(0.0001)) * chromaticAberration;
     vec3 chromaGlow;
-    chromaGlow.r = brightPart(sampleNativeRawDot(cell + round(radialCell * vec2(1.25, 0.75))).rgb).r;
+    chromaGlow.r = brightPart(sampleNativePhosphorDot(cell + round(radialCell * vec2(1.25, 0.75))).rgb).r;
     chromaGlow.g = brightPart(phosphor).g;
-    chromaGlow.b = brightPart(sampleNativeRawDot(cell - round(radialCell * vec2(1.25, 0.75))).rgb).b;
+    chromaGlow.b = brightPart(sampleNativePhosphorDot(cell - round(radialCell * vec2(1.25, 0.75))).rgb).b;
     vec3 glowBleed = (bloom * mix(0.12, 0.24, clamp(bleed, 0.0, 1.0)) + chromaGlow * 0.24) * glow;
     color += glowBleed;
 
@@ -233,13 +242,13 @@ void main() {
 
     vec2 bloomScale = vec2(bloomSpread * (resolution.y / max(resolution.x, 1.0)), bloomSpread);
     vec3 screenBloom = vec3(0.0);
-    screenBloom += brightPart(sampleSafe(sourceUv).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.000000,  1.000000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.000000, -1.000000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2(-0.866025,  0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2(-0.866025, -0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.866025,  0.500000) * bloomScale).rgb);
-    screenBloom += brightPart(sampleSafe(sourceUv + vec2( 0.866025, -0.500000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2( 0.000000,  1.000000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2( 0.000000, -1.000000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2(-0.866025,  0.500000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2(-0.866025, -0.500000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2( 0.866025,  0.500000) * bloomScale).rgb);
+    screenBloom += brightPart(samplePhosphorSafe(sourceUv + vec2( 0.866025, -0.500000) * bloomScale).rgb);
     screenBloom *= 1.0 / 7.0;
     color += colorPow(screenBloom, bloomPower) * bloomIntensity;
 

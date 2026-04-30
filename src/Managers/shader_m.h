@@ -24,6 +24,11 @@ public:
         float brightness{1.0f};
         float sharpness{0.0f};
         float persistence{0.0f};
+        float phosphorTrail{0.42f};
+        float phosphorDecayR{0.0060f};
+        float phosphorDecayG{0.0030f};
+        float phosphorDecayB{0.0012f};
+        float phosphorSpread{0.55f};
         float ntscArtifacts{0.0f};
         float overscan{1.0f};
         float saturation{1.0f};
@@ -64,11 +69,13 @@ private:
     static std::filesystem::path dir_;
     static RenderTexture2D sceneRT_;
     static RenderTexture2D postRT_;
-    static RenderTexture2D prevSceneRT_; // previous presented post-scaled frame (for persistence shaders)
+    static RenderTexture2D prevSceneRT_; // previous presented post-scaled frame (for temporal shaders)
+    static RenderTexture2D phosphorRT_[2];
     static RenderTexture2D ping_[2];
     static Texture2D crtMaskTexture_;
     static Texture2D crtArtifactsTexture_;
     static int pingIndex_;
+    static int phosphorIndex_;
     static int lastW_, lastH_;
     static int lastScreenW_, lastScreenH_;
     static std::vector<Pass> queue_;
@@ -82,6 +89,8 @@ private:
     static void ensureTargets();
     static void swapPing();
     static void uploadPassUniforms(Shader shader, const std::string& name, Texture2D source);
+    static void bindTemporalTextures(Shader shader, const std::string& name);
+    static Texture2D updatePhosphorState(Texture2D source);
     static Texture2D applyQueue(Texture2D base);
     static std::vector<std::pair<std::string, ShaderPair>> collect();
 };

@@ -237,6 +237,12 @@ static void drawCRTWindow() {
     ImGui::SliderFloat("Luminosite", &params.brightness, 0.25f, 2.25f, "%.2f");
     ImGui::SeparatorText("CRTSim");
     ImGui::SliderFloat("Sharpness", &params.sharpness, 0.0f, 1.5f, "%.2f");
+    ImGui::SeparatorText("Phosphore");
+    ImGui::SliderFloat("Trainee phosphore", &params.phosphorTrail, 0.0f, 1.0f, "%.2f");
+    ImGui::SliderFloat("Rouge -> 10%", &params.phosphorDecayR, 0.0005f, 0.0800f, "%.4fs");
+    ImGui::SliderFloat("Vert -> 10%", &params.phosphorDecayG, 0.0005f, 0.0800f, "%.4fs");
+    ImGui::SliderFloat("Bleu -> 10%", &params.phosphorDecayB, 0.0005f, 0.0800f, "%.4fs");
+    ImGui::SliderFloat("Diffusion phosphore", &params.phosphorSpread, 0.0f, 2.5f, "%.2f");
     ImGui::SliderFloat("Persistence", &params.persistence, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("NTSC artifacts", &params.ntscArtifacts, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Overscan", &params.overscan, 0.75f, 1.35f, "%.2f");
