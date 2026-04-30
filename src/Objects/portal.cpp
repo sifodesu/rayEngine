@@ -5,6 +5,7 @@
 #include "object_m.h"
 #include "ldtk_m.h"
 #include "collisionRect.h"
+#include "oneWayPlatform.h"
 #include <algorithm>
 #include <cmath>
 #include <map>
@@ -368,6 +369,8 @@ bool pieceBlocked(
         if (!owner || owner == entity) continue;
         if (dynamic_cast<Portal*>(owner)) continue;
         if (shouldIgnoreApertureCollision(piece, col)) continue;
+        if (OneWayPlatform::isOneWayPlatformBody(col) &&
+            !OneWayPlatform::blocksBody(entityBody, piece, col)) continue;
         if (CheckCollisionRecs(piece, col->getSurface())) return true;
     }
 
@@ -384,6 +387,8 @@ bool standardBlocked(GObject* entity, CollisionRect* entityBody, Rectangle propo
         if (!owner || owner == entity) continue;
         if (dynamic_cast<Portal*>(owner)) continue;
         if (shouldIgnoreApertureCollision(proposedRect, col)) continue;
+        if (OneWayPlatform::isOneWayPlatformBody(col) &&
+            !OneWayPlatform::blocksBody(entityBody, proposedRect, col)) continue;
         if (col->isSolid() && CheckCollisionRecs(proposedRect, col->getSurface())) return true;
     }
 

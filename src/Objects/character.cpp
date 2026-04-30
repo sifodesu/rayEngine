@@ -10,6 +10,7 @@
 #include "adiComponent.h"
 #include "definitions.h"
 #include "portal.h"
+#include "oneWayPlatform.h"
 
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
 
@@ -470,6 +471,8 @@ void Character::separateFromCollisions() {
         for (CollisionRect* other : CollisionRect::query(myRect, true)) {
             if (!other->isSolid() || other->getId() == body_->getId()) continue;
             if (Portal::shouldIgnoreTransitCollision(this, other)) continue;
+            if (OneWayPlatform::isOneWayPlatformBody(other) &&
+                !OneWayPlatform::supportsBody(body_, other)) continue;
             
             Rectangle otherRect = other->getSurface();
             if (!CheckCollisionRecs(myRect, otherRect)) continue;
@@ -537,7 +540,11 @@ bool Character::isOnGround() const {
     
     for (CollisionRect* other : CollisionRect::query(probe, true)) {
         if (Portal::shouldIgnoreTransitCollision(const_cast<Character*>(this), other)) continue;
-        if (other->isSolid() && (other->getId() != body_->getId()))
+        if (!other || other->getId() == body_->getId()) continue;
+        if (OneWayPlatform::isOneWayPlatformBody(other) &&
+            !OneWayPlatform::supportsBody(body_, other) &&
+            !OneWayPlatform::blocksBody(body_, probe, other)) continue;
+        if (other->isSolid())
             return true;
     }
     return false;

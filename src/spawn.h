@@ -11,6 +11,7 @@ enum class EntityType {
     Model3D,
     Portal,
     Plateforme,
+    OneWayPlatform,
     FriablePlatform,
     Shooter,
     Checkpoint,
@@ -29,6 +30,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Model3D") return EntityType::Model3D;
     if (typeStr == "Portal") return EntityType::Portal;
     if (typeStr == "Plateforme") return EntityType::Plateforme;
+    if (typeStr == "OneWayPlatform") return EntityType::OneWayPlatform;
     if (typeStr == "FriablePlatform") return EntityType::FriablePlatform;
     if (typeStr == "Shooter") return EntityType::Shooter;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;

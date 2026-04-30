@@ -12,6 +12,7 @@
 #include "pano.h"
 #include "receptacle.h"
 #include "plateforme.h"
+#include "oneWayPlatform.h"
 #include "friablePlatform.h"
 #include "shooter.h"
 #include "portal.h"
@@ -65,6 +66,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::Plateforme:
             obj = std::make_unique<Plateforme>(data);
+            break;
+        case EntityType::OneWayPlatform:
+            obj = std::make_unique<OneWayPlatform>(data);
             break;
         case EntityType::FriablePlatform:
             obj = std::make_unique<FriablePlatform>(data);
