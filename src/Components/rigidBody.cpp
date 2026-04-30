@@ -141,20 +141,25 @@ void RigidBody::routine() {
     // Gravity must keep running through portal transit; otherwise traversal
     // duration changes the height reached after exiting.
     if (gravityEnabled_) {
-        double gravityStep = mass_ * delta;
-        switch (gravityDirection_) {
-            case GravityDirection::DOWN:
-                speed_.y += gravityStep;
-                break;
-            case GravityDirection::UP:
-                speed_.y -= gravityStep;
-                break;
-            case GravityDirection::LEFT:
-                speed_.x -= gravityStep;
-                break;
-            case GravityDirection::RIGHT:
-                speed_.x += gravityStep;
-                break;
+        if (auto transitGravityStep = Portal::getTransitGravityStep(father_, gravityDirection_, mass_, delta)) {
+            speed_.x += transitGravityStep->x;
+            speed_.y += transitGravityStep->y;
+        } else {
+            double gravityStep = mass_ * delta;
+            switch (gravityDirection_) {
+                case GravityDirection::DOWN:
+                    speed_.y += gravityStep;
+                    break;
+                case GravityDirection::UP:
+                    speed_.y -= gravityStep;
+                    break;
+                case GravityDirection::LEFT:
+                    speed_.x -= gravityStep;
+                    break;
+                case GravityDirection::RIGHT:
+                    speed_.x += gravityStep;
+                    break;
+            }
         }
     }
 

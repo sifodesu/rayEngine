@@ -6,6 +6,8 @@
 #include <unordered_set>
 #include <vector>
 
+enum class GravityDirection;
+
 class Portal : public BasicEnt {
 public:
     explicit Portal(const SpawnData& data);
@@ -42,6 +44,7 @@ public:
     static bool isTransitProbeBlocked(GObject* entity, CollisionRect* entityBody, Rectangle probeRect);
     static bool separateTransitCollisions(GObject* entity, CollisionRect* entityBody);
     static bool syncTransit(GObject* entity, const std::vector<CollisionRect*>& carriedBodies = {});
+    static std::optional<Vector2> getTransitGravityStep(GObject* entity, GravityDirection currentDirection, double gravityAcceleration, float delta);
     static void updateTransits();
     static void clearTransits();
     static void cancelTransit(GObject* entity);

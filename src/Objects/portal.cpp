@@ -1,5 +1,6 @@
 #include "portal.h"
 #include "character.h"
+#include "rigidBody.h"
 #include "raycam_m.h"
 #include "object_m.h"
 #include "ldtk_m.h"
@@ -235,6 +236,35 @@ Vector2 rotateVectorBetweenFrames(Vector2 value, const PortalFrame& from, const 
         to.normal.x * -localOpen + to.tangent.x * localTangent,
         to.normal.y * -localOpen + to.tangent.y * localTangent
     };
+}
+
+Vector2 gravityVector(GravityDirection direction, double acceleration) {
+    float amount = static_cast<float>(acceleration);
+    switch (direction) {
+        case GravityDirection::DOWN:
+            return {0.0f, amount};
+        case GravityDirection::UP:
+            return {0.0f, -amount};
+        case GravityDirection::LEFT:
+            return {-amount, 0.0f};
+        case GravityDirection::RIGHT:
+            return {amount, 0.0f};
+    }
+    return {0.0f, amount};
+}
+
+GravityDirection gravityDirectionFromPortalDirection(PortalDirection direction) {
+    switch (direction) {
+        case PortalDirection::UP:
+            return GravityDirection::UP;
+        case PortalDirection::DOWN:
+            return GravityDirection::DOWN;
+        case PortalDirection::LEFT:
+            return GravityDirection::LEFT;
+        case PortalDirection::RIGHT:
+            return GravityDirection::RIGHT;
+    }
+    return GravityDirection::DOWN;
 }
 
 bool shouldIgnoreApertureCollision(Rectangle movingRect, CollisionRect* obstacle) {
@@ -1042,6 +1072,41 @@ bool Portal::syncTransit(GObject* entity, const std::vector<CollisionRect*>& car
 
     transit.previousFullRect = entityBody->getSurface();
     return false;
+}
+
+std::optional<Vector2> Portal::getTransitGravityStep(
+    GObject* entity,
+    GravityDirection currentDirection,
+    double gravityAcceleration,
+    float delta
+) {
+    if (!entity || delta <= 0.0f) return std::nullopt;
+
+    auto it = activeTransits.find(entity->id_);
+    if (it == activeTransits.end()) return std::nullopt;
+
+    PortalTransit& transit = it->second;
+    CollisionRect* entityBody = entity->getCollisionBody();
+    if (!entityBody || !transit.source || !transit.target) return std::nullopt;
+
+    auto sourceFrame = makeFrame(transit.source);
+    auto targetFrame = makeFrame(transit.target);
+    if (!sourceFrame.has_value() || !targetFrame.has_value()) return std::nullopt;
+
+    Vector2 logicalCenter = rectCenter(entityBody->getSurface());
+    if (signedDistanceToOpenSide(logicalCenter, *sourceFrame) >= 0.0f) {
+        Vector2 sourceGravity = gravityVector(currentDirection, gravityAcceleration);
+        return Vector2{sourceGravity.x * delta, sourceGravity.y * delta};
+    }
+
+    GravityDirection targetDirection = currentDirection;
+    if (transit.target->forcesGravity() && transit.target->getDirection().has_value()) {
+        targetDirection = gravityDirectionFromPortalDirection(*transit.target->getDirection());
+    }
+
+    Vector2 targetGravity = gravityVector(targetDirection, gravityAcceleration);
+    Vector2 targetGravityInSourceFrame = rotateVectorBetweenFrames(targetGravity, *targetFrame, *sourceFrame);
+    return Vector2{targetGravityInSourceFrame.x * delta, targetGravityInSourceFrame.y * delta};
 }
 
 void Portal::updateTransits() {
