@@ -31,6 +31,17 @@ public:
      * @param skipCharacters If true, skip entity spawning (useful for hot reload)
      */
     static void loadLevel(const std::string& filename, bool skipCharacters = false);
+
+    /**
+     * @brief Draw LDtk level backgrounds loaded from bgColor/bgRelPath fields
+     * @param viewRect Current camera rectangle in world coordinates, used for culling
+     */
+    static void drawBackgrounds(const Rectangle& viewRect);
+
+    /**
+     * @brief Release LDtk-owned background textures
+     */
+    static void unload();
     
     /**
      * @brief Enable/disable hot reload functionality
@@ -67,5 +78,3 @@ private:
     static inline std::string currentProjectFile{"ldtk_test.ldtk"};
     static inline std::map<std::string, int> ldtkIdToEngineId_;
 };
-
-

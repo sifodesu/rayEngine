@@ -5,6 +5,8 @@
 #include <vector>
 #include <map>
 #include <algorithm>
+#include <cmath>
+#include <optional>
 
 // Third party
 #include <nlohmann/json.hpp>
@@ -25,6 +27,17 @@ using namespace std;
 
 namespace {
 
+struct LdtkBackground {
+    Rectangle levelRect{0, 0, 0, 0};
+    std::optional<Color> color;
+    Texture2D texture{};
+    std::string bgPos{"Unscaled"};
+    float pivotX{0.5f};
+    float pivotY{0.5f};
+};
+
+std::vector<LdtkBackground> backgrounds;
+
 // ----------------------------------------------------------------------------
 // String & Path Utilities
 // ----------------------------------------------------------------------------
@@ -36,6 +49,18 @@ bool strEndsWith(const string& s, const string& suf) {
 string basename(const string& path) {
     size_t pos = path.find_last_of("/\\");
     return (pos == string::npos) ? path : path.substr(pos + 1);
+}
+
+std::filesystem::path projectBasePath(const string& filename) {
+    std::filesystem::path projectPath = std::filesystem::path(LDTK_PATH) / filename;
+    std::filesystem::path parent = projectPath.parent_path();
+    return parent.empty() ? std::filesystem::path(LDTK_PATH) : parent;
+}
+
+std::filesystem::path resolveProjectRelativePath(const string& filename, const string& relPath) {
+    std::filesystem::path path(relPath);
+    if (path.is_absolute()) return path;
+    return projectBasePath(filename) / path;
 }
 
 // ----------------------------------------------------------------------------
@@ -204,6 +229,159 @@ bool parseHexColor(const string& hex, Color& out) {
     if (hex.size() == 9 && !parseByte(7, c.a)) return false;
     out = c;
     return true;
+}
+
+bool rectsOverlap(Rectangle a, Rectangle b) {
+    return a.x < b.x + b.width &&
+           a.x + a.width > b.x &&
+           a.y < b.y + b.height &&
+           a.y + a.height > b.y;
+}
+
+float safePivot(float pivot) {
+    if (!std::isfinite(pivot)) return 0.5f;
+    return std::clamp(pivot, 0.0f, 1.0f);
+}
+
+void drawTextureCover(const Texture2D& texture, Rectangle levelRect, float pivotX, float pivotY) {
+    float texW = static_cast<float>(texture.width);
+    float texH = static_cast<float>(texture.height);
+    if (texW <= 0.0f || texH <= 0.0f || levelRect.width <= 0.0f || levelRect.height <= 0.0f) return;
+
+    float scale = std::max(levelRect.width / texW, levelRect.height / texH);
+    float srcW = levelRect.width / scale;
+    float srcH = levelRect.height / scale;
+    Rectangle source{
+        (texW - srcW) * safePivot(pivotX),
+        (texH - srcH) * safePivot(pivotY),
+        srcW,
+        srcH
+    };
+    DrawTexturePro(texture, source, levelRect, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+void drawTextureContain(const Texture2D& texture, Rectangle levelRect, float pivotX, float pivotY) {
+    float texW = static_cast<float>(texture.width);
+    float texH = static_cast<float>(texture.height);
+    if (texW <= 0.0f || texH <= 0.0f || levelRect.width <= 0.0f || levelRect.height <= 0.0f) return;
+
+    float scale = std::min(levelRect.width / texW, levelRect.height / texH);
+    float dstW = texW * scale;
+    float dstH = texH * scale;
+    Rectangle dest{
+        levelRect.x + (levelRect.width - dstW) * safePivot(pivotX),
+        levelRect.y + (levelRect.height - dstH) * safePivot(pivotY),
+        dstW,
+        dstH
+    };
+    Rectangle source{0, 0, texW, texH};
+    DrawTexturePro(texture, source, dest, Vector2{0, 0}, 0.0f, WHITE);
+}
+
+void drawTextureUnscaled(const Texture2D& texture, Rectangle levelRect, float pivotX, float pivotY) {
+    float texW = static_cast<float>(texture.width);
+    float texH = static_cast<float>(texture.height);
+    if (texW <= 0.0f || texH <= 0.0f) return;
+
+    Vector2 pos{
+        levelRect.x + (levelRect.width - texW) * safePivot(pivotX),
+        levelRect.y + (levelRect.height - texH) * safePivot(pivotY)
+    };
+    DrawTextureV(texture, pos, WHITE);
+}
+
+void drawTextureRepeat(const Texture2D& texture, Rectangle levelRect, Rectangle viewRect) {
+    float texW = static_cast<float>(texture.width);
+    float texH = static_cast<float>(texture.height);
+    if (texW <= 0.0f || texH <= 0.0f || levelRect.width <= 0.0f || levelRect.height <= 0.0f) return;
+
+    float drawMinX = std::max(levelRect.x, viewRect.x);
+    float drawMinY = std::max(levelRect.y, viewRect.y);
+    float drawMaxX = std::min(levelRect.x + levelRect.width, viewRect.x + viewRect.width);
+    float drawMaxY = std::min(levelRect.y + levelRect.height, viewRect.y + viewRect.height);
+    if (drawMinX >= drawMaxX || drawMinY >= drawMaxY) return;
+
+    float firstX = levelRect.x + std::floor((drawMinX - levelRect.x) / texW) * texW;
+    float firstY = levelRect.y + std::floor((drawMinY - levelRect.y) / texH) * texH;
+
+    for (float y = firstY; y < drawMaxY; y += texH) {
+        for (float x = firstX; x < drawMaxX; x += texW) {
+            Rectangle dest{x, y, texW, texH};
+            Rectangle src{0, 0, texW, texH};
+
+            if (dest.x < levelRect.x) {
+                float delta = levelRect.x - dest.x;
+                src.x += delta;
+                src.width -= delta;
+                dest.x += delta;
+                dest.width -= delta;
+            }
+            if (dest.y < levelRect.y) {
+                float delta = levelRect.y - dest.y;
+                src.y += delta;
+                src.height -= delta;
+                dest.y += delta;
+                dest.height -= delta;
+            }
+            float overflowX = (dest.x + dest.width) - (levelRect.x + levelRect.width);
+            if (overflowX > 0.0f) {
+                src.width -= overflowX;
+                dest.width -= overflowX;
+            }
+            float overflowY = (dest.y + dest.height) - (levelRect.y + levelRect.height);
+            if (overflowY > 0.0f) {
+                src.height -= overflowY;
+                dest.height -= overflowY;
+            }
+
+            if (src.width > 0.0f && src.height > 0.0f && dest.width > 0.0f && dest.height > 0.0f) {
+                DrawTexturePro(texture, src, dest, Vector2{0, 0}, 0.0f, WHITE);
+            }
+        }
+    }
+}
+
+std::optional<LdtkBackground> makeLevelBackground(const json& level, const string& filename) {
+    LdtkBackground bg;
+    bg.levelRect = Rectangle{
+        static_cast<float>(level.value("worldX", 0)),
+        static_cast<float>(level.value("worldY", 0)),
+        static_cast<float>(level.value("pxWid", 0)),
+        static_cast<float>(level.value("pxHei", 0))
+    };
+    if (level.contains("bgPos") && level["bgPos"].is_string()) {
+        bg.bgPos = level["bgPos"].get<string>();
+    }
+    bg.pivotX = level.value("bgPivotX", 0.5f);
+    bg.pivotY = level.value("bgPivotY", 0.5f);
+
+    string colorString;
+    if (level.contains("bgColor") && level["bgColor"].is_string()) {
+        colorString = level["bgColor"].get<string>();
+    } else if (level.contains("__bgColor") && level["__bgColor"].is_string()) {
+        colorString = level["__bgColor"].get<string>();
+    }
+    if (!colorString.empty()) {
+        Color parsed{WHITE};
+        if (parseHexColor(colorString, parsed)) bg.color = parsed;
+    }
+
+    if (level.contains("bgRelPath") && level["bgRelPath"].is_string()) {
+        std::filesystem::path bgPath = resolveProjectRelativePath(filename, level["bgRelPath"].get<string>());
+        if (std::filesystem::exists(bgPath)) {
+            bg.texture = LoadTexture(bgPath.string().c_str());
+            if (bg.texture.id > 0) {
+                SetTextureFilter(bg.texture, TEXTURE_FILTER_POINT);
+            }
+        } else {
+            cerr << "LDtk: background image not found " << bgPath.string() << '\n';
+        }
+    }
+
+    if (bg.color.has_value() || bg.texture.id > 0) {
+        return bg;
+    }
+    return std::nullopt;
 }
 
 void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int worldX, int worldY) {
@@ -606,6 +784,8 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     json root; file >> root;
     if (!root.contains("levels") || root["levels"].empty()) { cerr << "LDtk: no levels in " << filename << '\n'; return; }
 
+    unload();
+
     // Clear previous ID mapping
     if (!skipCharacters) {
         clearIdMapping();
@@ -618,6 +798,10 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
         int worldX = level.value("worldX", 0);
         int worldY = level.value("worldY", 0);
         auto intGrid = extractIntGrid(level);
+
+        if (auto background = makeLevelBackground(level, filename)) {
+            backgrounds.push_back(*background);
+        }
 
         int layerIndex = 0;
         for (auto& layer : level["layerInstances"]) { // Iterate draw order as provided
@@ -654,6 +838,41 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     
     // After all entities are loaded, setup portal links
     Portal::setupPortalLinks();
+}
+
+void Ldtk_m::drawBackgrounds(const Rectangle& viewRect) {
+    for (const LdtkBackground& bg : backgrounds) {
+        if (!rectsOverlap(bg.levelRect, viewRect)) continue;
+
+        if (bg.color.has_value()) {
+            DrawRectangleRec(bg.levelRect, *bg.color);
+        }
+
+        if (bg.texture.id <= 0) continue;
+
+        if (bg.bgPos == "Cover") {
+            drawTextureCover(bg.texture, bg.levelRect, bg.pivotX, bg.pivotY);
+        } else if (bg.bgPos == "Contain") {
+            drawTextureContain(bg.texture, bg.levelRect, bg.pivotX, bg.pivotY);
+        } else if (bg.bgPos == "Repeat") {
+            drawTextureRepeat(bg.texture, bg.levelRect, viewRect);
+        } else if (bg.bgPos == "CoverDirty") {
+            Rectangle source{0, 0, static_cast<float>(bg.texture.width), static_cast<float>(bg.texture.height)};
+            DrawTexturePro(bg.texture, source, bg.levelRect, Vector2{0, 0}, 0.0f, WHITE);
+        } else {
+            drawTextureUnscaled(bg.texture, bg.levelRect, bg.pivotX, bg.pivotY);
+        }
+    }
+}
+
+void Ldtk_m::unload() {
+    for (LdtkBackground& bg : backgrounds) {
+        if (bg.texture.id > 0) {
+            UnloadTexture(bg.texture);
+            bg.texture = Texture2D{};
+        }
+    }
+    backgrounds.clear();
 }
 
 

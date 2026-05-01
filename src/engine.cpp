@@ -89,6 +89,7 @@ void Engine::loadGameContent()
 void Engine::unloadGameContent()
 {
     Object_m::unload();
+    Ldtk_m::unload();
     Shader_m::unload();
     Sprite_m::unload();
     Model_m::unload();
@@ -193,6 +194,9 @@ void Engine::render()
         BeginMode3D(Raycam_m::getCam3D());
         in3D = true;
     };
+
+    begin2D();
+    Ldtk_m::drawBackgrounds(Raycam_m::getRayCam().getRect());
 
     for (auto& [layer, bucket] : layers) {
         if (!bucket.twod.empty()) {
