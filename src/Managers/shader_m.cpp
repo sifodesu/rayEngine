@@ -273,6 +273,11 @@ void Shader_m::addWorldArea(const std::string& shader, Rectangle& worldRect) {
     if (!has(shader)) return; queue_.push_back({Pass::WorldArea, shader, worldRect});
 }
 
+void Shader_m::addWaterArea(Rectangle worldRect, int waterKind) {
+    if (!has("water_refraction")) return;
+    queue_.push_back({Pass::WaterArea, "water_refraction", worldRect, waterKind});
+}
+
 void Shader_m::swapPing() { pingIndex_ ^= 1; }
 
 static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
@@ -499,6 +504,44 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                             BeginShaderMode(sh);
                             uploadPassUniforms(sh, pass.shader, current);
                             bindTemporalTextures(sh, pass.shader);
+                            BeginScissorMode((int)sr.x, (int)sr.y, (int)sr.width, (int)sr.height);
+                                DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
+                            EndScissorMode();
+                            EndShaderMode();
+                        }
+                    }
+                } break;
+                case Pass::WaterArea: {
+                    DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
+                    if (has(pass.shader)) {
+                        Camera2D cam = Raycam_m::getCam();
+                        Vector2 tl = GetWorldToScreen2D({pass.rect.x, pass.rect.y}, cam);
+                        Vector2 br = GetWorldToScreen2D({pass.rect.x+pass.rect.width, pass.rect.y+pass.rect.height}, cam);
+                        if (br.x < tl.x) std::swap(br.x, tl.x);
+                        if (br.y < tl.y) std::swap(br.y, tl.y);
+                        Rectangle sr = nativeRectToPostScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
+                        if (sr.width > 0 && sr.height > 0 && clampToBounds(sr, current.width, current.height)) {
+                            Shader sh = get(pass.shader);
+                            BeginShaderMode(sh);
+                            uploadPassUniforms(sh, pass.shader, current);
+                            bindTemporalTextures(sh, pass.shader);
+
+                            float waterRect[4] = { pass.rect.x, pass.rect.y, pass.rect.width, pass.rect.height };
+                            float cameraTarget[2] = { cam.target.x, cam.target.y };
+                            float cameraOffset[2] = { cam.offset.x, cam.offset.y };
+                            float cameraZoom = cam.zoom;
+                            float waterKind = static_cast<float>(pass.mode);
+                            int loc = GetShaderLocation(sh, "waterRect");
+                            if (loc >= 0) SetShaderValue(sh, loc, waterRect, SHADER_UNIFORM_VEC4);
+                            loc = GetShaderLocation(sh, "cameraTarget");
+                            if (loc >= 0) SetShaderValue(sh, loc, cameraTarget, SHADER_UNIFORM_VEC2);
+                            loc = GetShaderLocation(sh, "cameraOffset");
+                            if (loc >= 0) SetShaderValue(sh, loc, cameraOffset, SHADER_UNIFORM_VEC2);
+                            loc = GetShaderLocation(sh, "cameraZoom");
+                            if (loc >= 0) SetShaderValue(sh, loc, &cameraZoom, SHADER_UNIFORM_FLOAT);
+                            loc = GetShaderLocation(sh, "waterKind");
+                            if (loc >= 0) SetShaderValue(sh, loc, &waterKind, SHADER_UNIFORM_FLOAT);
+
                             BeginScissorMode((int)sr.x, (int)sr.y, (int)sr.width, (int)sr.height);
                                 DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
                             EndScissorMode();

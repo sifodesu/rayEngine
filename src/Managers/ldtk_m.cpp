@@ -736,7 +736,9 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer,
                  const map<int, TilesetInfo>& tilesetInfo, int layerGridSize) {
     SpawnData d;
     if (e.contains("__identifier")) {
-        d.entityType = stringToEntityType(e["__identifier"].get<string>());
+        std::string identifier = e["__identifier"].get<string>();
+        d.entityType = stringToEntityType(identifier);
+        d.typeDetail = identifier;
     }
     
     // Fill entity data from LDtk fields
@@ -826,10 +828,17 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
                     processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
                                     tilesetInfo, intGrid, worldX, worldY, layerIndex);
                 }
-            } else if (type == "Entities" && !skipCharacters) { // Entity layer -> spawn entities
+            } else if (type == "Entities") { // Entity layer -> spawn entities
+                std::string identifier = layer.value("__identifier", std::string{});
+                bool loadLayer = !skipCharacters || identifier == "Water";
+                if (!loadLayer) {
+                    ++layerIndex;
+                    continue;
+                }
                 int entityGridSize = layer["__gridSize"].get<int>();
+                int objectLayer = identifier == "Water" ? layerIndex : layerIndex + 100;
                 for (auto& e : layer["entityInstances"]) {
-                    spawnEntity(e, worldX, worldY, layerIndex + 100, tilesetInfo, entityGridSize);
+                    spawnEntity(e, worldX, worldY, objectLayer, tilesetInfo, entityGridSize);
                 }
             }
             ++layerIndex;

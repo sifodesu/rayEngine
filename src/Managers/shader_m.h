@@ -50,6 +50,7 @@ public:
     static void addFullscreen(const std::string& shader);
     static void addScreenArea(const std::string& shader, Rectangle screenRect);
     static void addWorldArea(const std::string& shader, Rectangle& worldRect);
+    static void addWaterArea(Rectangle worldRect, int waterKind);
     static void present();
 
     static void routine();
@@ -63,7 +64,7 @@ public:
 
 private:
     struct ShaderPair { std::filesystem::path vs; std::filesystem::path fs; };
-    struct Pass { enum Type { Fullscreen, ScreenArea, WorldArea } type; std::string shader; Rectangle rect; };
+    struct Pass { enum Type { Fullscreen, ScreenArea, WorldArea, WaterArea } type; std::string shader; Rectangle rect; int mode{0}; };
 
     static std::unordered_map<std::string, Shader> shaders_;
     static std::filesystem::path dir_;

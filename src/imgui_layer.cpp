@@ -273,42 +273,48 @@ static void drawCRTWindow() {
     ImGui::End();
 }
 
+static void drawPlayerWindow()
+{
+  if (ImGui::Begin("Player Debug")) {
+    if (auto *player = findPlayer()) {
+      float jump = player->getDebugJumpSpeed();
+      if (ImGui::SliderFloat("Jump Speed", &jump, 100.0f, 300.0f, "%.0f")) {
+        player->setDebugJumpSpeed(jump);
+      }
+
+      double mass = player->body_->getMass();
+      float massF = static_cast<float>(mass);
+      if (ImGui::SliderFloat("Gravity (mass)", &massF, 0.0f, 2000.0f, "%.0f")) {
+        player->body_->setMass(massF);
+      }
+
+      bool maxFall = player->body_->isMaxFallSpeedEnabled();
+      if (ImGui::Checkbox("Max fall speed", &maxFall)) {
+        player->body_->setMaxFallSpeedEnabled(maxFall);
+      }
+
+      float maxFallSpeed = static_cast<float>(player->body_->getMaxFallSpeed());
+      if (ImGui::SliderFloat("Max fall speed value", &maxFallSpeed, 50.0f,
+                             2000.0f, "%.0f")) {
+        player->body_->setMaxFallSpeed(maxFallSpeed);
+      }
+
+    } else {
+      ImGui::TextUnformatted("Player not found");
+    }
+  }
+  ImGui::End();
+}
+
 void BeginFrame() { rlImGuiBegin(); }
 void EndFrame() { rlImGuiEnd(); }
 
+
 void DrawWindows() {
-    if (ImGui::Begin("Player Debug")) {
-        if (auto *player = findPlayer()) {
-            float jump = player->getDebugJumpSpeed();
-            if (ImGui::SliderFloat("Jump Speed", &jump, 100.0f, 300.0f, "%.0f")) {
-                player->setDebugJumpSpeed(jump);
-            }
-
-            double mass = player->body_->getMass();
-            float massF = static_cast<float>(mass);
-            if (ImGui::SliderFloat("Gravity (mass)", &massF, 0.0f, 2000.0f, "%.0f")) {
-                player->body_->setMass(massF);
-            }
-
-            bool maxFall = player->body_->isMaxFallSpeedEnabled();
-            if (ImGui::Checkbox("Max fall speed", &maxFall)) {
-                player->body_->setMaxFallSpeedEnabled(maxFall);
-            }
-
-            float maxFallSpeed = static_cast<float>(player->body_->getMaxFallSpeed());
-            if (ImGui::SliderFloat("Max fall speed value", &maxFallSpeed, 50.0f, 2000.0f, "%.0f")) {
-                player->body_->setMaxFallSpeed(maxFallSpeed);
-            }
-        
-        } else {
-            ImGui::TextUnformatted("Player not found");
-        }
-    }
-    ImGui::End();
-
-    drawVisibleModelWindow();
-    drawGlitchSpriteWindow();
-    drawCRTWindow();
+    // drawPlayerWindow();
+    // drawVisibleModelWindow();
+    // drawGlitchSpriteWindow();
+    // drawCRTWindow();
 }
 
 } // namespace ImGuiLayer

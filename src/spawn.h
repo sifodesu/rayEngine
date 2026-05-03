@@ -13,6 +13,7 @@ enum class EntityType {
     Plateforme,
     OneWayPlatform,
     FriablePlatform,
+    Water,
     Shooter,
     Checkpoint,
     Kill,
@@ -32,6 +33,8 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Plateforme") return EntityType::Plateforme;
     if (typeStr == "OneWayPlatform") return EntityType::OneWayPlatform;
     if (typeStr == "FriablePlatform") return EntityType::FriablePlatform;
+    if (typeStr == "Water" || typeStr == "water") return EntityType::Water;
+    if (typeStr == "Waterfall" || typeStr == "waterfall") return EntityType::Water;
     if (typeStr == "Shooter") return EntityType::Shooter;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;
     if (typeStr == "Kill") return EntityType::Kill;

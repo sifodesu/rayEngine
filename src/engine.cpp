@@ -18,6 +18,7 @@
 #include "shader_m.h"
 #include "collisionRect.h"
 #include "portal.h"
+#include "water.h"
 #include "sprite.h"
 #include "sprite_m.h"
 #include "model_m.h"
@@ -142,6 +143,8 @@ void Engine::render()
     if (IsKeyPressed(KEY_C)) {
         showCollisionBoxes = !showCollisionBoxes;
     }
+
+    Water::beginFrame();
     
     auto comp = [](CollisionRect* a, CollisionRect* b) {
         int layerA = a->getFather()->layer_;
@@ -236,6 +239,8 @@ void Engine::render()
 
     if (in3D) EndMode3D();
     if (in2D) EndMode2D();
+
+    Water::flushRefractionPasses();
 }
 
 Engine::~Engine()

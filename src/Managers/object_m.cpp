@@ -18,6 +18,7 @@
 #include "portal.h"
 #include "projectile.h"
 #include "modelEnt.h"
+#include "water.h"
 
 using namespace std;
 
@@ -72,6 +73,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::FriablePlatform:
             obj = std::make_unique<FriablePlatform>(data);
+            break;
+        case EntityType::Water:
+            obj = std::make_unique<Water>(data);
             break;
         case EntityType::Shooter:
             obj = std::make_unique<Shooter>(data);
@@ -182,6 +186,7 @@ void Object_m::unload()
 {
     Portal::clearTransits();
     Portal::releaseAllDisabledTiles();
+    Water::clear();
     level_ents_.clear();
     level_tiles_.clear();
 }
