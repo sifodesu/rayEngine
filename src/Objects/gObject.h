@@ -5,10 +5,12 @@
 #include <optional>
 #include <raylib.h>
 #include <nlohmann/json.hpp>
+#include "spawn.h"
 
 class AdiComponent;
 class LinkableComponent;
 class KillComponent;
+class LightComponent;
 class CollisionRect;
 class Sprite;
 
@@ -30,6 +32,9 @@ public:
     void setKillOnCollision(bool enabled);
     void applyKillOnCollision(GObject* other);
     bool hasKillOnCollision() const { return killOnCol_; }
+    void configureLight(const SpawnData& data);
+    LightComponent* getLightComponent() { return lightComponent_; }
+    const LightComponent* getLightComponent() const { return lightComponent_; }
     
     // Méthode virtuelle pour récupérer l'AdiComponent (si présent)
     virtual std::optional<AdiComponent*> getAdiComponent() { return std::nullopt; }
@@ -45,4 +50,5 @@ public:
 protected:
     bool killOnCol_ = false;
     KillComponent* killOnColComponent_ = nullptr;
+    LightComponent* lightComponent_ = nullptr;
 };

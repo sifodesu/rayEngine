@@ -20,6 +20,7 @@
 #include "modelEnt.h"
 #include "water.h"
 #include "particle_m.h"
+#include "light_m.h"
 
 using namespace std;
 
@@ -89,6 +90,7 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
     }
     obj->layer_ = data.layer;
     obj->setKillOnCollision(data.interaction.killOnCol.value_or(false));
+    obj->configureLight(data);
     GObject* raw = obj.get();
     if (data.entityType == EntityType::Tile || data.isTileInstance)
         level_tiles_.emplace(data.id, std::move(obj));
@@ -191,6 +193,7 @@ void Object_m::unload()
     Particle_m::clear();
     level_ents_.clear();
     level_tiles_.clear();
+    Light_m::clear();
 }
 
 void Object_m::clearTiles()

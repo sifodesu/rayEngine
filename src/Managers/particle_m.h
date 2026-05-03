@@ -27,8 +27,8 @@ public:
         int splashStrengthCount = 6;
         int waterfallTouchCount = 5;
 
-        Color dustColor = {178, 160, 132, 255};
-        Color dustHighlightColor = {208, 196, 170, 255};
+        Color dustColor = {255, 255, 255, 255};
+        Color dustHighlightColor = {255, 255, 255, 255};
         Color waterColor = {164, 232, 255, 255};
         Color foamColor = {220, 250, 255, 255};
     };

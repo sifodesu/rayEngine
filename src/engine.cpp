@@ -20,6 +20,7 @@
 #include "portal.h"
 #include "water.h"
 #include "particle_m.h"
+#include "light_m.h"
 #include "sprite.h"
 #include "sprite_m.h"
 #include "model_m.h"
@@ -128,6 +129,7 @@ void Engine::game_loop()
         BeginDrawing();
             ClearBackground(BLACK);
             // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
+            if (Shader_m::has("lighting") && Light_m::hasActiveLights()) Shader_m::addFullscreen("lighting");
             if (Shader_m::has("crt")) Shader_m::addFullscreen("crt");
             Shader_m::present();
             DrawFPS(10, 10);
@@ -235,6 +237,7 @@ void Engine::render()
     begin2D();
     Water::drawOcclusionMasks();
     Particle_m::draw();
+    Light_m::drawDebug();
 
     if (showCollisionBoxes) {
         begin2D();

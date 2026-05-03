@@ -10,6 +10,7 @@
 #include "Components/collisionRect.h"
 #include "Managers/object_m.h" // adjust include path if differs in project
 #include "Managers/particle_m.h"
+#include "Managers/light_m.h"
 #include "Managers/raycam_m.h"
 #include "Managers/shader_m.h"
 #include "Objects/character.h"
@@ -399,6 +400,31 @@ static void drawStillWaterWindow()
   ImGui::End();
 }
 
+static void drawLightingWindow()
+{
+  if (!ImGui::Begin("Lighting Debug")) {
+    ImGui::End();
+    return;
+  }
+
+  Light_m::Params& params = Light_m::params();
+  ImGui::Text("Active lights: %d", Light_m::activeCount());
+  ImGui::Checkbox("Enabled", &params.enabled);
+  ImGui::SameLine();
+  ImGui::Checkbox("Debug draw", &params.debugDraw);
+
+  if (ImGui::Button("Reset lighting")) {
+    Light_m::resetParams();
+  }
+
+  ImGui::SeparatorText("Post Process");
+  ImGui::SliderFloat("Ambient", &params.ambient, 0.0f, 1.5f, "%.2f");
+  ImGui::SliderFloat("Global intensity", &params.globalIntensity, 0.0f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Falloff", &params.falloff, 0.1f, 5.0f, "%.2f");
+
+  ImGui::End();
+}
+
 static void drawPlayerWindow()
 {
   if (ImGui::Begin("Player Debug")) {
@@ -440,9 +466,11 @@ void DrawWindows() {
     // drawPlayerWindow();
     // drawVisibleModelWindow();
     // drawGlitchSpriteWindow();
-    drawCRTWindow();
+    // drawCRTWindow();
+    Shader_m::resetCRTParams();
     // drawParticleWindow();
     drawStillWaterWindow();
+    drawLightingWindow();
 }
 
 } // namespace ImGuiLayer

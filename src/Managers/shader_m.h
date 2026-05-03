@@ -99,9 +99,11 @@ private:
     static RenderTexture2D postRT_;
     static RenderTexture2D prevSceneRT_; // previous presented post-scaled frame (for temporal shaders)
     static RenderTexture2D phosphorRT_[2];
+    static RenderTexture2D nativePing_[2];
     static RenderTexture2D ping_[2];
     static Texture2D crtMaskTexture_;
     static Texture2D crtArtifactsTexture_;
+    static int nativePingIndex_;
     static int pingIndex_;
     static int phosphorIndex_;
     static int lastW_, lastH_;
@@ -115,10 +117,9 @@ private:
 
     // Internal helpers
     static void ensureTargets();
-    static void swapPing();
     static void uploadPassUniforms(Shader shader, const std::string& name, Texture2D source);
     static void bindTemporalTextures(Shader shader, const std::string& name);
     static Texture2D updatePhosphorState(Texture2D source);
-    static Texture2D applyQueue(Texture2D base);
+    static Texture2D applyPasses(Texture2D base, const std::vector<Pass>& passes, RenderTexture2D targets[2], int& targetIndex);
     static std::vector<std::pair<std::string, ShaderPair>> collect();
 };

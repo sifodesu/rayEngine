@@ -393,6 +393,11 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         return *d.model;
     };
 
+    auto ensureLightDesc = [&]() -> LightDesc& {
+        if (!d.light.has_value()) d.light = LightDesc{};
+        return *d.light;
+    };
+
     for (auto& f : inst["fieldInstances"]) {
         string fid = f["__identifier"];
         if (fid == "Type") {
@@ -553,6 +558,39 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         else if (fid == "killOnCol") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 d.interaction.killOnCol = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "emitLight" || fid == "lightEnabled") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureLightDesc().enabled = f["__value"].get<bool>();
+            }
+        }
+        else if (fid == "lightRadius") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureLightDesc().radius = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "lightIntensity") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureLightDesc().intensity = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "lightColor") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                Color parsed = WHITE;
+                if (parseHexColor(f["__value"].get<string>(), parsed)) {
+                    ensureLightDesc().color = parsed;
+                }
+            }
+        }
+        else if (fid == "lightOffsetX") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureLightDesc().offset.x = f["__value"].get<float>();
+            }
+        }
+        else if (fid == "lightOffsetY") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                ensureLightDesc().offset.y = f["__value"].get<float>();
             }
         }
         else if (fid == "breakTime") {

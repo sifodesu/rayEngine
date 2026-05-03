@@ -4,6 +4,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "definitions.h"
+#include "light_m.h"
 
 using json = nlohmann::json;
 
@@ -13,9 +14,11 @@ RenderTexture2D Shader_m::sceneRT_{};
 RenderTexture2D Shader_m::postRT_{};
 RenderTexture2D Shader_m::prevSceneRT_{};
 RenderTexture2D Shader_m::phosphorRT_[2] = {};
+RenderTexture2D Shader_m::nativePing_[2] = {};
 RenderTexture2D Shader_m::ping_[2] = {};
 Texture2D Shader_m::crtMaskTexture_{};
 Texture2D Shader_m::crtArtifactsTexture_{};
+int Shader_m::nativePingIndex_ = 0;
 int Shader_m::pingIndex_ = 0;
 int Shader_m::phosphorIndex_ = 0;
 int Shader_m::lastW_ = 0;
@@ -286,12 +289,15 @@ void Shader_m::load(const std::filesystem::path& dir) {
     lastScreenW_ = std::max(GetScreenWidth(), 1);
     lastScreenH_ = std::max(GetScreenHeight(), 1);
     sceneRT_ = loadPointRenderTexture(lastW_, lastH_);
+    nativePing_[0] = loadPointRenderTexture(lastW_, lastH_);
+    nativePing_[1] = loadPointRenderTexture(lastW_, lastH_);
     postRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     prevSceneRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     phosphorRT_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     phosphorRT_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     ping_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     ping_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    nativePingIndex_ = 0;
     phosphorIndex_ = 0;
     clearRenderTexture(prevSceneRT_);
     clearRenderTexture(phosphorRT_[0]);
@@ -315,6 +321,7 @@ void Shader_m::unload() {
     if (postRT_.id) { UnloadRenderTexture(postRT_); postRT_.id = 0; }
     if (prevSceneRT_.id) { UnloadRenderTexture(prevSceneRT_); prevSceneRT_.id = 0; }
     for (auto &r : phosphorRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
+    for (auto &r : nativePing_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     for (auto &r : ping_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     if (crtMaskTexture_.id) { UnloadTexture(crtMaskTexture_); crtMaskTexture_.id = 0; }
     if (crtArtifactsTexture_.id) { UnloadTexture(crtArtifactsTexture_); crtArtifactsTexture_.id = 0; }
@@ -335,9 +342,13 @@ void Shader_m::ensureTargets() {
     int sw = std::max(GetScreenWidth(), 1);
     int sh = std::max(GetScreenHeight(), 1);
 
-    if (w != lastW_ || h != lastH_) {
+    if (w != lastW_ || h != lastH_ || !sceneRT_.id || !nativePing_[0].id || !nativePing_[1].id) {
         if (sceneRT_.id) UnloadRenderTexture(sceneRT_);
+        for (auto &r: nativePing_) if (r.id) UnloadRenderTexture(r);
         sceneRT_ = loadPointRenderTexture(w,h);
+        nativePing_[0] = loadPointRenderTexture(w,h);
+        nativePing_[1] = loadPointRenderTexture(w,h);
+        nativePingIndex_ = 0;
         lastW_ = w; lastH_ = h;
     }
 
@@ -381,8 +392,6 @@ void Shader_m::addWaterArea(Rectangle worldRect, int waterKind) {
     queue_.push_back({Pass::WaterArea, "water_refraction", worldRect, waterKind});
 }
 
-void Shader_m::swapPing() { pingIndex_ ^= 1; }
-
 static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
 
 void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Texture2D source) {
@@ -403,6 +412,11 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
     if (loc >= 0) SetShaderValue(shader, loc, nativeResolution, SHADER_UNIFORM_VEC2);
     loc = GetShaderLocation(shader, "displayRect");
     if (loc >= 0) SetShaderValue(shader, loc, displayRect, SHADER_UNIFORM_VEC4);
+
+    if (name == "lighting") {
+        Light_m::upload(shader);
+        return;
+    }
 
     if (name != "crt" && name != "phosphor_state") return;
 
@@ -473,6 +487,8 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
 }
 
 void Shader_m::bindTemporalTextures(Shader shader, const std::string& name) {
+    if (name != "crt") return;
+
     Texture2D previousFrame = prevSceneRT_.texture;
     if (prevSceneRT_.id) {
         int loc = GetShaderLocation(shader, "prevTexture");
@@ -568,8 +584,8 @@ static void uploadWaterParams(Shader shader) {
     setFloatUniform(shader, "waterfallLineRandomSeed", params.waterfallLineRandomSeed);
 }
 
-static Rectangle nativeRectToPostScaled(Rectangle r, Texture2D postTex) {
-    Rectangle dst = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, postTex.width, postTex.height);
+static Rectangle nativeRectToTargetScaled(Rectangle r, Texture2D targetTex) {
+    Rectangle dst = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, targetTex.width, targetTex.height);
     float scaleX = dst.width / (float)NATIVE_RES_WIDTH;
     float scaleY = dst.height / (float)NATIVE_RES_HEIGHT;
     return {
@@ -592,14 +608,14 @@ static bool clampToBounds(Rectangle &r, int W, int H) {
     return r.width > 0 && r.height > 0;
 }
 
-Texture2D Shader_m::applyQueue(Texture2D base) {
-    Texture2D current = base;                      // Start with post-scaled scene
-    for (auto &pass : queue_) {                    // Iterate each queued pass sequentially
-        RenderTexture2D &dst = ping_[pingIndex_^1]; // Select the destination RT (the "next" ping target)
-        BeginTextureMode(dst);                     // Begin drawing into destination
+Texture2D Shader_m::applyPasses(Texture2D base, const std::vector<Pass>& passes, RenderTexture2D targets[2], int& targetIndex) {
+    Texture2D current = base;
+    for (const Pass& pass : passes) {
+        RenderTexture2D &dst = targets[targetIndex ^ 1];
+        BeginTextureMode(dst);
             switch(pass.type) {
                 case Pass::Fullscreen: {
-                    // Activate shader for entire screen
+                    // Activate shader for the whole current render target.
                     if (has(pass.shader)) {
                         Shader sh = get(pass.shader);
                         BeginShaderMode(sh);
@@ -619,7 +635,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                         BeginShaderMode(sh);
                         uploadPassUniforms(sh, pass.shader, current);
                         bindTemporalTextures(sh, pass.shader);
-                        Rectangle r = nativeRectToPostScaled(pass.rect, current);
+                        Rectangle r = nativeRectToTargetScaled(pass.rect, current);
                         if (r.width > 0 && r.height > 0 && clampToBounds(r, current.width, current.height)) {
                             BeginScissorMode((int)r.x, (int)r.y, (int)r.width, (int)r.height);
                                 DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
@@ -638,7 +654,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                         Vector2 br = GetWorldToScreen2D({pass.rect.x+pass.rect.width, pass.rect.y+pass.rect.height}, cam);
                         if (br.x < tl.x) std::swap(br.x, tl.x);
                         if (br.y < tl.y) std::swap(br.y, tl.y);
-                        Rectangle sr = nativeRectToPostScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
+                        Rectangle sr = nativeRectToTargetScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
                         if (sr.width > 0 && sr.height > 0 && clampToBounds(sr, current.width, current.height)) {
                             Shader sh = get(pass.shader);
                             BeginShaderMode(sh);
@@ -659,7 +675,7 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                         Vector2 br = GetWorldToScreen2D({pass.rect.x+pass.rect.width, pass.rect.y+pass.rect.height}, cam);
                         if (br.x < tl.x) std::swap(br.x, tl.x);
                         if (br.y < tl.y) std::swap(br.y, tl.y);
-                        Rectangle sr = nativeRectToPostScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
+                        Rectangle sr = nativeRectToTargetScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
                         if (sr.width > 0 && sr.height > 0 && clampToBounds(sr, current.width, current.height)) {
                             Shader sh = get(pass.shader);
                             BeginShaderMode(sh);
@@ -693,29 +709,44 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                     DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
                 } break;
             }
-        EndTextureMode();                          // Finish rendering to destination RT
-        current = dst.texture;                     // Promote destination to become new source for next pass
-        swapPing();                                // Flip ping index for next iteration
+        EndTextureMode();
+        current = dst.texture;
+        targetIndex ^= 1;
     }
-    return current; // Final texture after all passes
+    return current;
 }
 
 void Shader_m::present() {
     ensureTargets();
 
+    std::vector<Pass> nativePasses;
+    std::vector<Pass> displayPasses;
+    nativePasses.reserve(queue_.size());
+    displayPasses.reserve(queue_.size());
+    for (const Pass& pass : queue_) {
+        if (pass.shader == "crt") {
+            displayPasses.push_back(pass);
+        } else {
+            nativePasses.push_back(pass);
+        }
+    }
+
+    Texture2D nativeTex = nativePasses.empty()
+        ? sceneRT_.texture
+        : applyPasses(sceneRT_.texture, nativePasses, nativePing_, nativePingIndex_);
+
     BeginTextureMode(postRT_);
         ClearBackground(BLACK);
-        drawTextureLetterboxed(sceneRT_.texture, postRT_.texture.width, postRT_.texture.height);
+        drawTextureLetterboxed(nativeTex, postRT_.texture.width, postRT_.texture.height);
     EndTextureMode();
 
-    bool usesCrt = std::any_of(queue_.begin(), queue_.end(), [](const Pass& pass) {
-        return pass.shader == "crt";
-    });
-    if (usesCrt) {
+    if (!displayPasses.empty()) {
         updatePhosphorState(postRT_.texture);
     }
 
-    Texture2D outTex = queue_.empty()? postRT_.texture : applyQueue(postRT_.texture);
+    Texture2D outTex = displayPasses.empty()
+        ? postRT_.texture
+        : applyPasses(postRT_.texture, displayPasses, ping_, pingIndex_);
     // Post-process output is already in final window resolution.
     drawFullscreenTexture(outTex);
     // After presenting, keep copy as prev for temporal shaders.

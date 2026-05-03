@@ -92,6 +92,14 @@ struct AdiComponentDesc {
     std::vector<std::string> targetIds;
 };
 
+struct LightDesc {
+    bool enabled{false};
+    Color color{255, 238, 190, 255};
+    float radius{64.0f};
+    float intensity{1.0f};
+    Vector2 offset{0.0f, 0.0f};
+};
+
 enum class PortalDirection {
     UP,
     DOWN,
@@ -145,6 +153,7 @@ struct SpawnData {
     int layer{0};
     std::optional<SpriteDesc> sprite;
     std::optional<ModelDesc> model;
+    std::optional<LightDesc> light;
     PhysicsConfig physics;
     InteractionConfig interaction;
     LdtkMetadata ldtk;
