@@ -9,6 +9,7 @@
 
 #include "Components/collisionRect.h"
 #include "Managers/object_m.h" // adjust include path if differs in project
+#include "Managers/particle_m.h"
 #include "Managers/raycam_m.h"
 #include "Managers/shader_m.h"
 #include "Objects/character.h"
@@ -273,6 +274,131 @@ static void drawCRTWindow() {
     ImGui::End();
 }
 
+static void drawParticleWindow()
+{
+  if (!ImGui::Begin("Particles Debug")) {
+    ImGui::End();
+    return;
+  }
+
+  Particle_m::Params& params = Particle_m::params();
+  ImGui::Text("Particules actives: %d", Particle_m::activeCount());
+
+  ImGui::Checkbox("Enabled", &params.enabled);
+  ImGui::SameLine();
+  if (ImGui::Button("Clear")) {
+    Particle_m::clear();
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Reset")) {
+    Particle_m::resetParams();
+  }
+
+  ImGui::SeparatorText("Global");
+  ImGui::SliderFloat("Density", &params.density, 0.0f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Size", &params.sizeScale, 0.10f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Lifetime", &params.lifetimeScale, 0.05f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Dust speed", &params.dustSpeedScale, 0.0f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Water speed", &params.waterSpeedScale, 0.0f, 4.0f, "%.2f");
+  ImGui::SliderFloat("Gravity scale", &params.gravityScale, 0.0f, 4.0f, "%.2f");
+
+  ImGui::SeparatorText("Triggers");
+  ImGui::SliderFloat("Land min fall speed", &params.landDustMinFallSpeed, 0.0f, 500.0f, "%.0f");
+  ImGui::SliderFloat("Water min fall speed", &params.waterSplashMinFallSpeed, 0.0f, 500.0f, "%.0f");
+  ImGui::SliderFloat("Still water grace", &params.stillWaterTouchGrace, 0.0f, 0.25f, "%.3fs");
+  ImGui::SliderFloat("Splash cooldown", &params.waterSplashCooldown, 0.0f, 1.0f, "%.3fs");
+  ImGui::SliderFloat("Waterfall cooldown", &params.waterfallTouchCooldown, 0.0f, 0.5f, "%.3fs");
+
+  ImGui::SeparatorText("Counts");
+  ImGui::SliderInt("Jump dust", &params.jumpDustCount, 0, 64);
+  ImGui::SliderInt("Land base", &params.landDustBaseCount, 0, 64);
+  ImGui::SliderInt("Land strength", &params.landDustStrengthCount, 0, 64);
+  ImGui::SliderInt("Splash base", &params.splashBaseCount, 0, 80);
+  ImGui::SliderInt("Splash strength", &params.splashStrengthCount, 0, 80);
+  ImGui::SliderInt("Waterfall touch", &params.waterfallTouchCount, 0, 64);
+
+  ImGui::SeparatorText("Colors");
+  drawColorControl("Dust", params.dustColor);
+  drawColorControl("Dust highlight", params.dustHighlightColor);
+  drawColorControl("Water", params.waterColor);
+  drawColorControl("Foam", params.foamColor);
+
+  if (auto *player = findPlayer()) {
+    ImGui::SeparatorText("Test");
+    Rectangle body = player->getRect();
+    GravityDirection gravityDir = player->body_ ? player->body_->getGravityDirection() : GravityDirection::DOWN;
+    if (ImGui::Button("Emit jump dust")) {
+      Particle_m::emitJumpDust(body, gravityDir);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Emit land dust")) {
+      Particle_m::emitLandDust(body, gravityDir, 1.2f);
+    }
+    if (ImGui::Button("Emit splash")) {
+      Particle_m::emitWaterSplash(body, body, gravityDir, 1.2f);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button("Emit waterfall touch")) {
+      Particle_m::emitWaterfallTouch(body, body);
+    }
+  }
+
+  ImGui::End();
+}
+
+static void drawStillWaterWindow()
+{
+  static const char* saveStatus = "";
+
+  if (!ImGui::Begin("Water Debug")) {
+    ImGui::End();
+    return;
+  }
+
+  Shader_m::WaterParams& params = Shader_m::waterParams();
+  if (ImGui::Button("Save parameters")) {
+    saveStatus = Shader_m::saveWaterParams() ? "Saved water_params.json" : "Save failed";
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Load parameters")) {
+    saveStatus = Shader_m::loadWaterParams() ? "Loaded water_params.json" : "Load failed";
+  }
+  if (saveStatus[0] != '\0') {
+    ImGui::TextUnformatted(saveStatus);
+  }
+
+  if (ImGui::Button("Reset water")) {
+    Shader_m::resetWaterParams();
+    saveStatus = "";
+  }
+
+  ImGui::SeparatorText("Still Water");
+  ImGui::SliderFloat("Shift amplitude", &params.stillReflectionShiftAmplitude, 0.0f, 16.0f, "%.2f");
+  ImGui::SliderFloat("Ripple slow scale", &params.stillRippleSlowScale, 0.0f, 3.0f, "%.3f");
+  ImGui::SliderFloat("Ripple fast scale", &params.stillRippleFastScale, 0.0f, 4.0f, "%.3f");
+  ImGui::SliderFloat("Ripple slow speed", &params.stillRippleSlowSpeed, -12.0f, 12.0f, "%.2f");
+  ImGui::SliderFloat("Ripple fast speed", &params.stillRippleFastSpeed, -18.0f, 18.0f, "%.2f");
+  ImGui::SliderFloat("Ripple slow weight", &params.stillRippleSlowWeight, -2.0f, 2.0f, "%.2f");
+  ImGui::SliderFloat("Ripple fast weight", &params.stillRippleFastWeight, -2.0f, 2.0f, "%.2f");
+  ImGui::SliderFloat("Mirror line offset", &params.stillReflectionLineOffset, 0.0f, 8.0f, "%.2f");
+
+  ImGui::SeparatorText("Colors");
+  drawColorControl("Occlusion", params.stillOcclusionColor);
+
+  ImGui::SeparatorText("Waterfall");
+  ImGui::SliderFloat("Column shift", &params.waterfallShiftAmplitude, 0.0f, 16.0f, "%.2f");
+  ImGui::SliderFloat("Column segment height", &params.waterfallSegmentHeight, 1.0f, 32.0f, "%.2f");
+  ImGui::SliderFloat("Fall speed", &params.waterfallFlowSpeed, 0.0f, 220.0f, "%.1f");
+  ImGui::SliderFloat("Line spacing", &params.waterfallLineSpacing, 1.0f, 24.0f, "%.2f");
+  ImGui::SliderFloat("Line width", &params.waterfallLineWidth, 0.5f, 6.0f, "%.2f");
+  ImGui::SliderFloat("Line length", &params.waterfallLineLength, 1.0f, 48.0f, "%.2f");
+  ImGui::SliderFloat("Line period", &params.waterfallLinePeriod, 2.0f, 80.0f, "%.2f");
+  ImGui::SliderFloat("Line intensity", &params.waterfallLineIntensity, 0.0f, 1.0f, "%.2f");
+  ImGui::DragFloat("Line seed", &params.waterfallLineRandomSeed, 0.1f, -1000.0f, 1000.0f, "%.1f");
+
+  ImGui::End();
+}
+
 static void drawPlayerWindow()
 {
   if (ImGui::Begin("Player Debug")) {
@@ -314,7 +440,9 @@ void DrawWindows() {
     // drawPlayerWindow();
     // drawVisibleModelWindow();
     // drawGlitchSpriteWindow();
-    // drawCRTWindow();
+    drawCRTWindow();
+    // drawParticleWindow();
+    drawStillWaterWindow();
 }
 
 } // namespace ImGuiLayer

@@ -27,12 +27,40 @@ std::unordered_map<std::string, std::filesystem::file_time_type> Shader_m::fileT
 
 namespace {
 constexpr const char* CRT_PARAMS_PATH = "crt_params.json";
+constexpr const char* WATER_PARAMS_PATH = "water_params.json";
 bool crtParamsLoaded = false;
+bool waterParamsLoaded = false;
 
 float readFloat(const json& j, const char* key, float fallback) {
     if (!j.contains(key) || !j[key].is_number()) return fallback;
     return j[key].get<float>();
 }
+
+json colorToJson(Color color) {
+    return {
+        {"r", static_cast<int>(color.r)},
+        {"g", static_cast<int>(color.g)},
+        {"b", static_cast<int>(color.b)},
+        {"a", static_cast<int>(color.a)}
+    };
+}
+
+unsigned char readByte(const json& j, const char* key, unsigned char fallback) {
+    if (!j.contains(key) || !j[key].is_number_integer()) return fallback;
+    return static_cast<unsigned char>(std::clamp(j[key].get<int>(), 0, 255));
+}
+
+Color readColor(const json& j, const char* key, Color fallback) {
+    if (!j.contains(key) || !j[key].is_object()) return fallback;
+    const json& value = j[key];
+    return {
+        readByte(value, "r", fallback.r),
+        readByte(value, "g", fallback.g),
+        readByte(value, "b", fallback.b),
+        readByte(value, "a", fallback.a)
+    };
+}
+
 } // namespace
 
 Shader_m::CRTParams& Shader_m::crtParams() {
@@ -40,8 +68,17 @@ Shader_m::CRTParams& Shader_m::crtParams() {
     return params;
 }
 
+Shader_m::WaterParams& Shader_m::waterParams() {
+    static WaterParams params;
+    return params;
+}
+
 void Shader_m::resetCRTParams() {
     crtParams() = CRTParams{};
+}
+
+void Shader_m::resetWaterParams() {
+    waterParams() = WaterParams{};
 }
 
 bool Shader_m::saveCRTParams() {
@@ -127,6 +164,68 @@ bool Shader_m::loadCRTParams() {
     }
 }
 
+bool Shader_m::saveWaterParams() {
+    const WaterParams& params = waterParams();
+    json j = {
+        {"stillReflectionShiftAmplitude", params.stillReflectionShiftAmplitude},
+        {"stillRippleSlowScale", params.stillRippleSlowScale},
+        {"stillRippleFastScale", params.stillRippleFastScale},
+        {"stillRippleSlowSpeed", params.stillRippleSlowSpeed},
+        {"stillRippleFastSpeed", params.stillRippleFastSpeed},
+        {"stillRippleSlowWeight", params.stillRippleSlowWeight},
+        {"stillRippleFastWeight", params.stillRippleFastWeight},
+        {"stillReflectionLineOffset", params.stillReflectionLineOffset},
+        {"stillOcclusionColor", colorToJson(params.stillOcclusionColor)},
+        {"waterfallShiftAmplitude", params.waterfallShiftAmplitude},
+        {"waterfallSegmentHeight", params.waterfallSegmentHeight},
+        {"waterfallFlowSpeed", params.waterfallFlowSpeed},
+        {"waterfallLineSpacing", params.waterfallLineSpacing},
+        {"waterfallLineWidth", params.waterfallLineWidth},
+        {"waterfallLineLength", params.waterfallLineLength},
+        {"waterfallLinePeriod", params.waterfallLinePeriod},
+        {"waterfallLineIntensity", params.waterfallLineIntensity},
+        {"waterfallLineRandomSeed", params.waterfallLineRandomSeed},
+    };
+
+    std::ofstream f(WATER_PARAMS_PATH, std::ios::trunc);
+    if (!f.good()) return false;
+    f << j.dump(2);
+    return f.good();
+}
+
+bool Shader_m::loadWaterParams() {
+    std::ifstream f(WATER_PARAMS_PATH);
+    if (!f.good()) return false;
+
+    try {
+        json j;
+        f >> j;
+        WaterParams& params = waterParams();
+        params.stillReflectionShiftAmplitude = readFloat(j, "stillReflectionShiftAmplitude", params.stillReflectionShiftAmplitude);
+        params.stillRippleSlowScale = readFloat(j, "stillRippleSlowScale", params.stillRippleSlowScale);
+        params.stillRippleFastScale = readFloat(j, "stillRippleFastScale", params.stillRippleFastScale);
+        params.stillRippleSlowSpeed = readFloat(j, "stillRippleSlowSpeed", params.stillRippleSlowSpeed);
+        params.stillRippleFastSpeed = readFloat(j, "stillRippleFastSpeed", params.stillRippleFastSpeed);
+        params.stillRippleSlowWeight = readFloat(j, "stillRippleSlowWeight", params.stillRippleSlowWeight);
+        params.stillRippleFastWeight = readFloat(j, "stillRippleFastWeight", params.stillRippleFastWeight);
+        params.stillReflectionLineOffset = readFloat(j, "stillReflectionLineOffset", params.stillReflectionLineOffset);
+        params.stillOcclusionColor = readColor(j, "stillOcclusionColor", params.stillOcclusionColor);
+        params.waterfallShiftAmplitude = readFloat(j, "waterfallShiftAmplitude", params.waterfallShiftAmplitude);
+        params.waterfallSegmentHeight = readFloat(j, "waterfallSegmentHeight", params.waterfallSegmentHeight);
+        params.waterfallFlowSpeed = readFloat(j, "waterfallFlowSpeed", params.waterfallFlowSpeed);
+        if (params.waterfallFlowSpeed < 0.0f) params.waterfallFlowSpeed = -params.waterfallFlowSpeed;
+        params.waterfallLineSpacing = readFloat(j, "waterfallLineSpacing", params.waterfallLineSpacing);
+        params.waterfallLineWidth = readFloat(j, "waterfallLineWidth", params.waterfallLineWidth);
+        params.waterfallLineLength = readFloat(j, "waterfallLineLength", params.waterfallLineLength);
+        params.waterfallLinePeriod = readFloat(j, "waterfallLinePeriod", params.waterfallLinePeriod);
+        params.waterfallLineIntensity = readFloat(j, "waterfallLineIntensity", params.waterfallLineIntensity);
+        params.waterfallLineRandomSeed = readFloat(j, "waterfallLineRandomSeed", params.waterfallLineRandomSeed);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 static RenderTexture2D loadPointRenderTexture(int width, int height) {
     RenderTexture2D target = LoadRenderTexture(width, height);
     if (target.id) {
@@ -176,6 +275,10 @@ void Shader_m::load(const std::filesystem::path& dir) {
     if (!crtParamsLoaded) {
         loadCRTParams();
         crtParamsLoaded = true;
+    }
+    if (!waterParamsLoaded) {
+        loadWaterParams();
+        waterParamsLoaded = true;
     }
     unload();
     lastW_ = NATIVE_RES_WIDTH;
@@ -428,6 +531,43 @@ static void drawTextureLetterboxed(Texture2D tex, int targetW, int targetH) {
     DrawTexturePro(tex, src, dst, {0,0}, 0.0f, WHITE);
 }
 
+static void setFloatUniform(Shader shader, const char* name, float value) {
+    int loc = GetShaderLocation(shader, name);
+    if (loc >= 0) SetShaderValue(shader, loc, &value, SHADER_UNIFORM_FLOAT);
+}
+
+static void setColorUniform(Shader shader, const char* name, Color color) {
+    float value[3] = {
+        static_cast<float>(color.r) / 255.0f,
+        static_cast<float>(color.g) / 255.0f,
+        static_cast<float>(color.b) / 255.0f
+    };
+    int loc = GetShaderLocation(shader, name);
+    if (loc >= 0) SetShaderValue(shader, loc, value, SHADER_UNIFORM_VEC3);
+}
+
+static void uploadWaterParams(Shader shader) {
+    Shader_m::WaterParams& params = Shader_m::waterParams();
+    setFloatUniform(shader, "stillReflectionShiftAmplitude", params.stillReflectionShiftAmplitude);
+    setFloatUniform(shader, "stillRippleSlowScale", params.stillRippleSlowScale);
+    setFloatUniform(shader, "stillRippleFastScale", params.stillRippleFastScale);
+    setFloatUniform(shader, "stillRippleSlowSpeed", params.stillRippleSlowSpeed);
+    setFloatUniform(shader, "stillRippleFastSpeed", params.stillRippleFastSpeed);
+    setFloatUniform(shader, "stillRippleSlowWeight", params.stillRippleSlowWeight);
+    setFloatUniform(shader, "stillRippleFastWeight", params.stillRippleFastWeight);
+    setFloatUniform(shader, "stillReflectionLineOffset", params.stillReflectionLineOffset);
+
+    setFloatUniform(shader, "waterfallShiftAmplitude", params.waterfallShiftAmplitude);
+    setFloatUniform(shader, "waterfallSegmentHeight", params.waterfallSegmentHeight);
+    setFloatUniform(shader, "waterfallFlowSpeed", params.waterfallFlowSpeed);
+    setFloatUniform(shader, "waterfallLineSpacing", params.waterfallLineSpacing);
+    setFloatUniform(shader, "waterfallLineWidth", params.waterfallLineWidth);
+    setFloatUniform(shader, "waterfallLineLength", params.waterfallLineLength);
+    setFloatUniform(shader, "waterfallLinePeriod", params.waterfallLinePeriod);
+    setFloatUniform(shader, "waterfallLineIntensity", params.waterfallLineIntensity);
+    setFloatUniform(shader, "waterfallLineRandomSeed", params.waterfallLineRandomSeed);
+}
+
 static Rectangle nativeRectToPostScaled(Rectangle r, Texture2D postTex) {
     Rectangle dst = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, postTex.width, postTex.height);
     float scaleX = dst.width / (float)NATIVE_RES_WIDTH;
@@ -541,10 +681,9 @@ Texture2D Shader_m::applyQueue(Texture2D base) {
                             if (loc >= 0) SetShaderValue(sh, loc, &cameraZoom, SHADER_UNIFORM_FLOAT);
                             loc = GetShaderLocation(sh, "waterKind");
                             if (loc >= 0) SetShaderValue(sh, loc, &waterKind, SHADER_UNIFORM_FLOAT);
+                            uploadWaterParams(sh);
 
-                            BeginScissorMode((int)sr.x, (int)sr.y, (int)sr.width, (int)sr.height);
-                                DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
-                            EndScissorMode();
+                            DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
                             EndShaderMode();
                         }
                     }

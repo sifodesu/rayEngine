@@ -124,6 +124,14 @@ void Water::beginFrame() {
     visibleSurfaces.clear();
 }
 
+void Water::drawOcclusionMasks() {
+    const Color color = Shader_m::waterParams().stillOcclusionColor;
+    for (const WaterSurface& surface : visibleSurfaces) {
+        if (surface.kind != WaterVisualKind::Still) continue;
+        DrawRectangleRec(surface.rect, color);
+    }
+}
+
 void Water::flushRefractionPasses() {
     std::vector<WaterSurface> still;
     std::vector<WaterSurface> waterfalls;

@@ -19,6 +19,7 @@
 #include "collisionRect.h"
 #include "portal.h"
 #include "water.h"
+#include "particle_m.h"
 #include "sprite.h"
 #include "sprite_m.h"
 #include "model_m.h"
@@ -119,6 +120,7 @@ void Engine::game_loop()
         Shader_m::begin();
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});
             Object_m::routine();
+            Particle_m::update(static_cast<float>(Clock::getLap()));
             Raycam_m::getRayCam().routine();
             render();
         Shader_m::end();
@@ -229,6 +231,10 @@ void Engine::render()
             rendered3DLayer = true;
         }
     }
+
+    begin2D();
+    Water::drawOcclusionMasks();
+    Particle_m::draw();
 
     if (showCollisionBoxes) {
         begin2D();

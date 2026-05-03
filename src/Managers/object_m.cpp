@@ -19,6 +19,7 @@
 #include "projectile.h"
 #include "modelEnt.h"
 #include "water.h"
+#include "particle_m.h"
 
 using namespace std;
 
@@ -187,6 +188,7 @@ void Object_m::unload()
     Portal::clearTransits();
     Portal::releaseAllDisabledTiles();
     Water::clear();
+    Particle_m::clear();
     level_ents_.clear();
     level_tiles_.clear();
 }

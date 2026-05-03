@@ -1,0 +1,25 @@
+{
+  "stillOcclusionColor": {
+    "a": 255,
+    "b": 0,
+    "g": 0,
+    "r": 0
+  },
+  "stillReflectionLineOffset": 1.0,
+  "stillReflectionShiftAmplitude": 4.0,
+  "stillRippleFastScale": 0.9100000262260437,
+  "stillRippleFastSpeed": -4.400000095367432,
+  "stillRippleFastWeight": 0.30000001192092896,
+  "stillRippleSlowScale": 0.4300000071525574,
+  "stillRippleSlowSpeed": 2.0999999046325684,
+  "stillRippleSlowWeight": 0.699999988079071,
+  "waterfallFlowSpeed": 135.89999389648438,
+  "waterfallLineIntensity": 0.7799999713897705,
+  "waterfallLineLength": 13.0,
+  "waterfallLinePeriod": 28.0,
+  "waterfallLineRandomSeed": 13.699999809265137,
+  "waterfallLineSpacing": 5.0,
+  "waterfallLineWidth": 0.5,
+  "waterfallSegmentHeight": 8.0,
+  "waterfallShiftAmplitude": 3.0
+}

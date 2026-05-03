@@ -40,6 +40,29 @@ public:
         float bloomPower{2.0f};
     };
 
+    struct WaterParams {
+        float stillReflectionShiftAmplitude{4.0f};
+        float stillRippleSlowScale{0.43f};
+        float stillRippleFastScale{0.91f};
+        float stillRippleSlowSpeed{2.1f};
+        float stillRippleFastSpeed{-4.4f};
+        float stillRippleSlowWeight{0.70f};
+        float stillRippleFastWeight{0.30f};
+        float stillReflectionLineOffset{1.0f};
+
+        Color stillOcclusionColor{0, 0, 0, 255};
+
+        float waterfallShiftAmplitude{3.0f};
+        float waterfallSegmentHeight{8.0f};
+        float waterfallFlowSpeed{72.0f};
+        float waterfallLineSpacing{5.0f};
+        float waterfallLineWidth{1.0f};
+        float waterfallLineLength{13.0f};
+        float waterfallLinePeriod{28.0f};
+        float waterfallLineIntensity{0.78f};
+        float waterfallLineRandomSeed{13.7f};
+    };
+
     static void load(const std::filesystem::path& dir = std::filesystem::path("Data")/"Shaders");
     static void unload();
     static void reload();
@@ -61,6 +84,10 @@ public:
     static void resetCRTParams();
     static bool saveCRTParams();
     static bool loadCRTParams();
+    static WaterParams& waterParams();
+    static void resetWaterParams();
+    static bool saveWaterParams();
+    static bool loadWaterParams();
 
 private:
     struct ShaderPair { std::filesystem::path vs; std::filesystem::path fs; };

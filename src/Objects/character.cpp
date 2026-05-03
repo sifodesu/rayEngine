@@ -1,4 +1,8 @@
 #include "character.h"
+
+#include <algorithm>
+#include <cmath>
+
 #include "raymath.h"
 #include "input.h"
 #include "raycam_m.h"
@@ -11,8 +15,35 @@
 #include "definitions.h"
 #include "portal.h"
 #include "oneWayPlatform.h"
+#include "particle_m.h"
+#include "water.h"
 
 static constexpr float CHARACTER_DASH_FACTOR_BASE = 4.0f; // base before adi scaling
+
+namespace {
+
+float fallSpeedAlongGravity(RigidBody* body) {
+    if (!body) return 0.0f;
+
+    Vector2 speed = body->getSpeed();
+    switch (body->getGravityDirection()) {
+        case GravityDirection::DOWN:
+            return speed.y;
+        case GravityDirection::UP:
+            return -speed.y;
+        case GravityDirection::LEFT:
+            return -speed.x;
+        case GravityDirection::RIGHT:
+            return speed.x;
+    }
+    return 0.0f;
+}
+
+float impactStrength(float fallSpeed, float threshold) {
+    return std::clamp((fallSpeed - threshold) / 220.0f + 0.65f, 0.65f, 1.85f);
+}
+
+} // namespace
 
 Character::Character(const SpawnData& data) : GObject(data.id) {
     CollisionDesc col = data.physics.collision.value_or(CollisionDesc{});
@@ -57,6 +88,7 @@ float Character::currentDashFactor() const {
 
 void Character::routine() {
     double delta = Clock::getLap();
+    wasTouchingStillWater_ = GetTime() - lastStillWaterTouchAt_ <= Particle_m::params().stillWaterTouchGrace;
     dashing_ -= delta;
     
     // Collision separation - push character out if embedded in solid objects
@@ -74,8 +106,17 @@ void Character::routine() {
         updateHitboxRotation();
     }
 
+    const bool groundedAtStart = isOnGround();
+    const bool hadGroundState = groundStateInitialized_;
+    const float fallSpeedBeforeBody = fallSpeedAlongGravity(rigidBody);
+    lastFallSpeedBeforeMove_ = fallSpeedBeforeBody;
+    if (!groundStateInitialized_) {
+        wasGrounded_ = groundedAtStart;
+        groundStateInitialized_ = true;
+    }
+
     // Reset jump counter if we are on the ground
-    if (isOnGround()) {
+    if (groundedAtStart) {
         jumps_ = 2;
     } else {
         jumps_ = std::min(jumps_, 1);
@@ -102,6 +143,9 @@ void Character::routine() {
         // Jump direction depends on gravity direction
         if (InputMap::checkPressed("r1") && jumps_ > 0) {
             float jumpSpeed = currentJumpSpeed();
+            if (groundedAtStart) {
+                Particle_m::emitJumpDust(body_->getSurface(), gravityDir);
+            }
             switch (gravityDir) {
                 case GravityDirection::DOWN:
                     body_->setSpeed({ bodySpeed.x, -jumpSpeed}); // Jump up
@@ -309,6 +353,12 @@ void Character::routine() {
     body_->routine();
 
     bodySpeed = body_->getSpeed();
+    const bool groundedAfterBody = isOnGround();
+    const float landDustMinFallSpeed = Particle_m::params().landDustMinFallSpeed;
+    if (hadGroundState && !wasGrounded_ && groundedAfterBody && fallSpeedBeforeBody > landDustMinFallSpeed) {
+        Particle_m::emitLandDust(body_->getSurface(), gravityDir, impactStrength(fallSpeedBeforeBody, landDustMinFallSpeed));
+    }
+    wasGrounded_ = groundedAfterBody;
 
     if (bodySpeed.x == 0 && bodySpeed.y == 0) {
         dashing_ = 0;
@@ -445,12 +495,52 @@ void Character::collectDebugSprites(std::vector<Sprite*>& sprites) {
     }
 }
 
+void Character::onCollision(GObject* other) {
+    Water* water = dynamic_cast<Water*>(other);
+    if (!water || !body_) return;
+
+    Particle_m::Params& particleParams = Particle_m::params();
+    RigidBody* rigidBody = dynamic_cast<RigidBody*>(body_);
+    GravityDirection gravityDir = rigidBody ? rigidBody->getGravityDirection() : GravityDirection::DOWN;
+    const double now = GetTime();
+
+    if (water->getKind() == WaterVisualKind::Waterfall) {
+        if (now - lastWaterfallTouchAt_ >= particleParams.waterfallTouchCooldown) {
+            Particle_m::emitWaterfallTouch(body_->getSurface(), water->getRect());
+            lastWaterfallTouchAt_ = now;
+        }
+        return;
+    }
+
+    const bool enteringStillWater = !wasTouchingStillWater_;
+    lastStillWaterTouchAt_ = now;
+
+    const float fallSpeed = std::max(fallSpeedAlongGravity(rigidBody), lastFallSpeedBeforeMove_);
+    if (enteringStillWater &&
+        fallSpeed > particleParams.waterSplashMinFallSpeed &&
+        now - lastWaterSplashAt_ >= particleParams.waterSplashCooldown) {
+        Particle_m::emitWaterSplash(
+            body_->getSurface(),
+            water->getRect(),
+            gravityDir,
+            impactStrength(fallSpeed, particleParams.waterSplashMinFallSpeed));
+        lastWaterSplashAt_ = now;
+    }
+}
+
 void Character::respawn() {
     if (body_) {
         body_->setCoord(respawnPos_);
         body_->setSpeed({0,0});
         jumps_ = 0; // reset on respawn
         dashCooldownLeft_ = 0; // dash immediately available on respawn
+        groundStateInitialized_ = false;
+        wasGrounded_ = false;
+        wasTouchingStillWater_ = false;
+        lastStillWaterTouchAt_ = -1000.0;
+        lastFallSpeedBeforeMove_ = 0.0f;
+        lastWaterSplashAt_ = -1000.0;
+        lastWaterfallTouchAt_ = -1000.0;
     }
 }
 

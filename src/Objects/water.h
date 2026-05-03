@@ -17,8 +17,10 @@ public:
     void drawAtBody(Rectangle bodyRect) override;
     Rectangle getRect() override;
     CollisionRect* getCollisionBody() override { return body_; }
+    WaterVisualKind getKind() const { return kind_; }
 
     static void beginFrame();
+    static void drawOcclusionMasks();
     static void flushRefractionPasses();
     static void clear();
 

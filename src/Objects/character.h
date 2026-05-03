@@ -13,6 +13,7 @@ public:
     void routine();
     void draw();
     void drawAtBody(Rectangle bodyRect) override;
+    void onCollision(GObject* other) override;
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }
     void collectDebugSprites(std::vector<Sprite*>& sprites) override;
@@ -72,6 +73,13 @@ private:
 
     bool cancelJump_ = false; // if true, cut jump short on next routine (for variable jump height
     bool jumpHeld_ = false; // track if jump button is held across frames
+    bool groundStateInitialized_ = false;
+    bool wasGrounded_ = false;
+    bool wasTouchingStillWater_ = false;
+    double lastStillWaterTouchAt_ = -1000.0;
+    float lastFallSpeedBeforeMove_ = 0.0f;
+    double lastWaterSplashAt_ = -1000.0;
+    double lastWaterfallTouchAt_ = -1000.0;
     
     // Original hitbox dimensions (for rotation)
     Vector2 originalHitboxDims_{0, 0};

@@ -15,6 +15,23 @@ uniform vec2 cameraTarget;
 uniform vec2 cameraOffset;
 uniform float cameraZoom;
 uniform float waterKind;
+uniform float stillReflectionShiftAmplitude;
+uniform float stillRippleSlowScale;
+uniform float stillRippleFastScale;
+uniform float stillRippleSlowSpeed;
+uniform float stillRippleFastSpeed;
+uniform float stillRippleSlowWeight;
+uniform float stillRippleFastWeight;
+uniform float stillReflectionLineOffset;
+uniform float waterfallShiftAmplitude;
+uniform float waterfallSegmentHeight;
+uniform float waterfallFlowSpeed;
+uniform float waterfallLineSpacing;
+uniform float waterfallLineWidth;
+uniform float waterfallLineLength;
+uniform float waterfallLinePeriod;
+uniform float waterfallLineIntensity;
+uniform float waterfallLineRandomSeed;
 
 out vec4 finalColor;
 
@@ -24,19 +41,6 @@ float hash12(vec2 p) {
     return fract((p3.x + p3.y) * p3.z);
 }
 
-float valueNoise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
-    vec2 u = f * f * (3.0 - 2.0 * f);
-
-    float a = hash12(i);
-    float b = hash12(i + vec2(1.0, 0.0));
-    float c = hash12(i + vec2(0.0, 1.0));
-    float d = hash12(i + vec2(1.0, 1.0));
-
-    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
-}
-
 vec4 sampleSafe(vec2 uv) {
     if (uv.x < 0.0 || uv.y < 0.0 || uv.x > 1.0 || uv.y > 1.0) {
         return vec4(0.0);
@@ -44,9 +48,17 @@ vec4 sampleSafe(vec2 uv) {
     return texture(texture0, uv);
 }
 
+bool uvInside(vec2 uv) {
+    return uv.x >= 0.0 && uv.y >= 0.0 && uv.x <= 1.0 && uv.y <= 1.0;
+}
+
 vec2 uvToNativePx(vec2 uv) {
     vec2 screenPx = vec2(uv.x, 1.0 - uv.y) * resolution;
     return ((screenPx - displayRect.xy) / max(displayRect.zw, vec2(1.0))) * nativeResolution;
+}
+
+vec2 nativePixelCenter(vec2 nativePx) {
+    return floor(nativePx) + vec2(0.5);
 }
 
 vec2 nativeDeltaToUv(vec2 deltaPx) {
@@ -63,7 +75,8 @@ vec2 worldToNativePx(vec2 world) {
 }
 
 vec2 nativePxToUv(vec2 nativePx) {
-    vec2 screenPx = displayRect.xy + (nativePx / max(nativeResolution, vec2(1.0))) * displayRect.zw;
+    vec2 snappedNativePx = nativePixelCenter(nativePx);
+    vec2 screenPx = displayRect.xy + (snappedNativePx / max(nativeResolution, vec2(1.0))) * displayRect.zw;
     vec2 screenUv = screenPx / max(resolution, vec2(1.0));
     return vec2(screenUv.x, 1.0 - screenUv.y);
 }
@@ -72,65 +85,83 @@ vec2 worldToUv(vec2 world) {
     return nativePxToUv(worldToNativePx(world));
 }
 
+bool insideWaterRect(vec2 local) {
+    return local.x >= 0.0 && local.y >= 0.0 && local.x < waterRect.z && local.y < waterRect.w;
+}
+
 float snapPixel(float value) {
     return sign(value) * floor(abs(value) + 0.5);
 }
 
 float verticalPixelLineShift(vec2 local, float amplitude, float segmentHeight, float speed) {
     float line = floor(local.x);
-    float flow = local.y + time * speed;
-    float segment = floor(flow / max(segmentHeight, 1.0));
-    float segmentPhase = fract(flow / max(segmentHeight, 1.0));
+    float segmentSize = max(segmentHeight, 1.0);
+    float flow = local.y - time * abs(speed);
+    float segment = floor(flow / segmentSize);
+    float segmentPhase = fract(flow / segmentSize);
     float a = hash12(vec2(line, segment));
     float b = hash12(vec2(line, segment + 1.0));
     float n = mix(a, b, smoothstep(0.0, 1.0, segmentPhase));
-    float bend = sin(flow * 0.21 + a * 6.2831853) * 0.55;
-    return snapPixel((n * 2.0 - 1.0) * amplitude + bend);
+    return snapPixel((n * 2.0 - 1.0) * amplitude);
 }
 
-float horizontalReflectionLineShift(vec2 local, float amplitude) {
+float horizontalReflectionLineShift(vec2 local) {
     float line = floor(local.y);
-    float slow = sin(line * 0.43 + time * 2.1);
-    float fast = sin(line * 0.91 - time * 4.4);
-    return snapPixel((slow * 0.70 + fast * 0.30) * amplitude);
+    float slow = sin(line * stillRippleSlowScale + time * stillRippleSlowSpeed);
+    float fast = sin(line * stillRippleFastScale + time * stillRippleFastSpeed);
+    return snapPixel((slow * stillRippleSlowWeight + fast * stillRippleFastWeight) * stillReflectionShiftAmplitude);
 }
 
 vec3 stillWater(vec2 uv, vec2 world, vec2 local) {
-    float reflectedLine = floor(local.y) + 1.0;
-    float shift = horizontalReflectionLineShift(local, 4.0);
+    float reflectedLine = floor(local.y) + stillReflectionLineOffset;
+    float shift = horizontalReflectionLineShift(local);
 
     vec2 reflectedWorld = vec2(world.x - shift, waterRect.y - reflectedLine);
-    return sampleSafe(worldToUv(reflectedWorld)).rgb;
+    vec2 reflectedUv = worldToUv(reflectedWorld);
+
+    if (!uvInside(reflectedUv) || reflectedWorld.y >= waterRect.y) {
+        return texture(texture0, uv).rgb;
+    }
+
+    return texture(texture0, reflectedUv).rgb;
 }
 
-vec3 waterfall(vec2 uv, vec2 world, vec2 local) {
-    float shift = verticalPixelLineShift(local, 4.0, 7.0, -86.0);
+float fallingWhiteLines(vec2 local) {
+    float spacing = max(waterfallLineSpacing, 1.0);
+    float width = max(waterfallLineWidth, 0.5);
+    float period = max(waterfallLinePeriod, 1.0);
+    float length = clamp(waterfallLineLength, 1.0, period);
+    float lane = floor(local.x / spacing);
+    float laneRandom = hash12(vec2(lane, waterfallLineRandomSeed));
+    float laneX = fract(local.x / spacing) * spacing;
+    float lineCenter = spacing * 0.5 + (laneRandom - 0.5) * max(spacing - width, 0.0) * 0.35;
+    float xMask = 1.0 - smoothstep(width * 0.5, width * 0.5 + 0.5, abs(laneX - lineCenter));
+
+    float dashY = fract((local.y - time * abs(waterfallFlowSpeed) + laneRandom * period) / period) * period;
+    float yMask = smoothstep(0.0, 1.0, dashY) * (1.0 - smoothstep(max(length - 1.0, 0.0), length, dashY));
+    return clamp(xMask * yMask * mix(0.55, 1.0, laneRandom) * waterfallLineIntensity, 0.0, 1.0);
+}
+
+vec3 waterfall(vec2 uv, vec2 local) {
+    float shift = verticalPixelLineShift(local, waterfallShiftAmplitude, waterfallSegmentHeight, waterfallFlowSpeed);
     vec3 refracted = sampleSafe(uv + nativeDeltaToUv(vec2(shift, 0.0))).rgb;
-
-    float height = max(waterRect.w, 1.0);
-    float bottom = smoothstep(0.68, 1.0, clamp(local.y / height, 0.0, 1.0));
-    float lane = floor(local.x / 3.0);
-    float laneRandom = hash12(vec2(lane, 13.7));
-    float laneCenter = fract(local.x / 3.0) - 0.5;
-    float laneMask = smoothstep(0.28, 0.04, abs(laneCenter));
-    float dashPeriod = 11.0 + laneRandom * 9.0;
-    float dashPhase = fract((local.y - time * (78.0 + laneRandom * 38.0) + laneRandom * dashPeriod) / dashPeriod);
-    float fallingDash = laneMask * smoothstep(0.02, 0.10, dashPhase) * (1.0 - smoothstep(0.28, 0.52, dashPhase));
-    float thread = smoothstep(0.70, 0.96, hash12(vec2(floor(local.x), floor(local.y * 0.18 - time * 12.0))));
-    float foam = thread * 0.10 + fallingDash * 0.62 + bottom * 0.22;
-
-    vec3 color = refracted * vec3(0.70, 0.92, 1.08) + vec3(0.0, 0.030, 0.055);
-    color += foam * vec3(0.17, 0.25, 0.29);
-    return color;
+    float lines = fallingWhiteLines(local);
+    return mix(refracted, vec3(1.0), lines);
 }
 
 void main() {
-    vec2 uv = fragTexCoord;
-    vec2 nativePx = uvToNativePx(uv);
+    vec2 rawUv = fragTexCoord;
+    vec2 nativePx = nativePixelCenter(uvToNativePx(rawUv));
+    vec2 uv = nativePxToUv(nativePx);
     vec2 world = nativeToWorld(nativePx);
     vec2 local = world - waterRect.xy;
 
-    vec3 color = waterKind > 0.5 ? waterfall(uv, world, local) : stillWater(uv, world, local);
+    if (!insideWaterRect(local)) {
+        finalColor = texture(texture0, rawUv) * colDiffuse * fragColor;
+        return;
+    }
+
+    vec3 color = waterKind > 0.5 ? waterfall(uv, local) : stillWater(uv, world, local);
 
     finalColor = vec4(clamp(color, 0.0, 1.0), 1.0) * colDiffuse * fragColor;
 }
