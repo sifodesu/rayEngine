@@ -89,6 +89,12 @@ float Character::currentDashFactor() const {
 void Character::routine() {
     double delta = Clock::getLap();
     wasTouchingStillWater_ = GetTime() - lastStillWaterTouchAt_ <= Particle_m::params().stillWaterTouchGrace;
+
+    if (dying_) {
+        updateDeathRespawn(delta);
+        return;
+    }
+
     dashing_ -= delta;
     
     // Collision separation - push character out if embedded in solid objects
@@ -480,11 +486,15 @@ Rectangle Character::spriteRectForBody(Rectangle bodyRect) const {
 }
 
 void Character::draw() {
+    if (!shouldDrawDuringDeath()) return;
+
     updateSpriteRotation();
     current_anim_->draw(spriteRectForBody(body_->getSurface()));
 }
 
 void Character::drawAtBody(Rectangle bodyRect) {
+    if (!shouldDrawDuringDeath()) return;
+
     updateSpriteRotation();
     current_anim_->draw(spriteRectForBody(bodyRect));
 }
@@ -529,9 +539,36 @@ void Character::onCollision(GObject* other) {
 }
 
 void Character::respawn() {
+    if (dying_) return;
+
+    if (body_) {
+        Portal::cancelTransit(this);
+        body_->setSpeed({0,0});
+        body_->setGravityEnabled(false);
+        dashing_ = 0.0;
+        jumpHeld_ = false;
+        dying_ = true;
+        deathElapsed_ = 0.0;
+    }
+}
+
+void Character::updateDeathRespawn(double delta) {
+    if (!body_) return;
+
+    body_->setSpeed({0, 0});
+    body_->setGravityEnabled(false);
+    deathElapsed_ += std::max(delta, 0.0);
+
+    if (deathElapsed_ >= deathRespawnDelay_) {
+        finishRespawn();
+    }
+}
+
+void Character::finishRespawn() {
     if (body_) {
         body_->setCoord(respawnPos_);
         body_->setSpeed({0,0});
+        body_->setGravityEnabled(true);
         jumps_ = 0; // reset on respawn
         dashCooldownLeft_ = 0; // dash immediately available on respawn
         groundStateInitialized_ = false;
@@ -542,6 +579,17 @@ void Character::respawn() {
         lastWaterSplashAt_ = -1000.0;
         lastWaterfallTouchAt_ = -1000.0;
     }
+
+    dashing_ = 0.0;
+    jumpHeld_ = false;
+    dying_ = false;
+    deathElapsed_ = 0.0;
+}
+
+bool Character::shouldDrawDuringDeath() const {
+    if (!dying_) return true;
+
+    return std::fmod(deathElapsed_, deathBlinkPeriod_) < deathBlinkPeriod_ * 0.5;
 }
 
 void Character::separateFromCollisions() {

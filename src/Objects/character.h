@@ -42,6 +42,9 @@ private:
     // Helpers
     bool isOnGround() const;
     void separateFromCollisions();
+    void updateDeathRespawn(double delta);
+    void finishRespawn();
+    bool shouldDrawDuringDeath() const;
 
     std::unordered_map<std::string, Sprite *> anims_;
     double dashing_;
@@ -80,6 +83,10 @@ private:
     float lastFallSpeedBeforeMove_ = 0.0f;
     double lastWaterSplashAt_ = -1000.0;
     double lastWaterfallTouchAt_ = -1000.0;
+    bool dying_ = false;
+    double deathElapsed_ = 0.0;
+    static constexpr double deathRespawnDelay_ = 1.0;
+    static constexpr double deathBlinkPeriod_ = 0.16;
     
     // Original hitbox dimensions (for rotation)
     Vector2 originalHitboxDims_{0, 0};
