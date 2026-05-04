@@ -146,10 +146,10 @@ void Water::flushRefractionPasses() {
         }
     }
 
-    for (const WaterSurface& surface : mergeStillWater(std::move(still))) {
+    for (const WaterSurface& surface : mergeWaterfalls(std::move(waterfalls))) {
         Shader_m::addWaterArea(surface.rect, static_cast<int>(surface.kind));
     }
-    for (const WaterSurface& surface : mergeWaterfalls(std::move(waterfalls))) {
+    for (const WaterSurface& surface : mergeStillWater(std::move(still))) {
         Shader_m::addWaterArea(surface.rect, static_cast<int>(surface.kind));
     }
 

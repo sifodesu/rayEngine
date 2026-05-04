@@ -22,6 +22,16 @@ public:
 
 private:
     static void deleteObj(int id);
+    static void eraseObj(int id);
+    static void updateActiveRoom();
+    static void resetRoom(Rectangle room);
+    static bool objectIsActive(GObject* obj, Rectangle room);
+    static bool spawnOverlapsRoom(const SpawnData& data, Rectangle room);
+    static bool isPlayerObject(GObject* obj);
+    static Rectangle roomFromPoint(Vector2 point);
+    static Rectangle active_room_;
+    static bool active_room_initialized_;
+    static std::map<int, SpawnData> initial_spawns_;
     static std::string level_name_;
     static int idCounter;
 };

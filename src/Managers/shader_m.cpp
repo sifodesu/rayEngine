@@ -719,17 +719,27 @@ Texture2D Shader_m::applyPasses(Texture2D base, const std::vector<Pass>& passes,
 void Shader_m::present() {
     ensureTargets();
 
+    std::vector<Pass> nativeRegularPasses;
+    std::vector<Pass> nativeWaterPasses;
     std::vector<Pass> nativePasses;
     std::vector<Pass> displayPasses;
+    nativeRegularPasses.reserve(queue_.size());
+    nativeWaterPasses.reserve(queue_.size());
     nativePasses.reserve(queue_.size());
     displayPasses.reserve(queue_.size());
     for (const Pass& pass : queue_) {
         if (pass.shader == "crt") {
             displayPasses.push_back(pass);
+        } else if (pass.type == Pass::WaterArea) {
+            // Water refraction must run after every other native pass so it can
+            // reflect the fully post-processed scene right before CRT.
+            nativeWaterPasses.push_back(pass);
         } else {
-            nativePasses.push_back(pass);
+            nativeRegularPasses.push_back(pass);
         }
     }
+    nativePasses.insert(nativePasses.end(), nativeRegularPasses.begin(), nativeRegularPasses.end());
+    nativePasses.insert(nativePasses.end(), nativeWaterPasses.begin(), nativeWaterPasses.end());
 
     Texture2D nativeTex = nativePasses.empty()
         ? sceneRT_.texture
