@@ -202,6 +202,17 @@ void Engine::render()
         in3D = true;
     };
 
+    auto endDrawModes = [&]() {
+        if (in3D) {
+            EndMode3D();
+            in3D = false;
+        }
+        if (in2D) {
+            EndMode2D();
+            in2D = false;
+        }
+    };
+
     begin2D();
     Ldtk_m::drawBackgrounds(Raycam_m::getRayCam().getRect());
 
@@ -222,6 +233,10 @@ void Engine::render()
             }
             Portal::drawTransitsForLayer(layer);
             for (Portal* portal : portals) portal->draw();
+
+            Water::drawOcclusionMasks();
+            endDrawModes();
+            Water::flushRefractionPasses();
         }
 
         if (!bucket.threed.empty()) {
@@ -235,7 +250,6 @@ void Engine::render()
     }
 
     begin2D();
-    Water::drawOcclusionMasks();
     Particle_m::draw();
     Light_m::drawDebug();
 
@@ -246,10 +260,7 @@ void Engine::render()
         }
     }
 
-    if (in3D) EndMode3D();
-    if (in2D) EndMode2D();
-
-    Water::flushRefractionPasses();
+    endDrawModes();
 }
 
 Engine::~Engine()

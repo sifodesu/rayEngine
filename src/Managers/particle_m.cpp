@@ -189,15 +189,6 @@ void emitSurfaceDust(Rectangle source, GravityDirection dir, int count, float st
     }
 }
 
-Rectangle overlapRect(Rectangle a, Rectangle b) {
-    const float x1 = std::max(a.x, b.x);
-    const float y1 = std::max(a.y, b.y);
-    const float x2 = std::min(a.x + a.width, b.x + b.width);
-    const float y2 = std::min(a.y + a.height, b.y + b.height);
-    if (x2 <= x1 || y2 <= y1) return {0.0f, 0.0f, 0.0f, 0.0f};
-    return {x1, y1, x2 - x1, y2 - y1};
-}
-
 } // namespace
 
 void Particle_m::update(float dt) {
@@ -299,35 +290,6 @@ void Particle_m::emitWaterSplash(Rectangle source, Rectangle waterRect, GravityD
         p.length = randRange(2.5f, 5.5f);
         p.color = pickWaterColor();
         p.style = (i % 3 == 0) ? ParticleStyle::Streak : ParticleStyle::Circle;
-        pushParticle(p);
-    }
-}
-
-void Particle_m::emitWaterfallTouch(Rectangle source, Rectangle waterfallRect) {
-    if (!particleParams.enabled) return;
-
-    Rectangle overlap = overlapRect(source, waterfallRect);
-    if (overlap.width <= 0.0f || overlap.height <= 0.0f) return;
-
-    const int count = scaledCount(particleParams.waterfallTouchCount);
-    for (int i = 0; i < count; ++i) {
-        Particle p{};
-        p.pos = {
-            randRange(overlap.x, overlap.x + overlap.width),
-            randRange(overlap.y, overlap.y + overlap.height)
-        };
-        p.vel = {
-            randRange(-42.0f, 42.0f) * particleParams.waterSpeedScale,
-            randRange(35.0f, 115.0f) * particleParams.waterSpeedScale
-        };
-        p.accel = {0.0f, 80.0f * particleParams.gravityScale};
-        p.age = 0.0f;
-        p.life = randRange(0.16f, 0.34f) * particleParams.lifetimeScale;
-        p.startSize = randRange(0.75f, 1.35f) * particleParams.sizeScale;
-        p.endSize = 0.1f;
-        p.length = randRange(3.0f, 8.0f);
-        p.color = pickWaterColor();
-        p.style = (i < 3) ? ParticleStyle::Streak : ParticleStyle::Circle;
         pushParticle(p);
     }
 }

@@ -82,7 +82,6 @@ private:
     double lastStillWaterTouchAt_ = -1000.0;
     float lastFallSpeedBeforeMove_ = 0.0f;
     double lastWaterSplashAt_ = -1000.0;
-    double lastWaterfallTouchAt_ = -1000.0;
     bool dying_ = false;
     double deathElapsed_ = 0.0;
     static constexpr double deathRespawnDelay_ = 1.0;

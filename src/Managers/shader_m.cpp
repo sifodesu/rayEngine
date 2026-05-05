@@ -392,6 +392,29 @@ void Shader_m::addWaterArea(Rectangle worldRect, int waterKind) {
     queue_.push_back({Pass::WaterArea, "water_refraction", worldRect, waterKind});
 }
 
+void Shader_m::applyWaterAreasToScene(const std::vector<std::pair<Rectangle, int>>& areas) {
+    if (areas.empty() || !has("water_refraction")) return;
+
+    ensureTargets();
+
+    std::vector<Pass> passes;
+    passes.reserve(areas.size());
+    for (const auto& [rect, waterKind] : areas) {
+        passes.push_back({Pass::WaterArea, "water_refraction", rect, waterKind});
+    }
+
+    // Layer-local water must be baked into the scene target before higher layers render.
+    EndTextureMode();
+    Texture2D waterTex = applyPasses(sceneRT_.texture, passes, nativePing_, nativePingIndex_);
+
+    BeginTextureMode(sceneRT_);
+        ClearBackground(BLACK);
+        DrawTextureRec(waterTex, {0, 0, (float)waterTex.width, -(float)waterTex.height}, {0, 0}, WHITE);
+    EndTextureMode();
+
+    BeginTextureMode(sceneRT_);
+}
+
 static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
 
 void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Texture2D source) {

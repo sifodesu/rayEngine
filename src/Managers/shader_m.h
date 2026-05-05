@@ -4,6 +4,7 @@
 #include <vector>
 #include <filesystem>
 #include <unordered_map>
+#include <utility>
 #include "raylib.h"
 
 class Shader_m {
@@ -74,6 +75,7 @@ public:
     static void addScreenArea(const std::string& shader, Rectangle screenRect);
     static void addWorldArea(const std::string& shader, Rectangle& worldRect);
     static void addWaterArea(Rectangle worldRect, int waterKind);
+    static void applyWaterAreasToScene(const std::vector<std::pair<Rectangle, int>>& areas);
     static void present();
 
     static void routine();

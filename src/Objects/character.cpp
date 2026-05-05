@@ -515,10 +515,6 @@ void Character::onCollision(GObject* other) {
     const double now = GetTime();
 
     if (water->getKind() == WaterVisualKind::Waterfall) {
-        if (now - lastWaterfallTouchAt_ >= particleParams.waterfallTouchCooldown) {
-            Particle_m::emitWaterfallTouch(body_->getSurface(), water->getRect());
-            lastWaterfallTouchAt_ = now;
-        }
         return;
     }
 
@@ -577,7 +573,6 @@ void Character::finishRespawn() {
         lastStillWaterTouchAt_ = -1000.0;
         lastFallSpeedBeforeMove_ = 0.0f;
         lastWaterSplashAt_ = -1000.0;
-        lastWaterfallTouchAt_ = -1000.0;
     }
 
     dashing_ = 0.0;

@@ -308,7 +308,6 @@ static void drawParticleWindow()
   ImGui::SliderFloat("Water min fall speed", &params.waterSplashMinFallSpeed, 0.0f, 500.0f, "%.0f");
   ImGui::SliderFloat("Still water grace", &params.stillWaterTouchGrace, 0.0f, 0.25f, "%.3fs");
   ImGui::SliderFloat("Splash cooldown", &params.waterSplashCooldown, 0.0f, 1.0f, "%.3fs");
-  ImGui::SliderFloat("Waterfall cooldown", &params.waterfallTouchCooldown, 0.0f, 0.5f, "%.3fs");
 
   ImGui::SeparatorText("Counts");
   ImGui::SliderInt("Jump dust", &params.jumpDustCount, 0, 64);
@@ -316,7 +315,6 @@ static void drawParticleWindow()
   ImGui::SliderInt("Land strength", &params.landDustStrengthCount, 0, 64);
   ImGui::SliderInt("Splash base", &params.splashBaseCount, 0, 80);
   ImGui::SliderInt("Splash strength", &params.splashStrengthCount, 0, 80);
-  ImGui::SliderInt("Waterfall touch", &params.waterfallTouchCount, 0, 64);
 
   ImGui::SeparatorText("Colors");
   drawColorControl("Dust", params.dustColor);
@@ -337,10 +335,6 @@ static void drawParticleWindow()
     }
     if (ImGui::Button("Emit splash")) {
       Particle_m::emitWaterSplash(body, body, gravityDir, 1.2f);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Emit waterfall touch")) {
-      Particle_m::emitWaterfallTouch(body, body);
     }
   }
 

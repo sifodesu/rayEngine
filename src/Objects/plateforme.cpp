@@ -5,9 +5,124 @@
 #include "adiComponent.h"
 #include "object_m.h"
 #include "portal.h"
+#include <algorithm>
 #include <cmath>
 
 namespace {
+
+constexpr float kSupportTolerance = 2.0f;
+constexpr double kMaxPlatformStepDelta = 1.0 / 60.0;
+constexpr double kMaxPlatformCatchUpDelta = 0.1;
+
+double platformMovementDelta(double deltaTime) {
+    if (!std::isfinite(deltaTime) || deltaTime <= 0.0) return 0.0;
+    return std::min(deltaTime, kMaxPlatformCatchUpDelta);
+}
+
+int consumePixelAccumulator(float& accumulator) {
+    constexpr float eps = 0.00001f;
+
+    if (accumulator >= 1.0f - eps) {
+        int move = (int)std::floor(accumulator + eps);
+        accumulator -= (float)move;
+        return move;
+    }
+
+    if (accumulator <= -1.0f + eps) {
+        int move = (int)std::ceil(accumulator - eps);
+        accumulator -= (float)move;
+        return move;
+    }
+
+    return 0;
+}
+
+float rectOverlap(float aMin, float aMax, float bMin, float bMax) {
+    return std::min(aMax, bMax) - std::max(aMin, bMin);
+}
+
+float vectorLength(Vector2 value) {
+    return sqrtf(value.x * value.x + value.y * value.y);
+}
+
+GravityDirection gravityDirectionFor(CollisionRect* rect) {
+    RigidBody* rigid = dynamic_cast<RigidBody*>(rect);
+    return rigid ? rigid->getGravityDirection() : GravityDirection::DOWN;
+}
+
+Rectangle expandedPlatformQuery(Rectangle platformSurface) {
+    return Rectangle{
+        platformSurface.x - kSupportTolerance,
+        platformSurface.y - kSupportTolerance,
+        platformSurface.width + 2.0f * kSupportTolerance,
+        platformSurface.height + 2.0f * kSupportTolerance
+    };
+}
+
+bool isSupportedByPlatform(Rectangle objRect, Rectangle platformSurface, GravityDirection gravityDir) {
+    switch (gravityDir) {
+        case GravityDirection::DOWN: {
+            float feetToTop = fabsf((objRect.y + objRect.height) - platformSurface.y);
+            return feetToTop <= kSupportTolerance &&
+                   rectOverlap(objRect.x, objRect.x + objRect.width,
+                               platformSurface.x, platformSurface.x + platformSurface.width) > 0.5f;
+        }
+        case GravityDirection::UP: {
+            float headToBottom = fabsf(objRect.y - (platformSurface.y + platformSurface.height));
+            return headToBottom <= kSupportTolerance &&
+                   rectOverlap(objRect.x, objRect.x + objRect.width,
+                               platformSurface.x, platformSurface.x + platformSurface.width) > 0.5f;
+        }
+        case GravityDirection::LEFT: {
+            float leftToRight = fabsf(objRect.x - (platformSurface.x + platformSurface.width));
+            return leftToRight <= kSupportTolerance &&
+                   rectOverlap(objRect.y, objRect.y + objRect.height,
+                               platformSurface.y, platformSurface.y + platformSurface.height) > 0.5f;
+        }
+        case GravityDirection::RIGHT: {
+            float rightToLeft = fabsf((objRect.x + objRect.width) - platformSurface.x);
+            return rightToLeft <= kSupportTolerance &&
+                   rectOverlap(objRect.y, objRect.y + objRect.height,
+                               platformSurface.y, platformSurface.y + platformSurface.height) > 0.5f;
+        }
+    }
+    return false;
+}
+
+Rectangle supportPoint(Rectangle rect, GravityDirection gravityDir) {
+    switch (gravityDir) {
+        case GravityDirection::DOWN:
+            return Rectangle{rect.x + rect.width / 2.0f, rect.y + rect.height - 0.5f, 1.0f, 1.0f};
+        case GravityDirection::UP:
+            return Rectangle{rect.x + rect.width / 2.0f, rect.y - 0.5f, 1.0f, 1.0f};
+        case GravityDirection::LEFT:
+            return Rectangle{rect.x - 0.5f, rect.y + rect.height / 2.0f, 1.0f, 1.0f};
+        case GravityDirection::RIGHT:
+            return Rectangle{rect.x + rect.width - 0.5f, rect.y + rect.height / 2.0f, 1.0f, 1.0f};
+    }
+    return Rectangle{rect.x + rect.width / 2.0f, rect.y + rect.height - 0.5f, 1.0f, 1.0f};
+}
+
+void cancelFallIntoSupport(CollisionRect* rect) {
+    RigidBody* rigid = dynamic_cast<RigidBody*>(rect);
+    if (!rigid) return;
+
+    Vector2 speed = rigid->getSpeed();
+    switch (rigid->getGravityDirection()) {
+        case GravityDirection::DOWN:
+            if (speed.y > 0.0f) rigid->setSpeed({speed.x, 0.0f});
+            break;
+        case GravityDirection::UP:
+            if (speed.y < 0.0f) rigid->setSpeed({speed.x, 0.0f});
+            break;
+        case GravityDirection::LEFT:
+            if (speed.x < 0.0f) rigid->setSpeed({0.0f, speed.y});
+            break;
+        case GravityDirection::RIGHT:
+            if (speed.x > 0.0f) rigid->setSpeed({0.0f, speed.y});
+            break;
+    }
+}
 
 bool canBeCarriedByPlatform(CollisionRect* rect, const Plateforme* platform) {
     if (!rect || rect->isRenderProxy()) return false;
@@ -141,25 +256,16 @@ std::vector<Plateforme::CarriedObject> Plateforme::findRidingObjects() const {
 
     for (size_t surfaceIndex = 0; surfaceIndex < platformSurfaces.size(); ++surfaceIndex) {
         Rectangle platformSurface = platformSurfaces[surfaceIndex];
-        Rectangle topProbe = platformSurface;
-        topProbe.y -= 2.0f;
-        topProbe.height = 4.0f;
+        Rectangle supportProbe = expandedPlatformQuery(platformSurface);
 
-        for (auto* rect : CollisionRect::query(topProbe)) {
+        for (auto* rect : CollisionRect::query(supportProbe)) {
             if (!rect || rect == body_) continue;
             if (alreadyCarried(rect)) continue;
             if (!canBeCarriedByPlatform(rect, this)) continue;
             if (platformInTransit && isTileBody(rect) && !wasAlreadyCarried(rect)) continue;
 
             Rectangle objRect = rect->getSurface();
-            float objBottom = objRect.y + objRect.height;
-            float platTop = platformSurface.y;
-
-            bool onPlatform = (objBottom >= platTop - 1.0f && objBottom <= platTop + 2.0f &&
-                               objRect.x < platformSurface.x + platformSurface.width &&
-                               objRect.x + objRect.width > platformSurface.x);
-
-            if (onPlatform) {
+            if (isSupportedByPlatform(objRect, platformSurface, gravityDirectionFor(rect))) {
                 carryList.push_back(CarriedObject{
                     rect,
                     {objRect.x - platformSurface.x, objRect.y - platformSurface.y},
@@ -205,15 +311,9 @@ void Plateforme::attachCarriedObjects(const std::vector<CarriedObject>& objects)
         newR.x = platformSurface.x + carried.offset.x;
         newR.y = platformSurface.y + carried.offset.y;
 
-        Rectangle supportPoint{
-            newR.x + newR.width / 2.0f,
-            newR.y + newR.height - 0.5f,
-            1.0f,
-            1.0f
-        };
         if (!carried.targetSide &&
             targetSurface.has_value() &&
-            !Portal::isTransitSourceVisible(this, supportPoint)) {
+            !Portal::isTransitSourceVisible(this, supportPoint(newR, gravityDirectionFor(rect)))) {
             if (auto targetRect = Portal::transformTransitRect(this, newR)) {
                 newR = *targetRect;
             }
@@ -221,12 +321,7 @@ void Plateforme::attachCarriedObjects(const std::vector<CarriedObject>& objects)
 
         Portal::cancelTransit(rect->getFather());
         rect->setSurface(newR);
-
-        Character* ch = dynamic_cast<Character*>(rect->getFather());
-        if (ch) {
-            Vector2 sp = ch->body_->getSpeed();
-            if (sp.y != 0.0f) ch->body_->setSpeed({ sp.x, 0.0f });
-        }
+        cancelFallIntoSupport(rect);
     }
 }
 
@@ -240,89 +335,79 @@ void Plateforme::switchDirection() {
     waiting_ = waitTime_;
 }
 
-void Plateforme::snapToTarget(Vector2 target) {
-    Rectangle surf = body_->getSurface();
-    float tlx = target.x - surf.width/2.0f;
-    float tly = target.y - surf.height/2.0f;
-    body_->setCoord({ tlx, tly });
+void Plateforme::advanceWaypoint() {
+    if (behavior_ == Behavior::PING_PONG) {
+        current_ += dir_;
+        if (shouldSwitchDirection()) {
+            switchDirection();
+        }
+    } else {
+        current_++;
+        if (current_ >= (int)waypoints_.size()) current_ = 0;
+    }
 }
 
-Vector2 Plateforme::calculateMovement(Vector2 currentCenter, double deltaTime) {
-    if (waypoints_.size() < 2) return currentCenter;
+void Plateforme::applyMovementDelta(Vector2 deltaMove) {
+    if (fabsf(deltaMove.x) <= 0.0001f && fabsf(deltaMove.y) <= 0.0001f) return;
 
-    Vector2 target = getCurrentTarget();
-    Vector2 toTarget { target.x - currentCenter.x, target.y - currentCenter.y };
-    float dist = sqrtf(toTarget.x*toTarget.x + toTarget.y*toTarget.y);
-    
-    if (dist < 0.5f) {
-        snapToTarget(target);
-        
-        if (behavior_ == Behavior::PING_PONG) {
-            current_ += dir_;
-            if (shouldSwitchDirection()) {
-                switchDirection();
-            }
-        } else { // LOOP
-            current_++; 
-            if (current_ >= waypoints_.size()) current_ = 0;
-            // Immediate transition to next waypoint
-        }
-        return target;
-    }
+    auto ridingObjects = findRidingObjects();
+    moveBodyThroughPortals(this, body_, deltaMove);
+    attachCarriedObjects(ridingObjects);
+    rememberCarriedObjects(ridingObjects);
+    lastCenter_ = getCurrentCenter();
+}
 
-    Vector2 newCenter = currentCenter;
+void Plateforme::advanceMovement(double deltaTime) {
+    if (waypoints_.size() < 2) return;
+
     float desired = speed_ * (float)deltaTime;
-    float remainingInSegment = dist;
+    const int maxIterations = (int)waypoints_.size() * 4 + 8;
+    int iterations = 0;
 
-    while (desired > 0.00001f && remainingInSegment > 0.00001f) {
+    while (desired > 0.00001f && waiting_ <= 0.0f && iterations++ < maxIterations) {
+        Vector2 currentCenter = getCurrentCenter();
+        Vector2 target = getCurrentTarget();
+        Vector2 toTarget{target.x - currentCenter.x, target.y - currentCenter.y};
+        float remainingInSegment = vectorLength(toTarget);
+
+        if (remainingInSegment < 0.5f) {
+            Vector2 snapDelta{target.x - currentCenter.x, target.y - currentCenter.y};
+            applyMovementDelta(snapDelta);
+            accX_ = 0.0f;
+            accY_ = 0.0f;
+            desired = std::max(0.0f, desired - remainingInSegment);
+            advanceWaypoint();
+            continue;
+        }
+
         float step = std::min(desired, remainingInSegment);
-        Vector2 dir { toTarget.x / remainingInSegment, toTarget.y / remainingInSegment };
+        Vector2 dir{toTarget.x / remainingInSegment, toTarget.y / remainingInSegment};
         Vector2 continuousDelta { dir.x * step, dir.y * step };
         
         // Accumulate per-axis for pixel-perfect movement
         accX_ += continuousDelta.x;
         accY_ += continuousDelta.y;
         
-        int moveX = (int)std::floor(accX_ + (accX_ > 0 ? 0.00001f : -0.00001f));
-        int moveY = (int)std::floor(accY_ + (accY_ > 0 ? 0.00001f : -0.00001f));
-        
-        if (moveX != 0) accX_ -= (float)moveX;
-        if (moveY != 0) accY_ -= (float)moveY;
+        int moveX = consumePixelAccumulator(accX_);
+        int moveY = consumePixelAccumulator(accY_);
 
         if (moveX != 0 || moveY != 0) {
-            newCenter.x += (float)moveX;
-            newCenter.y += (float)moveY;
+            applyMovementDelta({(float)moveX, (float)moveY});
         }
 
         desired -= step;
-        toTarget = { target.x - newCenter.x, target.y - newCenter.y };
-        remainingInSegment = sqrtf(toTarget.x*toTarget.x + toTarget.y*toTarget.y);
 
+        currentCenter = getCurrentCenter();
+        toTarget = {target.x - currentCenter.x, target.y - currentCenter.y};
+        remainingInSegment = vectorLength(toTarget);
         if (remainingInSegment < 0.5f) {
-            snapToTarget(target);
-            newCenter = target;
-            
-            if (behavior_ == Behavior::PING_PONG) {
-                current_ += dir_;
-                if (shouldSwitchDirection()) {
-                    switchDirection();
-                    if (waiting_ > 0) {
-                        desired = 0;
-                        break;
-                    }
-                }
-            } else { // LOOP
-                current_++;
-                if (current_ >= waypoints_.size()) current_ = 0;
-            }
-            
-            target = getCurrentTarget();
-            toTarget = { target.x - newCenter.x, target.y - newCenter.y };
-            remainingInSegment = sqrtf(toTarget.x*toTarget.x + toTarget.y*toTarget.y);
+            Vector2 snapDelta{target.x - currentCenter.x, target.y - currentCenter.y};
+            applyMovementDelta(snapDelta);
+            accX_ = 0.0f;
+            accY_ = 0.0f;
+            advanceWaypoint();
         }
     }
-    
-    return newCenter;
 }
 
 void Plateforme::routine() {
@@ -333,32 +418,29 @@ void Plateforme::routine() {
     
     if (waypoints_.size() < 2) return;
     
-    double deltaTime = Clock::getLap();
+    double rawDeltaTime = Clock::getLap();
+    if (!std::isfinite(rawDeltaTime) || rawDeltaTime <= 0.0) return;
+
     Vector2 currentCenter = getCurrentCenter();
 
     // Handle waiting period at endpoints
     if (waiting_ > 0) {
-        waiting_ -= (float)deltaTime;
+        waiting_ -= (float)rawDeltaTime;
         if (waiting_ < 0) waiting_ = 0;
+        rememberCarriedObjects(findRidingObjects());
         lastCenter_ = currentCenter;
         return;
     }
 
-    auto ridingObjects = findRidingObjects();
-
-    // Calculate new position
-    Vector2 newCenter = calculateMovement(currentCenter, deltaTime);
-    Vector2 deltaMove { newCenter.x - currentCenter.x, newCenter.y - currentCenter.y };
-
-    // Apply movement to platform
-    if (fabsf(deltaMove.x) > 0.0001f || fabsf(deltaMove.y) > 0.0001f) {
-        moveBodyThroughPortals(this, body_, deltaMove);
+    double movementTime = platformMovementDelta(rawDeltaTime);
+    while (movementTime > 0.0 && waiting_ <= 0.0f) {
+        double stepDelta = std::min(movementTime, kMaxPlatformStepDelta);
+        advanceMovement(stepDelta);
+        movementTime -= stepDelta;
     }
-
-    attachCarriedObjects(ridingObjects);
-    rememberCarriedObjects(ridingObjects);
     
-    lastCenter_ = newCenter;
+    rememberCarriedObjects(findRidingObjects());
+    lastCenter_ = getCurrentCenter();
 }
 
 // Public interface methods

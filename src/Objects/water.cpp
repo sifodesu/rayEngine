@@ -135,8 +135,10 @@ void Water::drawOcclusionMasks() {
 void Water::flushRefractionPasses() {
     std::vector<WaterSurface> still;
     std::vector<WaterSurface> waterfalls;
+    std::vector<std::pair<Rectangle, int>> areas;
     still.reserve(visibleSurfaces.size());
     waterfalls.reserve(visibleSurfaces.size());
+    areas.reserve(visibleSurfaces.size());
 
     for (const WaterSurface& surface : visibleSurfaces) {
         if (surface.kind == WaterVisualKind::Waterfall) {
@@ -147,12 +149,13 @@ void Water::flushRefractionPasses() {
     }
 
     for (const WaterSurface& surface : mergeWaterfalls(std::move(waterfalls))) {
-        Shader_m::addWaterArea(surface.rect, static_cast<int>(surface.kind));
+        areas.push_back({surface.rect, static_cast<int>(surface.kind)});
     }
     for (const WaterSurface& surface : mergeStillWater(std::move(still))) {
-        Shader_m::addWaterArea(surface.rect, static_cast<int>(surface.kind));
+        areas.push_back({surface.rect, static_cast<int>(surface.kind)});
     }
 
+    Shader_m::applyWaterAreasToScene(areas);
     visibleSurfaces.clear();
 }
 

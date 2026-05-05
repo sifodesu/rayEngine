@@ -45,8 +45,9 @@ private:
     void rememberCarriedObjects(const std::vector<CarriedObject>& objects);
     
     // Movement logic
-    Vector2 calculateMovement(Vector2 currentCenter, double deltaTime);
-    void snapToTarget(Vector2 target);
+    void advanceMovement(double deltaTime);
+    void applyMovementDelta(Vector2 deltaMove);
+    void advanceWaypoint();
     bool shouldSwitchDirection();
     void switchDirection();
 

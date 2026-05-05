@@ -238,6 +238,10 @@ bool rectsOverlap(Rectangle a, Rectangle b) {
            a.y + a.height > b.y;
 }
 
+int drawOrderForLdtkLayer(int displayIndex, int layerCount) {
+    return std::max(0, layerCount - 1 - displayIndex);
+}
+
 float safePivot(float pivot) {
     if (!std::isfinite(pivot)) return 0.5f;
     return std::clamp(pivot, 0.0f, 1.0f);
@@ -843,28 +847,33 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
             backgrounds.push_back(*background);
         }
 
+        const auto& layerInstances = level["layerInstances"];
         int layerIndex = 0;
-        for (auto& layer : level["layerInstances"]) { // Iterate draw order as provided
+        const int layerCount = static_cast<int>(layerInstances.size());
+        for (auto& layer : layerInstances) {
+            // LDtk exports layerInstances in display order: first is top-most,
+            // last is behind. The engine draws lower layer numbers first.
+            const int drawLayer = drawOrderForLdtkLayer(layerIndex, layerCount);
             string type = layer["__type"].get<string>();
             if (type == "Tiles") { // Tile layer -> spawn tiles
                 int tileSize = layer["__gridSize"].get<int>();
                 int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                 processTileArray(layer["gridTiles"], tileSize, tilesetUid, tilesetFile, 
-                                tilesetInfo, intGrid, worldX, worldY, layerIndex);
+                                tilesetInfo, intGrid, worldX, worldY, drawLayer);
             } else if (type == "AutoLayer") { // AutoLayer -> spawn autolayer tiles
                 int tileSize = layer["__gridSize"].get<int>();
                 int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                 processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
-                                tilesetInfo, intGrid, worldX, worldY, layerIndex);
+                                tilesetInfo, intGrid, worldX, worldY, drawLayer);
             } else if (type == "IntGrid") { // IntGrid layer -> spawn auto-generated tiles if any
                 if (layer.contains("autoLayerTiles") && !layer["autoLayerTiles"].empty()) {
                     int tileSize = layer["__gridSize"].get<int>();
                     int tilesetUid = layer.value("__tilesetDefUid", -1);
                     string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                     processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
-                                    tilesetInfo, intGrid, worldX, worldY, layerIndex);
+                                    tilesetInfo, intGrid, worldX, worldY, drawLayer);
                 }
             } else if (type == "Entities") { // Entity layer -> spawn entities
                 std::string identifier = layer.value("__identifier", std::string{});
@@ -874,9 +883,8 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
                     continue;
                 }
                 int entityGridSize = layer["__gridSize"].get<int>();
-                int objectLayer = identifier == "Water" ? layerIndex : layerIndex + 100;
                 for (auto& e : layer["entityInstances"]) {
-                    spawnEntity(e, worldX, worldY, objectLayer, tilesetInfo, entityGridSize);
+                    spawnEntity(e, worldX, worldY, drawLayer, tilesetInfo, entityGridSize);
                 }
             }
             ++layerIndex;
