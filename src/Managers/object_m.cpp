@@ -19,6 +19,7 @@
 #include "projectile.h"
 #include "modelEnt.h"
 #include "water.h"
+#include "fog.h"
 #include "particle_m.h"
 #include "light_m.h"
 #include <algorithm>
@@ -115,6 +116,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
         case EntityType::Water:
             obj = std::make_unique<Water>(data);
             break;
+        case EntityType::Fog:
+            obj = std::make_unique<Fog>(data);
+            break;
         case EntityType::Shooter:
             obj = std::make_unique<Shooter>(data);
             break;
@@ -210,6 +214,7 @@ void Object_m::resetRoom(Rectangle room)
     std::vector<SpawnData> toRespawn;
     for (auto& [id, spawn] : initial_spawns_) {
         if (spawn.entityType == EntityType::Character) continue;
+        if (spawn.entityType == EntityType::Fog) continue;
         if (spawnOverlapsRoom(spawn, room)) {
             toRespawn.push_back(spawn);
         }
@@ -368,6 +373,7 @@ void Object_m::unload()
     Portal::clearTransits();
     Portal::releaseAllDisabledTiles();
     Water::clear();
+    Fog::clear();
     Particle_m::clear();
     level_ents_.clear();
     level_tiles_.clear();

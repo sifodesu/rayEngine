@@ -31,8 +31,10 @@ std::unordered_map<std::string, std::filesystem::file_time_type> Shader_m::fileT
 namespace {
 constexpr const char* CRT_PARAMS_PATH = "crt_params.json";
 constexpr const char* WATER_PARAMS_PATH = "water_params.json";
+constexpr const char* FOG_PARAMS_PATH = "fog_params.json";
 bool crtParamsLoaded = false;
 bool waterParamsLoaded = false;
+bool fogParamsLoaded = false;
 
 float readFloat(const json& j, const char* key, float fallback) {
     if (!j.contains(key) || !j[key].is_number()) return fallback;
@@ -76,12 +78,21 @@ Shader_m::WaterParams& Shader_m::waterParams() {
     return params;
 }
 
+Shader_m::FogParams& Shader_m::fogParams() {
+    static FogParams params;
+    return params;
+}
+
 void Shader_m::resetCRTParams() {
     crtParams() = CRTParams{};
 }
 
 void Shader_m::resetWaterParams() {
     waterParams() = WaterParams{};
+}
+
+void Shader_m::resetFogParams() {
+    fogParams() = FogParams{};
 }
 
 bool Shader_m::saveCRTParams() {
@@ -229,6 +240,45 @@ bool Shader_m::loadWaterParams() {
     }
 }
 
+bool Shader_m::saveFogParams() {
+    const FogParams& params = fogParams();
+    json j = {
+        {"color", colorToJson(params.color)},
+        {"opacity", params.opacity},
+        {"scale", params.scale},
+        {"speedX", params.speedX},
+        {"speedY", params.speedY},
+        {"contrast", params.contrast},
+        {"softness", params.softness},
+    };
+
+    std::ofstream f(FOG_PARAMS_PATH, std::ios::trunc);
+    if (!f.good()) return false;
+    f << j.dump(2);
+    return f.good();
+}
+
+bool Shader_m::loadFogParams() {
+    std::ifstream f(FOG_PARAMS_PATH);
+    if (!f.good()) return false;
+
+    try {
+        json j;
+        f >> j;
+        FogParams& params = fogParams();
+        params.color = readColor(j, "color", params.color);
+        params.opacity = readFloat(j, "opacity", params.opacity);
+        params.scale = readFloat(j, "scale", params.scale);
+        params.speedX = readFloat(j, "speedX", params.speedX);
+        params.speedY = readFloat(j, "speedY", params.speedY);
+        params.contrast = readFloat(j, "contrast", params.contrast);
+        params.softness = readFloat(j, "softness", params.softness);
+        return true;
+    } catch (...) {
+        return false;
+    }
+}
+
 static RenderTexture2D loadPointRenderTexture(int width, int height) {
     RenderTexture2D target = LoadRenderTexture(width, height);
     if (target.id) {
@@ -282,6 +332,10 @@ void Shader_m::load(const std::filesystem::path& dir) {
     if (!waterParamsLoaded) {
         loadWaterParams();
         waterParamsLoaded = true;
+    }
+    if (!fogParamsLoaded) {
+        loadFogParams();
+        fogParamsLoaded = true;
     }
     unload();
     lastW_ = NATIVE_RES_WIDTH;
@@ -410,6 +464,33 @@ void Shader_m::applyWaterAreasToScene(const std::vector<std::pair<Rectangle, int
     BeginTextureMode(sceneRT_);
         ClearBackground(BLACK);
         DrawTextureRec(waterTex, {0, 0, (float)waterTex.width, -(float)waterTex.height}, {0, 0}, WHITE);
+    EndTextureMode();
+
+    BeginTextureMode(sceneRT_);
+}
+
+void Shader_m::addFogArea(Rectangle worldRect) {
+    if (!has("fog")) return;
+    queue_.push_back({Pass::FogArea, "fog", worldRect});
+}
+
+void Shader_m::applyFogAreasToScene(const std::vector<Rectangle>& areas) {
+    if (areas.empty() || !has("fog")) return;
+
+    ensureTargets();
+
+    std::vector<Pass> passes;
+    passes.reserve(areas.size());
+    for (Rectangle rect : areas) {
+        passes.push_back({Pass::FogArea, "fog", rect});
+    }
+
+    EndTextureMode();
+    Texture2D fogTex = applyPasses(sceneRT_.texture, passes, nativePing_, nativePingIndex_);
+
+    BeginTextureMode(sceneRT_);
+        ClearBackground(BLACK);
+        DrawTextureRec(fogTex, {0, 0, (float)fogTex.width, -(float)fogTex.height}, {0, 0}, WHITE);
     EndTextureMode();
 
     BeginTextureMode(sceneRT_);
@@ -607,6 +688,17 @@ static void uploadWaterParams(Shader shader) {
     setFloatUniform(shader, "waterfallLineRandomSeed", params.waterfallLineRandomSeed);
 }
 
+static void uploadFogParams(Shader shader) {
+    Shader_m::FogParams& params = Shader_m::fogParams();
+    setColorUniform(shader, "fogColor", params.color);
+    setFloatUniform(shader, "fogOpacity", params.opacity);
+    setFloatUniform(shader, "fogScale", params.scale);
+    setFloatUniform(shader, "fogSpeedX", params.speedX);
+    setFloatUniform(shader, "fogSpeedY", params.speedY);
+    setFloatUniform(shader, "fogContrast", params.contrast);
+    setFloatUniform(shader, "fogSoftness", params.softness);
+}
+
 static Rectangle nativeRectToTargetScaled(Rectangle r, Texture2D targetTex) {
     Rectangle dst = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, targetTex.width, targetTex.height);
     float scaleX = dst.width / (float)NATIVE_RES_WIDTH;
@@ -723,6 +815,42 @@ Texture2D Shader_m::applyPasses(Texture2D base, const std::vector<Pass>& passes,
                             uploadWaterParams(sh);
 
                             DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
+                            EndShaderMode();
+                        }
+                    }
+                } break;
+                case Pass::FogArea: {
+                    DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
+                    if (has(pass.shader)) {
+                        Camera2D cam = Raycam_m::getCam();
+                        Vector2 tl = GetWorldToScreen2D({pass.rect.x, pass.rect.y}, cam);
+                        Vector2 br = GetWorldToScreen2D({pass.rect.x+pass.rect.width, pass.rect.y+pass.rect.height}, cam);
+                        if (br.x < tl.x) std::swap(br.x, tl.x);
+                        if (br.y < tl.y) std::swap(br.y, tl.y);
+                        Rectangle sr = nativeRectToTargetScaled({tl.x, tl.y, br.x - tl.x, br.y - tl.y}, current);
+                        if (sr.width > 0 && sr.height > 0 && clampToBounds(sr, current.width, current.height)) {
+                            Shader sh = get(pass.shader);
+                            BeginShaderMode(sh);
+                            uploadPassUniforms(sh, pass.shader, current);
+                            bindTemporalTextures(sh, pass.shader);
+
+                            float fogRect[4] = { pass.rect.x, pass.rect.y, pass.rect.width, pass.rect.height };
+                            float cameraTarget[2] = { cam.target.x, cam.target.y };
+                            float cameraOffset[2] = { cam.offset.x, cam.offset.y };
+                            float cameraZoom = cam.zoom;
+                            int loc = GetShaderLocation(sh, "fogRect");
+                            if (loc >= 0) SetShaderValue(sh, loc, fogRect, SHADER_UNIFORM_VEC4);
+                            loc = GetShaderLocation(sh, "cameraTarget");
+                            if (loc >= 0) SetShaderValue(sh, loc, cameraTarget, SHADER_UNIFORM_VEC2);
+                            loc = GetShaderLocation(sh, "cameraOffset");
+                            if (loc >= 0) SetShaderValue(sh, loc, cameraOffset, SHADER_UNIFORM_VEC2);
+                            loc = GetShaderLocation(sh, "cameraZoom");
+                            if (loc >= 0) SetShaderValue(sh, loc, &cameraZoom, SHADER_UNIFORM_FLOAT);
+                            uploadFogParams(sh);
+
+                            BeginScissorMode((int)sr.x, (int)sr.y, (int)sr.width, (int)sr.height);
+                                DrawTextureRec(current, {0,0,(float)current.width, -(float)current.height}, {0,0}, WHITE);
+                            EndScissorMode();
                             EndShaderMode();
                         }
                     }

@@ -394,6 +394,48 @@ static void drawStillWaterWindow()
   ImGui::End();
 }
 
+static void drawFogWindow()
+{
+  static const char* saveStatus = "";
+
+  if (!ImGui::Begin("Fog Debug")) {
+    ImGui::End();
+    return;
+  }
+
+  Shader_m::FogParams& params = Shader_m::fogParams();
+  if (ImGui::Button("Save parameters")) {
+    saveStatus = Shader_m::saveFogParams() ? "Saved fog_params.json" : "Save failed";
+  }
+  ImGui::SameLine();
+  if (ImGui::Button("Load parameters")) {
+    saveStatus = Shader_m::loadFogParams() ? "Loaded fog_params.json" : "Load failed";
+  }
+  if (saveStatus[0] != '\0') {
+    ImGui::TextUnformatted(saveStatus);
+  }
+
+  if (ImGui::Button("Reset fog")) {
+    Shader_m::resetFogParams();
+    saveStatus = "";
+  }
+
+  ImGui::SeparatorText("Shape");
+  ImGui::SliderFloat("Max opacity", &params.opacity, 0.0f, 1.0f, "%.2f");
+  ImGui::SliderFloat("Cloud size", &params.scale, 0.001f, 0.02f, "%.4f");
+  ImGui::SliderFloat("Cloud coverage", &params.contrast, 0.0f, 1.0f, "%.2f");
+  ImGui::SliderFloat("Edge softness", &params.softness, 0.0f, 96.0f, "%.1f");
+
+  ImGui::SeparatorText("Motion");
+  ImGui::SliderFloat("Speed X", &params.speedX, -32.0f, 32.0f, "%.2f");
+  ImGui::SliderFloat("Speed Y", &params.speedY, -32.0f, 32.0f, "%.2f");
+
+  ImGui::SeparatorText("Color");
+  drawColorControl("Fog color", params.color);
+
+  ImGui::End();
+}
+
 static void drawLightingWindow()
 {
   if (!ImGui::Begin("Lighting Debug")) {
@@ -464,6 +506,7 @@ void DrawWindows() {
     Shader_m::resetCRTParams();
     // drawParticleWindow();
     drawStillWaterWindow();
+    drawFogWindow();
     drawLightingWindow();
 }
 

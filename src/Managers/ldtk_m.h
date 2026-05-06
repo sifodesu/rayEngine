@@ -28,7 +28,7 @@ public:
     /**
      * @brief Load an LDtk project file and spawn all its contents
      * @param filename Name of the .ldtk file (relative to LDTK_PATH)
-     * @param skipCharacters If true, skip entity spawning (useful for hot reload)
+     * @param skipCharacters If true, skip LDtk entities tagged "chara" (useful for hot reload)
      */
     static void loadLevel(const std::string& filename, bool skipCharacters = false);
 

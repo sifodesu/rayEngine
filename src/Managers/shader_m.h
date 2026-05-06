@@ -64,6 +64,16 @@ public:
         float waterfallLineRandomSeed{13.7f};
     };
 
+    struct FogParams {
+        Color color{184, 202, 208, 255};
+        float opacity{0.28f};
+        float scale{0.0028f};
+        float speedX{1.1f};
+        float speedY{-0.35f};
+        float contrast{0.66f};
+        float softness{32.0f};
+    };
+
     static void load(const std::filesystem::path& dir = std::filesystem::path("Data")/"Shaders");
     static void unload();
     static void reload();
@@ -76,6 +86,8 @@ public:
     static void addWorldArea(const std::string& shader, Rectangle& worldRect);
     static void addWaterArea(Rectangle worldRect, int waterKind);
     static void applyWaterAreasToScene(const std::vector<std::pair<Rectangle, int>>& areas);
+    static void addFogArea(Rectangle worldRect);
+    static void applyFogAreasToScene(const std::vector<Rectangle>& areas);
     static void present();
 
     static void routine();
@@ -90,10 +102,14 @@ public:
     static void resetWaterParams();
     static bool saveWaterParams();
     static bool loadWaterParams();
+    static FogParams& fogParams();
+    static void resetFogParams();
+    static bool saveFogParams();
+    static bool loadFogParams();
 
 private:
     struct ShaderPair { std::filesystem::path vs; std::filesystem::path fs; };
-    struct Pass { enum Type { Fullscreen, ScreenArea, WorldArea, WaterArea } type; std::string shader; Rectangle rect; int mode{0}; };
+    struct Pass { enum Type { Fullscreen, ScreenArea, WorldArea, WaterArea, FogArea } type; std::string shader; Rectangle rect; int mode{0}; };
 
     static std::unordered_map<std::string, Shader> shaders_;
     static std::filesystem::path dir_;

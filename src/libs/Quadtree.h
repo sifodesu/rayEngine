@@ -7,6 +7,7 @@
 #include <vector>
 #include <functional>
 #include <iostream>
+#include <climits>
 #include "Box.h"
 #include "raylib.h"
 

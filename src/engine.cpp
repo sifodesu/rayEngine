@@ -19,6 +19,7 @@
 #include "collisionRect.h"
 #include "portal.h"
 #include "water.h"
+#include "fog.h"
 #include "particle_m.h"
 #include "light_m.h"
 #include "sprite.h"
@@ -149,6 +150,7 @@ void Engine::render()
     }
 
     Water::beginFrame();
+    Fog::beginFrame();
     
     auto comp = [](CollisionRect* a, CollisionRect* b) {
         int layerA = a->getFather()->layer_;
@@ -237,6 +239,7 @@ void Engine::render()
             Water::drawOcclusionMasks();
             endDrawModes();
             Water::flushRefractionPasses();
+            Fog::flushFogPasses();
         }
 
         if (!bucket.threed.empty()) {

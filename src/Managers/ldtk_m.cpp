@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <optional>
+#include <utility>
 
 // Third party
 #include <nlohmann/json.hpp>
@@ -37,6 +38,33 @@ struct LdtkBackground {
 };
 
 std::vector<LdtkBackground> backgrounds;
+
+map<int, vector<string>> collectEntityDefTags(const json& root) {
+    map<int, vector<string>> tagsByDefUid;
+    if (!root.contains("defs") || !root["defs"].contains("entities")) return tagsByDefUid;
+
+    for (const auto& def : root["defs"]["entities"]) {
+        int uid = def.value("uid", -1);
+        if (uid < 0) continue;
+
+        vector<string> tags;
+        if (def.contains("tags") && def["tags"].is_array()) {
+            for (const auto& tag : def["tags"]) {
+                if (tag.is_string()) tags.push_back(tag.get<string>());
+            }
+        }
+        tagsByDefUid[uid] = std::move(tags);
+    }
+
+    return tagsByDefUid;
+}
+
+bool entityHasTag(const json& entity, const map<int, vector<string>>& tagsByDefUid, const string& tag) {
+    int defUid = entity.value("defUid", -1);
+    auto it = tagsByDefUid.find(defUid);
+    if (it == tagsByDefUid.end()) return false;
+    return std::find(it->second.begin(), it->second.end(), tag) != it->second.end();
+}
 
 // ----------------------------------------------------------------------------
 // String & Path Utilities
@@ -818,7 +846,7 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer,
 
 } // namespace
 
-// Public API: import an LDtk project (.ldtk). Optionally skip entities (characters) when doing hot reload.
+// Public API: import an LDtk project (.ldtk). Optionally skip character-tagged entities when doing hot reload.
 void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     if (!strEndsWith(filename, ".ldtk")) { cerr << "LDtk: expected .ldtk file got " << filename << '\n'; return; }
 
@@ -837,6 +865,7 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     
     currentProjectFile = filename; // track for hot reload
     auto tilesetInfo = collectTilesetInfo(root);
+    auto entityDefTags = collectEntityDefTags(root);
 
     for (auto& level : root["levels"]) { // Each LDtk level (supports multi-level worlds)
         int worldX = level.value("worldX", 0);
@@ -876,14 +905,11 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
                                     tilesetInfo, intGrid, worldX, worldY, drawLayer);
                 }
             } else if (type == "Entities") { // Entity layer -> spawn entities
-                std::string identifier = layer.value("__identifier", std::string{});
-                bool loadLayer = !skipCharacters || identifier == "Water";
-                if (!loadLayer) {
-                    ++layerIndex;
-                    continue;
-                }
                 int entityGridSize = layer["__gridSize"].get<int>();
                 for (auto& e : layer["entityInstances"]) {
+                    if (skipCharacters && entityHasTag(e, entityDefTags, "chara")) {
+                        continue;
+                    }
                     spawnEntity(e, worldX, worldY, drawLayer, tilesetInfo, entityGridSize);
                 }
             }
