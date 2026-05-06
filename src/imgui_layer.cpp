@@ -190,6 +190,7 @@ static void drawGlitchSpriteWindow() {
     ImGui::SliderFloat("Vitesse", &params.speed, 0.0f, 8.0f, "%.2f");
     ImGui::SliderFloat("Pixel shift", &params.pixelShift, 0.0f, 12.0f, "%.2f");
     ImGui::SliderFloat("RGB shift", &params.colorShift, 0.0f, 8.0f, "%.2f");
+    ImGui::SliderFloat("Inversion couleurs", &params.colorInvert, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Jitter orientation", &params.orientationJitter, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Flip blocs 8x8", &params.blockFlip, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Frequence bandes", &params.bandFrequency, 1.0f, 48.0f, "%.1f");
@@ -501,13 +502,13 @@ void EndFrame() { rlImGuiEnd(); }
 void DrawWindows() {
     // drawPlayerWindow();
     // drawVisibleModelWindow();
-    // drawGlitchSpriteWindow();
+    drawGlitchSpriteWindow();
     // drawCRTWindow();
-    Shader_m::resetCRTParams();
+    // Shader_m::resetCRTParams();
     // drawParticleWindow();
-    drawStillWaterWindow();
-    drawFogWindow();
-    drawLightingWindow();
+    // drawStillWaterWindow();
+    // drawFogWindow();
+    // drawLightingWindow();
 }
 
 } // namespace ImGuiLayer

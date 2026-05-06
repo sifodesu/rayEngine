@@ -9,6 +9,7 @@ struct SpriteGlitchParams {
     float speed{1.0f};
     float pixelShift{2.0f};
     float colorShift{1.25f};
+    float colorInvert{0.35f};
     float orientationJitter{0.45f};
     float blockFlip{0.65f};
     float bandFrequency{14.0f};

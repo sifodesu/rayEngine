@@ -21,7 +21,9 @@ enum class EntityType {
     Projectile,
     Pano,
     Receptacle,
-    UpgradePickup
+    UpgradePickup,
+    PlayerClone,
+    CloneTrigger
 };
 
 // Helper function to convert string to EntityType
@@ -44,6 +46,8 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Pano") return EntityType::Pano;
     if (typeStr == "Receptacle") return EntityType::Receptacle;
     if (typeStr.rfind("upgrade_", 0) == 0) return EntityType::UpgradePickup;
+    if (typeStr == "PlayerClone") return EntityType::PlayerClone;
+    if (typeStr == "CloneTrigger") return EntityType::CloneTrigger;
     return EntityType::Basic; // default fallback
 }
 
@@ -151,6 +155,7 @@ struct SpawnData {
     EntityType entityType{EntityType::Basic};
     std::string typeDetail; // e.g., "upgrade_speed", "upgrade_jump" for subtypes
     std::optional<int> sourceObjectId; // runtime-only owner id (not from LDtk)
+    bool setAsCameraTarget{true}; // runtime-only: Character spawns usually own the camera target
     bool isTileInstance{false}; // Spawned from a LDtk tile layer, even if typed as Basic/Kill/etc.
     int layer{0};
     std::optional<SpriteDesc> sprite;

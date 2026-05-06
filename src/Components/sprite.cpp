@@ -46,19 +46,21 @@ bool Sprite::beginGlitchShader(Rectangle src) {
     Shader shader = Shader_m::get("glitch");
     SpriteGlitchParams& params = glitchParams();
 
-    float srcX2 = src.x + src.width;
-    float srcY2 = src.y + src.height;
+    float sourceWidth = std::fabs(src.width);
+    float sourceHeight = std::fabs(src.height);
+    float srcX2 = src.x + sourceWidth;
+    float srcY2 = src.y + sourceHeight;
     float uvMin[2] = {
-        std::min(src.x, srcX2) / (float)sprite_sheet_.width,
-        std::min(src.y, srcY2) / (float)sprite_sheet_.height
+        src.x / (float)sprite_sheet_.width,
+        src.y / (float)sprite_sheet_.height
     };
     float uvMax[2] = {
-        std::max(src.x, srcX2) / (float)sprite_sheet_.width,
-        std::max(src.y, srcY2) / (float)sprite_sheet_.height
+        srcX2 / (float)sprite_sheet_.width,
+        srcY2 / (float)sprite_sheet_.height
     };
     float frameSize[2] = {
-        std::max(std::fabs(src.width), 1.0f),
-        std::max(std::fabs(src.height), 1.0f)
+        std::max(sourceWidth, 1.0f),
+        std::max(sourceHeight, 1.0f)
     };
     float time = (float)GetTime();
 
@@ -72,6 +74,8 @@ bool Sprite::beginGlitchShader(Rectangle src) {
     if (loc >= 0) SetShaderValue(shader, loc, &params.pixelShift, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "colorShift");
     if (loc >= 0) SetShaderValue(shader, loc, &params.colorShift, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "colorInvert");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.colorInvert, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "orientationJitter");
     if (loc >= 0) SetShaderValue(shader, loc, &params.orientationJitter, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "blockFlip");
@@ -138,19 +142,23 @@ void Sprite::draw(Vector2 pos) {
     pos.y = std::roundf(pos.y);
     Rectangle src = frameRects_.empty()? Rectangle{0,0,0,0} : frameRects_[current_frame_ % frameRects_.size()];
     
-    // Slightly inset the source to avoid sampling neighboring texels due to float precision
+    // Slightly inset the source to avoid sampling neighboring texels due to float precision.
+    // Apply this before flipping so mirrored sprites keep the same safe sampling bounds.
     const float inset = 0.01f;
-    bool willFlipX = flipX_;
-    bool willFlipY = flipY_;
-    if (!willFlipX) { src.x += inset; src.width -= 2*inset; }
-    if (!willFlipY) { src.y += inset; src.height -= 2*inset; }
-    // Apply flipping by negating width/height and adjusting origin
+    if (std::fabs(src.width) > inset * 2.0f) {
+        src.x += inset;
+        src.width -= inset * 2.0f;
+    }
+    if (std::fabs(src.height) > inset * 2.0f) {
+        src.y += inset;
+        src.height -= inset * 2.0f;
+    }
+    // Raylib flips negative source dimensions from the original top-left.
+    // Do not shift x/y here, or the sampled rectangle moves outside the texture.
     if (flipX_) {
-        src.x += src.width; // shift to the right edge
         src.width = -src.width;
     }
     if (flipY_) {
-        src.y += src.height; // shift to the bottom edge
         src.height = -src.height;
     }
 
@@ -168,19 +176,23 @@ void Sprite::draw(Rectangle targetRect) {
     
     Rectangle src = frameRects_.empty()? Rectangle{0,0,0,0} : frameRects_[current_frame_ % frameRects_.size()];
     
-    // Slightly inset the source to avoid sampling neighboring texels due to float precision
+    // Slightly inset the source to avoid sampling neighboring texels due to float precision.
+    // Apply this before flipping so mirrored sprites keep the same safe sampling bounds.
     const float inset = 0.01f;
-    bool willFlipX = flipX_;
-    bool willFlipY = flipY_;
-    if (!willFlipX) { src.x += inset; src.width -= 2*inset; }
-    if (!willFlipY) { src.y += inset; src.height -= 2*inset; }
-    // Apply flipping by negating width/height and adjusting origin
+    if (std::fabs(src.width) > inset * 2.0f) {
+        src.x += inset;
+        src.width -= inset * 2.0f;
+    }
+    if (std::fabs(src.height) > inset * 2.0f) {
+        src.y += inset;
+        src.height -= inset * 2.0f;
+    }
+    // Raylib flips negative source dimensions from the original top-left.
+    // Do not shift x/y here, or the sampled rectangle moves outside the texture.
     if (flipX_) {
-        src.x += src.width; // shift to the right edge
         src.width = -src.width;
     }
     if (flipY_) {
-        src.y += src.height; // shift to the bottom edge
         src.height = -src.height;
     }
     

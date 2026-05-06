@@ -367,6 +367,7 @@ bool pieceBlocked(
 
         GObject* owner = col->getFather();
         if (!owner || owner == entity) continue;
+        if (!owner->blocksMovementFor(entity)) continue;
         if (dynamic_cast<Portal*>(owner)) continue;
         if (shouldIgnoreApertureCollision(piece, col)) continue;
         if (OneWayPlatform::isOneWayPlatformBody(col) &&
@@ -385,6 +386,7 @@ bool standardBlocked(GObject* entity, CollisionRect* entityBody, Rectangle propo
         if (isActiveMainBody(col)) continue;
         GObject* owner = col->getFather();
         if (!owner || owner == entity) continue;
+        if (!owner->blocksMovementFor(entity)) continue;
         if (dynamic_cast<Portal*>(owner)) continue;
         if (shouldIgnoreApertureCollision(proposedRect, col)) continue;
         if (OneWayPlatform::isOneWayPlatformBody(col) &&
@@ -993,6 +995,7 @@ bool Portal::separateTransitCollisions(GObject* entity, CollisionRect* entityBod
 
                 GObject* owner = other->getFather();
                 if (!owner || owner == entity) continue;
+                if (!owner->blocksMovementFor(entity)) continue;
                 if (dynamic_cast<Portal*>(owner)) continue;
                 if (shouldIgnoreApertureCollision(pieceRect, other)) continue;
 
@@ -1181,6 +1184,24 @@ std::optional<Rectangle> Portal::getTransitTargetSurface(GObject* entity) {
     if (it == activeTransits.end()) return std::nullopt;
 
     return it->second.targetFullRect;
+}
+
+std::vector<Rectangle> Portal::getVisibleCollisionSurfaces(GObject* entity) {
+    std::vector<Rectangle> surfaces;
+    if (!entity) return surfaces;
+
+    auto it = activeTransits.find(entity->id_);
+    if (it == activeTransits.end()) {
+        if (CollisionRect* body = entity->getCollisionBody()) {
+            surfaces.push_back(body->getSurface());
+        }
+        return surfaces;
+    }
+
+    PortalTransit& transit = it->second;
+    if (transit.sourcePiece.has_value()) surfaces.push_back(*transit.sourcePiece);
+    if (transit.targetPiece.has_value()) surfaces.push_back(*transit.targetPiece);
+    return surfaces;
 }
 
 std::optional<Vector2> Portal::getTransitVisibleCenter(GObject* entity) {

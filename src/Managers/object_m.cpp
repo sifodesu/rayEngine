@@ -20,6 +20,8 @@
 #include "modelEnt.h"
 #include "water.h"
 #include "fog.h"
+#include "playerClone.h"
+#include "cloneTrigger.h"
 #include "particle_m.h"
 #include "light_m.h"
 #include <algorithm>
@@ -88,6 +90,12 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::UpgradePickup:
             obj = std::make_unique<UpgradePickup>(data);
+            break;
+        case EntityType::PlayerClone:
+            obj = std::make_unique<PlayerClone>(data);
+            break;
+        case EntityType::CloneTrigger:
+            obj = std::make_unique<CloneTrigger>(data);
             break;
         case EntityType::Checkpoint:
             obj = std::make_unique<Checkpoint>(data);

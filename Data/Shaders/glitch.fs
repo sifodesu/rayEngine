@@ -11,6 +11,7 @@ uniform float intensity;
 uniform float speed;
 uniform float pixelShift;
 uniform float colorShift;
+uniform float colorInvert;
 uniform float orientationJitter;
 uniform float blockFlip;
 uniform float bandFrequency;
@@ -89,6 +90,10 @@ void main() {
     float chromaNoise = hash12(vec2(floor(localUv.y * bands * 0.5) + seed, tick + 19.0));
     rgb += (chromaNoise - 0.5) * 0.18 * amount * burst;
     rgb = mix(base.rgb, rgb, clamp(amount, 0.0, 1.0));
+
+    float invertNoise = hash12(vec2(band + seed + 57.0, tick + 11.0));
+    float invertGate = step(1.0 - clamp(colorInvert * amount, 0.0, 1.0), invertNoise);
+    rgb = mix(rgb, 1.0 - rgb, invertGate);
 
     float alpha = base.a * colDiffuse.a * fragColor.a;
     finalColor = vec4(rgb * colDiffuse.rgb * fragColor.rgb, alpha);

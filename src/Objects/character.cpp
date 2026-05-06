@@ -50,7 +50,9 @@ Character::Character(const SpawnData& data) : GObject(data.id) {
     BodyDesc body = data.physics.body.value_or(BodyDesc{});
     body_ = new RigidBody(col, body, this);
     dashing_ = 0;
-    Raycam_m::setTarget(body_, true);
+    if (data.setAsCameraTarget) {
+        Raycam_m::setTarget(body_, true);
+    }
     if (auto s = Sprite_m::get("chara_idle")) anims_["idle"] = new Sprite(*s); else anims_["idle"] = new Sprite(SpriteDesc{});
     if (auto s = Sprite_m::get("chara_walk")) anims_["walk"] = new Sprite(*s); else anims_["walk"] = new Sprite(SpriteDesc{});
     if (data.sprite && data.sprite->glitched) {
@@ -62,6 +64,15 @@ Character::Character(const SpawnData& data) : GObject(data.id) {
     
     // Store original hitbox dimensions
     originalHitboxDims_ = body_->getDims();
+}
+
+Character::~Character() {
+    delete body_;
+    body_ = nullptr;
+    for (auto& [name, sprite] : anims_) {
+        delete sprite;
+    }
+    anims_.clear();
 }
 
 bool Character::depositOneAdi() {
@@ -505,6 +516,10 @@ void Character::collectDebugSprites(std::vector<Sprite*>& sprites) {
     }
 }
 
+bool Character::blocksMovementFor(GObject* moving) const {
+    return !(moving && moving->isPlayerClone());
+}
+
 void Character::onCollision(GObject* other) {
     Water* water = dynamic_cast<Water*>(other);
     if (!water || !body_) return;
@@ -603,6 +618,8 @@ void Character::separateFromCollisions() {
         
         for (CollisionRect* other : CollisionRect::query(myRect, true)) {
             if (!other->isSolid() || other->getId() == body_->getId()) continue;
+            GObject* owner = other->getFather();
+            if (owner && !owner->blocksMovementFor(this)) continue;
             if (Portal::shouldIgnoreTransitCollision(this, other)) continue;
             if (OneWayPlatform::isOneWayPlatformBody(other) &&
                 !OneWayPlatform::supportsBody(body_, other)) continue;
@@ -674,6 +691,8 @@ bool Character::isOnGround() const {
     for (CollisionRect* other : CollisionRect::query(probe, true)) {
         if (Portal::shouldIgnoreTransitCollision(const_cast<Character*>(this), other)) continue;
         if (!other || other->getId() == body_->getId()) continue;
+        GObject* owner = other->getFather();
+        if (owner && !owner->blocksMovementFor(const_cast<Character*>(this))) continue;
         if (OneWayPlatform::isOneWayPlatformBody(other) &&
             !OneWayPlatform::supportsBody(body_, other) &&
             !OneWayPlatform::blocksBody(body_, probe, other)) continue;

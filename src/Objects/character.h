@@ -10,9 +10,11 @@ class Character : public GObject
 {
 public:
     explicit Character(const SpawnData& data);
+    ~Character() override;
     void routine();
     void draw();
     void drawAtBody(Rectangle bodyRect) override;
+    bool blocksMovementFor(GObject* moving) const override;
     void onCollision(GObject* other) override;
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }
