@@ -1,5 +1,6 @@
 #include "playerClone.h"
 
+#include "object_m.h"
 #include "portal.h"
 #include "raycam_m.h"
 
@@ -62,6 +63,48 @@ bool isPlayerObject(GObject* obj) {
 PlayerClone::PlayerClone(const SpawnData& data)
     : Character(makeCloneData(data)) {
     if (body_) body_->setSolid(true);
+}
+
+PlayerClone* PlayerClone::spawnFromPlayerAt(Rectangle spawnArea, int layer) {
+    RigidBody* playerBody = Raycam_m::getTarget();
+    if (!playerBody) return nullptr;
+
+    auto* player = dynamic_cast<Character*>(playerBody->getFather());
+    if (!player || !player->getCollisionBody()) return nullptr;
+
+    Rectangle playerRect = playerBody->getSurface();
+    Rectangle cloneRect{
+        spawnArea.x + spawnArea.width * 0.5f - playerRect.width * 0.5f,
+        spawnArea.y + spawnArea.height * 0.5f - playerRect.height * 0.5f,
+        playerRect.width,
+        playerRect.height
+    };
+
+    SpawnData cloneData;
+    cloneData.id = Object_m::genID();
+    cloneData.entityType = EntityType::PlayerClone;
+    cloneData.typeDetail = "PlayerClone";
+    cloneData.setAsCameraTarget = false;
+    cloneData.layer = layer;
+    cloneData.sprite = SpriteDesc{};
+    cloneData.sprite->glitched = true;
+    cloneData.physics.collision = CollisionDesc{cloneRect, true};
+
+    auto* playerRigid = dynamic_cast<RigidBody*>(playerBody);
+    if (playerRigid) {
+        BodyDesc body;
+        body.speed = playerRigid->getSpeed();
+        body.gravityAcceleration = playerRigid->getMass();
+        cloneData.physics.body = body;
+    }
+
+    auto* clone = dynamic_cast<PlayerClone*>(Object_m::createFromSpawn(cloneData));
+    if (clone && playerRigid) {
+        clone->body_->setGravityDirection(playerRigid->getGravityDirection());
+        clone->body_->setMaxFallSpeedEnabled(playerRigid->isMaxFallSpeedEnabled());
+        clone->body_->setMaxFallSpeed(playerRigid->getMaxFallSpeed());
+    }
+    return clone;
 }
 
 void PlayerClone::routine() {

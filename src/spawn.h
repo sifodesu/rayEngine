@@ -23,7 +23,9 @@ enum class EntityType {
     Receptacle,
     UpgradePickup,
     PlayerClone,
-    CloneTrigger
+    CloneTrigger,
+    CloneButton,
+    CloneSpawner
 };
 
 // Helper function to convert string to EntityType
@@ -48,6 +50,8 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr.rfind("upgrade_", 0) == 0) return EntityType::UpgradePickup;
     if (typeStr == "PlayerClone") return EntityType::PlayerClone;
     if (typeStr == "CloneTrigger") return EntityType::CloneTrigger;
+    if (typeStr == "CloneButton") return EntityType::CloneButton;
+    if (typeStr == "CloneSpawner") return EntityType::CloneSpawner;
     return EntityType::Basic; // default fallback
 }
 
