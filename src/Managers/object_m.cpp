@@ -24,6 +24,8 @@
 #include "cloneTrigger.h"
 #include "cloneButton.h"
 #include "cloneSpawner.h"
+#include "triggerButton.h"
+#include "door.h"
 #include "particle_m.h"
 #include "light_m.h"
 #include <algorithm>
@@ -104,6 +106,12 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::CloneSpawner:
             obj = std::make_unique<CloneSpawner>(data);
+            break;
+        case EntityType::Button:
+            obj = std::make_unique<TriggerButton>(data);
+            break;
+        case EntityType::Door:
+            obj = std::make_unique<Door>(data);
             break;
         case EntityType::Checkpoint:
             obj = std::make_unique<Checkpoint>(data);
@@ -388,6 +396,8 @@ void Object_m::unload()
 {
     Portal::clearTransits();
     Portal::releaseAllDisabledTiles();
+    TriggerButton::clearPersistentState();
+    Door::clearPersistentState();
     Water::clear();
     Fog::clear();
     Particle_m::clear();

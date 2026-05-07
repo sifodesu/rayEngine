@@ -25,7 +25,9 @@ enum class EntityType {
     PlayerClone,
     CloneTrigger,
     CloneButton,
-    CloneSpawner
+    CloneSpawner,
+    Button,
+    Door
 };
 
 // Helper function to convert string to EntityType
@@ -52,6 +54,8 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "CloneTrigger") return EntityType::CloneTrigger;
     if (typeStr == "CloneButton") return EntityType::CloneButton;
     if (typeStr == "CloneSpawner") return EntityType::CloneSpawner;
+    if (typeStr == "Button" || typeStr == "TriggerButton") return EntityType::Button;
+    if (typeStr == "Door" || typeStr == "TriggerDoor") return EntityType::Door;
     return EntityType::Basic; // default fallback
 }
 
@@ -127,6 +131,7 @@ struct InteractionConfig {
     std::optional<std::string> dialog;
     std::optional<std::vector<Vector2>> pathPoints;
     std::optional<bool> enabled;
+    std::optional<bool> staysActivated; // Button remains active after first activation
     std::optional<bool> killOnCol;
     std::optional<PortalDirection> direction;
     std::optional<bool> forceGravity; // Portal forces gravity direction on player

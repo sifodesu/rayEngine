@@ -230,6 +230,37 @@ vector<string> parseCommaSeparatedIds(const string& input) {
     return result;
 }
 
+void appendIdValue(const json& value, vector<string>& out) {
+    if (value.is_null()) return;
+
+    if (value.is_string()) {
+        vector<string> ids = parseCommaSeparatedIds(value.get<string>());
+        out.insert(out.end(), ids.begin(), ids.end());
+        return;
+    }
+
+    if (value.is_object()) {
+        if (value.contains("entityIid") && value["entityIid"].is_string()) {
+            out.push_back(value["entityIid"].get<string>());
+        }
+        return;
+    }
+
+    if (value.is_array()) {
+        for (const auto& item : value) {
+            appendIdValue(item, out);
+        }
+    }
+}
+
+vector<string> parseIdListValue(const json& value) {
+    vector<string> ids;
+    appendIdValue(value, ids);
+    ids.erase(std::remove(ids.begin(), ids.end(), string{}), ids.end());
+    ids.erase(std::unique(ids.begin(), ids.end()), ids.end());
+    return ids;
+}
+
 bool parseHexColor(const string& hex, Color& out) {
     if (hex.size() != 7 && hex.size() != 9) return false;
     if (hex[0] != '#') return false;
@@ -587,6 +618,11 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
                 d.interaction.enabled = f["__value"].get<bool>();
             }
         }
+        else if (fid == "staysActivated") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                d.interaction.staysActivated = f["__value"].get<bool>();
+            }
+        }
         else if (fid == "killOnCol") {
             if (f.contains("__value") && !f["__value"].is_null()) {
                 d.interaction.killOnCol = f["__value"].get<bool>();
@@ -661,7 +697,15 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
         }
         else if (fid == "targetIds") {
             if (f.contains("__value") && !f["__value"].is_null()) {
-                auto targets = parseCommaSeparatedIds(f["__value"].get<string>());
+                auto targets = parseIdListValue(f["__value"]);
+                if (!targets.empty()) {
+                    d.ldtk.targetIds = targets;
+                }
+            }
+        }
+        else if (fid == "buttonRefs" || fid == "buttonIds" || fid == "buttons") {
+            if (f.contains("__value") && !f["__value"].is_null()) {
+                auto targets = parseIdListValue(f["__value"]);
                 if (!targets.empty()) {
                     d.ldtk.targetIds = targets;
                 }
@@ -821,11 +865,20 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer,
     if (!d.physics.collision) 
         d.physics.collision = CollisionDesc{};
     
+    float entityWidth = (float)e["width"].get<int>();
+    float entityHeight = (float)e["height"].get<int>();
+    float pivotX = 0.0f;
+    float pivotY = 0.0f;
+    if (e.contains("__pivot") && e["__pivot"].is_array() && e["__pivot"].size() >= 2) {
+        pivotX = e["__pivot"][0].get<float>();
+        pivotY = e["__pivot"][1].get<float>();
+    }
+
     d.physics.collision->rect = Rectangle{
-        (float)(e["px"][0].get<int>() + worldX), 
-        (float)(e["px"][1].get<int>() + worldY), 
-        (float)e["width"].get<int>(), 
-        (float)e["height"].get<int>()
+        (float)(e["px"][0].get<int>() + worldX) - entityWidth * pivotX,
+        (float)(e["px"][1].get<int>() + worldY) - entityHeight * pivotY,
+        entityWidth,
+        entityHeight
     };
     
     // Store LDtk IID for linking
