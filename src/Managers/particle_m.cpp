@@ -4,6 +4,8 @@
 #include <cmath>
 #include <vector>
 
+#include "collisionRect.h"
+#include "object_m.h"
 #include "raymath.h"
 
 namespace {
@@ -13,6 +15,11 @@ constexpr size_t MAX_PARTICLES = 700;
 enum class ParticleStyle {
     Circle,
     Streak
+};
+
+enum class ParticleKind {
+    Dust,
+    Water
 };
 
 struct Particle {
@@ -26,6 +33,7 @@ struct Particle {
     float length;
     Color color;
     ParticleStyle style;
+    ParticleKind kind;
 };
 
 std::vector<Particle> particles;
@@ -79,13 +87,13 @@ Vector2 pointOnContactSide(Rectangle rect, GravityDirection dir, float along) {
     along = std::clamp(along, 0.0f, 1.0f);
     switch (dir) {
         case GravityDirection::DOWN:
-            return {rect.x + rect.width * along, rect.y + rect.height + 0.5f};
+            return {rect.x + rect.width * along, rect.y + rect.height - 0.5f};
         case GravityDirection::UP:
-            return {rect.x + rect.width * along, rect.y - 0.5f};
+            return {rect.x + rect.width * along, rect.y + 0.5f};
         case GravityDirection::LEFT:
-            return {rect.x - 0.5f, rect.y + rect.height * along};
+            return {rect.x + 0.5f, rect.y + rect.height * along};
         case GravityDirection::RIGHT:
-            return {rect.x + rect.width + 0.5f, rect.y + rect.height * along};
+            return {rect.x + rect.width - 0.5f, rect.y + rect.height * along};
     }
     return {rect.x + rect.width * along, rect.y + rect.height};
 }
@@ -148,7 +156,26 @@ int scaledCount(int count) {
     return std::max(1, static_cast<int>(std::round(count * particleParams.density)));
 }
 
+bool pointInSolidTile(Vector2 point) {
+    Rectangle probe{point.x - 0.25f, point.y - 0.25f, 0.5f, 0.5f};
+    for (CollisionRect* rect : CollisionRect::query(probe, true)) {
+        if (!rect || !CheckCollisionPointRec(point, rect->getSurface())) continue;
+
+        GObject* owner = rect->getFather();
+        if (owner && Object_m::level_tiles_.find(owner->id_) != Object_m::level_tiles_.end()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool particleShouldDieInSolid(const Particle& particle) {
+    return particle.kind == ParticleKind::Dust && pointInSolidTile(particle.pos);
+}
+
 void pushParticle(const Particle& particle) {
+    if (particleShouldDieInSolid(particle)) return;
+
     if (particles.size() >= MAX_PARTICLES) {
         particles.erase(particles.begin(), particles.begin() + static_cast<long>(std::min<size_t>(particles.size(), 24)));
     }
@@ -185,6 +212,7 @@ void emitSurfaceDust(Rectangle source, GravityDirection dir, int count, float st
         p.length = 0.0f;
         p.color = pickDustColor();
         p.style = ParticleStyle::Circle;
+        p.kind = ParticleKind::Dust;
         pushParticle(p);
     }
 }
@@ -205,7 +233,7 @@ void Particle_m::update(float dt) {
 
     particles.erase(
         std::remove_if(particles.begin(), particles.end(), [](const Particle& p) {
-            return p.age >= p.life;
+            return p.age >= p.life || particleShouldDieInSolid(p);
         }),
         particles.end());
 }
@@ -213,6 +241,8 @@ void Particle_m::update(float dt) {
 void Particle_m::draw() {
     for (const Particle& p : particles) {
         if (p.life <= 0.0f) continue;
+        if (particleShouldDieInSolid(p)) continue;
+
         const float t = std::clamp(p.age / p.life, 0.0f, 1.0f);
         const float fade = (1.0f - t) * (1.0f - t);
         const float size = p.startSize + (p.endSize - p.startSize) * t;
@@ -290,6 +320,7 @@ void Particle_m::emitWaterSplash(Rectangle source, Rectangle waterRect, GravityD
         p.length = randRange(2.5f, 5.5f);
         p.color = pickWaterColor();
         p.style = (i % 3 == 0) ? ParticleStyle::Streak : ParticleStyle::Circle;
+        p.kind = ParticleKind::Water;
         pushParticle(p);
     }
 }

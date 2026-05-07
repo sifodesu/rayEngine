@@ -7,7 +7,7 @@ class Particle_m {
 public:
     struct Params {
         bool enabled = true;
-        float density = 1.0f;
+        float density = 0.3f;
         float sizeScale = 1.0f;
         float lifetimeScale = 1.0f;
         float dustSpeedScale = 1.0f;
