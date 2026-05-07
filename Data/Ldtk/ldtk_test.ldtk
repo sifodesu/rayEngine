@@ -1388,7 +1388,7 @@
 			"renderMode": "Tile",
 			"showName": true,
 			"tilesetId": 22,
-			"tileRenderMode": "Cover",
+			"tileRenderMode": "FitInside",
 			"tileRect": { "tilesetUid": 22, "x": 0, "y": 0, "w": 8, "h": 8 },
 			"uiTileRect": null,
 			"nineSliceBorders": [],
@@ -5430,14 +5430,14 @@
 			}
 		},
 		{
-			"__cWid": 1,
-			"__cHei": 2,
+			"__cWid": 2,
+			"__cHei": 3,
 			"identifier": "Heart",
 			"uid": 22,
 			"relPath": "../Textures/chara_walk.aseprite",
 			"embedAtlas": null,
-			"pxWid": 8,
-			"pxHei": 10,
+			"pxWid": 16,
+			"pxHei": 20,
 			"tileGridSize": 8,
 			"spacing": 0,
 			"padding": 0,
@@ -5446,7 +5446,7 @@
 			"enumTags": [],
 			"customData": [],
 			"savedSelections": [],
-			"cachedPixelData": null
+			"cachedPixelData": { "opaqueTiles": "000011", "averageColors": "d44bc44bc55bc55b00000000" }
 		},
 		{
 			"__cWid": 51,
