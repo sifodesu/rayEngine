@@ -502,7 +502,7 @@ void EndFrame() { rlImGuiEnd(); }
 void DrawWindows() {
     // drawPlayerWindow();
     // drawVisibleModelWindow();
-    drawGlitchSpriteWindow();
+    // drawGlitchSpriteWindow();
     // drawCRTWindow();
     // Shader_m::resetCRTParams();
     // drawParticleWindow();

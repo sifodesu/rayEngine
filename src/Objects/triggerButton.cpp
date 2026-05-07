@@ -84,6 +84,16 @@ bool TriggerButton::isButtonActivated(const std::string& id) {
     return persistentIt != persistentActivations_.end() && persistentIt->second;
 }
 
+bool TriggerButton::getButtonRect(const std::string& id, Rectangle& out) {
+    auto it = registry_.find(id);
+    if (it == registry_.end() || !it->second || !it->second->body_) {
+        return false;
+    }
+
+    out = it->second->body_->getSurface();
+    return true;
+}
+
 void TriggerButton::clearPersistentState() {
     registry_.clear();
     persistentActivations_.clear();

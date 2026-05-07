@@ -19,6 +19,7 @@ public:
     bool isActivated() const { return activated_; }
 
     static bool isButtonActivated(const std::string& id);
+    static bool getButtonRect(const std::string& id, Rectangle& out);
     static void clearPersistentState();
 
 private:

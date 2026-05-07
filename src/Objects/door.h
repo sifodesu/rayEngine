@@ -20,9 +20,20 @@ private:
     bool shouldOpen() const;
     void setOpen(bool open);
     bool isIndicatorLit(std::size_t index) const;
+    void ensureCableCache(Rectangle rect);
+    void drawCables(Rectangle rect);
     void drawIndicators(Rectangle rect) const;
 
+    struct CablePath {
+        std::string buttonId;
+        std::vector<Vector2> points;
+        float seed{0.0f};
+        bool attempted{false};
+        bool hasPath{false};
+    };
+
     std::vector<std::string> buttonIds_;
+    std::vector<CablePath> cablePaths_;
     std::string registryId_;
     bool open_{false};
 
