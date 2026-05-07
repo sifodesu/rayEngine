@@ -166,8 +166,21 @@ IntGridInfo extractIntGrid(const json& level) {
 // Tile Spawning
 // ----------------------------------------------------------------------------
 
+Color tintFromLayerOpacity(float opacity) {
+    opacity = std::clamp(opacity, 0.0f, 1.0f);
+    Color tint = WHITE;
+    tint.a = static_cast<unsigned char>(std::round(opacity * 255.0f));
+    return tint;
+}
+
+Color tintWithAlphaMultiplier(Color tint, float opacity) {
+    opacity = std::clamp(opacity, 0.0f, 1.0f);
+    tint.a = static_cast<unsigned char>(std::round(static_cast<float>(tint.a) * opacity));
+    return tint;
+}
+
 void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy, 
-               int px, int py, int layer, const string& typeStr = "") {
+               int px, int py, int layer, Color tint = WHITE, const string& typeStr = "") {
     SpawnData d;
     d.id = Object_m::genID();
     d.isTileInstance = true;
@@ -187,7 +200,7 @@ void spawnTile(const string& tilesetFile, int tileSize, int sx, int sy,
     // Setup sprite
     SpriteDesc sd;
     sd.filename = tilesetFile;
-    sd.tint = WHITE;
+    sd.tint = tint;
     sd.frameRects.push_back({(float)sx, (float)sy, (float)tileSize, (float)tileSize});
     d.sprite = sd;
     
@@ -790,7 +803,7 @@ void fillEntityFields(const json& inst, SpawnData& d, int layerGridSize, int wor
 
 void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const string& tilesetFile,
                       const map<int, TilesetInfo>& tilesetInfo, const IntGridInfo& intGrid,
-                      int worldX, int worldY, int layer) {
+                      int worldX, int worldY, int layer, Color tint = WHITE) {
     // Get tileset info for type lookups
     const TilesetInfo* tsInfo = nullptr;
     auto tsIt = tilesetInfo.find(tilesetUid);
@@ -803,6 +816,7 @@ void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const
         int localPy = tile["px"][1];
         int sx = tile["src"][0];
         int sy = tile["src"][1];
+        Color tileTint = tintWithAlphaMultiplier(tint, tile.value("a", 1.0f));
         
         // Look up tile type from enum tags
         string tileType = "";
@@ -814,7 +828,7 @@ void processTileArray(const json& tileArray, int tileSize, int tilesetUid, const
             }
         }
         
-        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, layer, tileType);
+        spawnTile(tilesetFile, tileSize, sx, sy, localPx + worldX, localPy + worldY, layer, tileTint, tileType);
     }
 }
 
@@ -937,25 +951,26 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
             // last is behind. The engine draws lower layer numbers first.
             const int drawLayer = drawOrderForLdtkLayer(layerIndex, layerCount);
             string type = layer["__type"].get<string>();
+            Color layerTint = tintFromLayerOpacity(layer.value("__opacity", 1.0f));
             if (type == "Tiles") { // Tile layer -> spawn tiles
                 int tileSize = layer["__gridSize"].get<int>();
                 int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                 processTileArray(layer["gridTiles"], tileSize, tilesetUid, tilesetFile, 
-                                tilesetInfo, intGrid, worldX, worldY, drawLayer);
+                                tilesetInfo, intGrid, worldX, worldY, drawLayer, layerTint);
             } else if (type == "AutoLayer") { // AutoLayer -> spawn autolayer tiles
                 int tileSize = layer["__gridSize"].get<int>();
                 int tilesetUid = layer.value("__tilesetDefUid", -1);
                 string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                 processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
-                                tilesetInfo, intGrid, worldX, worldY, drawLayer);
+                                tilesetInfo, intGrid, worldX, worldY, drawLayer, layerTint);
             } else if (type == "IntGrid") { // IntGrid layer -> spawn auto-generated tiles if any
                 if (layer.contains("autoLayerTiles") && !layer["autoLayerTiles"].empty()) {
                     int tileSize = layer["__gridSize"].get<int>();
                     int tilesetUid = layer.value("__tilesetDefUid", -1);
                     string tilesetFile = basename(layer.value("__tilesetRelPath", string{}));
                     processTileArray(layer["autoLayerTiles"], tileSize, tilesetUid, tilesetFile, 
-                                    tilesetInfo, intGrid, worldX, worldY, drawLayer);
+                                    tilesetInfo, intGrid, worldX, worldY, drawLayer, layerTint);
                 }
             } else if (type == "Entities") { // Entity layer -> spawn entities
                 int entityGridSize = layer["__gridSize"].get<int>();

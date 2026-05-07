@@ -162,9 +162,12 @@ void Sprite::draw(Vector2 pos) {
         src.height = -src.height;
     }
 
+    bool alphaBlendActive = tint_.a < 255;
+    if (alphaBlendActive) BeginBlendMode(BLEND_ALPHA);
     bool shaderActive = beginGlitchShader(src);
     DrawTextureRec(sprite_sheet_, src, pos, tint_);
     if (shaderActive) EndShaderMode();
+    if (alphaBlendActive) EndBlendMode();
 }
 
 void Sprite::draw(Rectangle targetRect) {
@@ -202,7 +205,10 @@ void Sprite::draw(Rectangle targetRect) {
     Rectangle rotatedTarget = targetRect;
     rotatedTarget.x += origin.x; // Offset to center
     rotatedTarget.y += origin.y;
+    bool alphaBlendActive = tint_.a < 255;
+    if (alphaBlendActive) BeginBlendMode(BLEND_ALPHA);
     bool shaderActive = beginGlitchShader(src);
     DrawTexturePro(sprite_sheet_, src, rotatedTarget, origin, rotation_, tint_);
     if (shaderActive) EndShaderMode();
+    if (alphaBlendActive) EndBlendMode();
 }
