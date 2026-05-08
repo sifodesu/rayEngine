@@ -44,6 +44,7 @@ private:
     // Helpers
     bool isOnGround() const;
     void separateFromCollisions();
+    void drawAdiHud(Rectangle bodyRect) const;
     void updateDeathRespawn(double delta);
     void finishRespawn();
     bool shouldDrawDuringDeath() const;

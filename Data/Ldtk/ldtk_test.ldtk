@@ -5207,6 +5207,41 @@
 			"fieldDefs": []
 		},
 		{
+			"identifier": "CloneKiller",
+			"uid": 7226,
+			"tags": ["clone"],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": "Clone-only hazard. Destroys PlayerClone entities and leaves the player alive.",
+			"width": 8,
+			"height": 8,
+			"resizableX": true,
+			"resizableY": true,
+			"minWidth": 8,
+			"maxWidth": null,
+			"minHeight": 8,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 0.25,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#FF3860",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "Stretch",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
+		},
+		{
 			"identifier": "Button",
 			"uid": 7222,
 			"tags": ["button"],
@@ -57738,7 +57773,7 @@
 						},
 						{
 							"__identifier": "CloneButton",
-							"__grid": [138,224],
+							"__grid": [145,224],
 							"__pivot": [0,0],
 							"__tags": ["adi"],
 							"__tile": null,
@@ -57747,7 +57782,7 @@
 							"width": 8,
 							"height": 8,
 							"defUid": 7219,
-							"px": [1104,1792],
+							"px": [1160,1792],
 							"fieldInstances": [{ "__identifier": "trigger", "__type": "EntityRef", "__value": {
 								"entityIid": "26bb8600-48b0-11f1-a9a3-dd20173f9432",
 								"layerIid": "4c19ee62-21a0-11f1-b52e-5d376982b88f",
@@ -57757,7 +57792,7 @@
 								"id": "V_String",
 								"params": ["26bb8600-48b0-11f1-a9a3-dd20173f9432"]
 							}] }],
-							"__worldX": 464,
+							"__worldX": 520,
 							"__worldY": 832
 						},
 						{
@@ -57876,7 +57911,7 @@
 						},
 						{
 							"__identifier": "Checkpoint",
-							"__grid": [146,223],
+							"__grid": [144,222],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": { "tilesetUid": 20, "x": 0, "y": 104, "w": 8, "h": 8 },
@@ -57885,14 +57920,62 @@
 							"width": 8,
 							"height": 16,
 							"defUid": 37,
-							"px": [1168,1784],
+							"px": [1152,1776],
 							"fieldInstances": [
 								{ "__identifier": "Type", "__type": "LocalEnum.Type", "__value": "Checkpoint", "__tile": null, "defUid": 61, "realEditorValues": [] },
 								{ "__identifier": "glitched", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7203, "realEditorValues": [] },
 								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7002, "realEditorValues": [] }
 							],
+							"__worldX": 512,
+							"__worldY": 816
+						},
+						{
+							"__identifier": "Door",
+							"__grid": [146,223],
+							"__pivot": [0,0],
+							"__tags": ["door"],
+							"__tile": null,
+							"__smartColor": "#606A5E",
+							"iid": "998ca6d0-48b0-11f1-8369-37a4d8c0bc59",
+							"width": 8,
+							"height": 16,
+							"defUid": 7223,
+							"px": [1168,1784],
+							"fieldInstances": [{ "__identifier": "buttonRefs", "__type": "Array<EntityRef>", "__value": [ {
+								"entityIid": "98f9bd40-48b0-11f1-a9a3-47159d6ed535",
+								"layerIid": "4c19ee62-21a0-11f1-b52e-5d376982b88f",
+								"levelIid": "4c19ee60-21a0-11f1-b52e-332122951c25",
+								"worldIid": "e50a8b71-5e50-11f0-acf6-6fc33ccd8c1d"
+							}, {
+								"entityIid": "9ad8b670-48b0-11f1-a9a3-e772ac6ea9ea",
+								"layerIid": "4c19ee62-21a0-11f1-b52e-5d376982b88f",
+								"levelIid": "4c19ee60-21a0-11f1-b52e-332122951c25",
+								"worldIid": "e50a8b71-5e50-11f0-acf6-6fc33ccd8c1d"
+							} ], "__tile": null, "defUid": 7224, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["98f9bd40-48b0-11f1-a9a3-47159d6ed535"]
+							}, {
+								"id": "V_String",
+								"params": ["9ad8b670-48b0-11f1-a9a3-e772ac6ea9ea"]
+							} ] }],
 							"__worldX": 528,
 							"__worldY": 824
+						},
+						{
+							"__identifier": "CloneKiller",
+							"__grid": [123,229],
+							"__pivot": [0,0],
+							"__tags": ["clone"],
+							"__tile": null,
+							"__smartColor": "#FF3860",
+							"iid": "05302600-48b0-11f1-97eb-fb15cd988f4d",
+							"width": 8,
+							"height": 56,
+							"defUid": 7226,
+							"px": [984,1832],
+							"fieldInstances": [],
+							"__worldX": 344,
+							"__worldY": 872
 						}
 					]
 				},

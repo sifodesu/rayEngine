@@ -75,9 +75,35 @@ void AdiComponent::setActivated(bool activated) {
     }
 }
 
+int AdiComponent::clearStoredAdi(Character* refundTarget) {
+    int oldAdi = currentAdi;
+    if (oldAdi <= 0) return 0;
+
+    currentAdi = 0;
+    if (refundTarget) {
+        for (int i = 0; i < oldAdi; ++i) {
+            refundTarget->retrieveOneAdi();
+        }
+    }
+
+    if (onAdiChanged) {
+        onAdiChanged(oldAdi, currentAdi);
+    }
+
+    updateActivation();
+    return oldAdi;
+}
+
 void AdiComponent::setTriggered(bool triggered) {
+    setTriggeredBy("", triggered);
+}
+
+void AdiComponent::setTriggeredBy(const std::string& sourceId, bool triggered) {
     if (canBeTriggered) {
         // Notifier qu'on a été triggered
+        if (onTriggeredBy) {
+            onTriggeredBy(sourceId, triggered);
+        }
         if (onTriggered) {
             onTriggered(triggered);
         }
@@ -114,7 +140,7 @@ void AdiComponent::triggerTargets(bool activated) {
         if (it != triggerRegistry_.end() && it->second) {
             AdiComponent* target = it->second;
             if (target->canBeTriggered) {
-                target->setTriggered(activated);
+                target->setTriggeredBy(ldtkId_, activated);
             }
         }
     }
@@ -129,6 +155,12 @@ void AdiComponent::registerForTrigger(const std::string& id, AdiComponent* compo
 
 void AdiComponent::unregisterForTrigger(const std::string& id) {
     triggerRegistry_.erase(id);
+}
+
+AdiComponent* AdiComponent::findRegistered(const std::string& id) {
+    auto it = triggerRegistry_.find(id);
+    if (it == triggerRegistry_.end()) return nullptr;
+    return it->second;
 }
 
 void AdiComponent::clearTriggerRegistry() {

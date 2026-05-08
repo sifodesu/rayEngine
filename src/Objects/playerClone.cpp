@@ -4,6 +4,7 @@
 #include "portal.h"
 #include "raycam_m.h"
 
+#include <utility>
 #include <vector>
 
 namespace {
@@ -65,6 +66,24 @@ PlayerClone::PlayerClone(const SpawnData& data)
     if (body_) body_->setSolid(true);
 }
 
+void PlayerClone::destroyClone() {
+    if (to_delete_) return;
+    to_delete_ = true;
+    notifyDestroyed();
+}
+
+void PlayerClone::setOnDestroyed(std::function<void(PlayerClone&)> onDestroyed) {
+    onDestroyed_ = std::move(onDestroyed);
+}
+
+void PlayerClone::notifyDestroyed() {
+    if (destructionNotified_) return;
+    destructionNotified_ = true;
+    if (onDestroyed_) {
+        onDestroyed_(*this);
+    }
+}
+
 PlayerClone* PlayerClone::spawnFromPlayerAt(Rectangle spawnArea, int layer) {
     RigidBody* playerBody = Raycam_m::getTarget();
     if (!playerBody) return nullptr;
@@ -108,7 +127,9 @@ PlayerClone* PlayerClone::spawnFromPlayerAt(Rectangle spawnArea, int layer) {
 }
 
 void PlayerClone::routine() {
+    if (to_delete_) return;
     Character::routine();
+    if (to_delete_) return;
     if (!armed_) {
         if (!overlapsPlayer(body_)) {
             armed_ = true;
@@ -129,6 +150,7 @@ bool PlayerClone::blocksMovementFor(GObject* moving) const {
 }
 
 void PlayerClone::onCollision(GObject* other) {
+    if (to_delete_) return;
     Character::onCollision(other);
 
     if (!armed_ || !isPlayerObject(other) || !touchesPlayer(body_)) return;

@@ -26,6 +26,7 @@ enum class EntityType {
     CloneTrigger,
     CloneButton,
     CloneSpawner,
+    CloneKiller,
     Button,
     Door
 };
@@ -54,6 +55,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "CloneTrigger") return EntityType::CloneTrigger;
     if (typeStr == "CloneButton") return EntityType::CloneButton;
     if (typeStr == "CloneSpawner") return EntityType::CloneSpawner;
+    if (typeStr == "CloneKiller") return EntityType::CloneKiller;
     if (typeStr == "Button" || typeStr == "TriggerButton") return EntityType::Button;
     if (typeStr == "Door" || typeStr == "TriggerDoor") return EntityType::Door;
     return EntityType::Basic; // default fallback

@@ -24,6 +24,7 @@
 #include "cloneTrigger.h"
 #include "cloneButton.h"
 #include "cloneSpawner.h"
+#include "cloneKiller.h"
 #include "triggerButton.h"
 #include "door.h"
 #include "particle_m.h"
@@ -106,6 +107,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::CloneSpawner:
             obj = std::make_unique<CloneSpawner>(data);
+            break;
+        case EntityType::CloneKiller:
+            obj = std::make_unique<CloneKiller>(data);
             break;
         case EntityType::Button:
             obj = std::make_unique<TriggerButton>(data);

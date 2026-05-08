@@ -1,0 +1,2726 @@
+{
+  "sources": [
+    {
+      "slug": "ig01",
+      "source": "Data/Textures/decor/ig_0393d838c8b188a10169fc46c9158c8191865acbbd407d87ce.png",
+      "alpha_sheet": "Data/Textures/decor/usable_ig/sheets/ig01_stone_energy_decor_alpha.png",
+      "sprite_count": 40
+    },
+    {
+      "slug": "ig02",
+      "source": "Data/Textures/decor/ig_0393d838c8b188a10169fc48f6d2c481918994b410c3873844.png",
+      "alpha_sheet": "Data/Textures/decor/usable_ig/sheets/ig02_gray_stone_tiles_alpha.png",
+      "sprite_count": 62
+    },
+    {
+      "slug": "ig03",
+      "source": "Data/Textures/decor/ig_0393d838c8b188a10169fc4a8b0be481919ef66128028b4c9d.png",
+      "alpha_sheet": "Data/Textures/decor/usable_ig/sheets/ig03_purple_stone_tiles_alpha.png",
+      "sprite_count": 58
+    }
+  ],
+  "sprites": [
+    {
+      "id": "ig01_001",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_001_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_001_stone_energy_decor_25.png",
+      "bbox": [
+        11,
+        11,
+        157,
+        168
+      ],
+      "size": [
+        146,
+        157
+      ]
+    },
+    {
+      "id": "ig01_002",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_002_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_002_stone_energy_decor_25.png",
+      "bbox": [
+        175,
+        11,
+        419,
+        168
+      ],
+      "size": [
+        244,
+        157
+      ]
+    },
+    {
+      "id": "ig01_003",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_003_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_003_stone_energy_decor_25.png",
+      "bbox": [
+        429,
+        11,
+        667,
+        168
+      ],
+      "size": [
+        238,
+        157
+      ]
+    },
+    {
+      "id": "ig01_004",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_004_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_004_stone_energy_decor_25.png",
+      "bbox": [
+        680,
+        11,
+        839,
+        195
+      ],
+      "size": [
+        159,
+        184
+      ]
+    },
+    {
+      "id": "ig01_005",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_005_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_005_stone_energy_decor_25.png",
+      "bbox": [
+        745,
+        78,
+        838,
+        195
+      ],
+      "size": [
+        93,
+        117
+      ]
+    },
+    {
+      "id": "ig01_006",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_006_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_006_stone_energy_decor_25.png",
+      "bbox": [
+        854,
+        11,
+        1041,
+        215
+      ],
+      "size": [
+        187,
+        204
+      ]
+    },
+    {
+      "id": "ig01_007",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_007_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_007_stone_energy_decor_25.png",
+      "bbox": [
+        1052,
+        11,
+        1208,
+        206
+      ],
+      "size": [
+        156,
+        195
+      ]
+    },
+    {
+      "id": "ig01_008",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_008_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_008_stone_energy_decor_25.png",
+      "bbox": [
+        1229,
+        11,
+        1330,
+        205
+      ],
+      "size": [
+        101,
+        194
+      ]
+    },
+    {
+      "id": "ig01_009",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_009_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_009_stone_energy_decor_25.png",
+      "bbox": [
+        11,
+        213,
+        157,
+        477
+      ],
+      "size": [
+        146,
+        264
+      ]
+    },
+    {
+      "id": "ig01_010",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_010_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_010_stone_energy_decor_25.png",
+      "bbox": [
+        177,
+        215,
+        308,
+        478
+      ],
+      "size": [
+        131,
+        263
+      ]
+    },
+    {
+      "id": "ig01_011",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_011_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_011_stone_energy_decor_25.png",
+      "bbox": [
+        328,
+        215,
+        588,
+        479
+      ],
+      "size": [
+        260,
+        264
+      ]
+    },
+    {
+      "id": "ig01_012",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_012_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_012_stone_energy_decor_25.png",
+      "bbox": [
+        599,
+        215,
+        787,
+        478
+      ],
+      "size": [
+        188,
+        263
+      ]
+    },
+    {
+      "id": "ig01_013",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_013_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_013_stone_energy_decor_25.png",
+      "bbox": [
+        796,
+        212,
+        994,
+        478
+      ],
+      "size": [
+        198,
+        266
+      ]
+    },
+    {
+      "id": "ig01_014",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_014_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_014_stone_energy_decor_25.png",
+      "bbox": [
+        1012,
+        215,
+        1155,
+        477
+      ],
+      "size": [
+        143,
+        262
+      ]
+    },
+    {
+      "id": "ig01_015",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_015_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_015_stone_energy_decor_25.png",
+      "bbox": [
+        1175,
+        234,
+        1338,
+        477
+      ],
+      "size": [
+        163,
+        243
+      ]
+    },
+    {
+      "id": "ig01_016",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_016_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_016_stone_energy_decor_25.png",
+      "bbox": [
+        11,
+        494,
+        156,
+        686
+      ],
+      "size": [
+        145,
+        192
+      ]
+    },
+    {
+      "id": "ig01_017",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_017_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_017_stone_energy_decor_25.png",
+      "bbox": [
+        178,
+        492,
+        386,
+        685
+      ],
+      "size": [
+        208,
+        193
+      ]
+    },
+    {
+      "id": "ig01_018",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_018_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_018_stone_energy_decor_25.png",
+      "bbox": [
+        400,
+        493,
+        589,
+        686
+      ],
+      "size": [
+        189,
+        193
+      ]
+    },
+    {
+      "id": "ig01_019",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_019_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_019_stone_energy_decor_25.png",
+      "bbox": [
+        623,
+        494,
+        752,
+        688
+      ],
+      "size": [
+        129,
+        194
+      ]
+    },
+    {
+      "id": "ig01_020",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_020_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_020_stone_energy_decor_25.png",
+      "bbox": [
+        780,
+        492,
+        987,
+        656
+      ],
+      "size": [
+        207,
+        164
+      ]
+    },
+    {
+      "id": "ig01_021",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_021_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_021_stone_energy_decor_25.png",
+      "bbox": [
+        1011,
+        492,
+        1164,
+        686
+      ],
+      "size": [
+        153,
+        194
+      ]
+    },
+    {
+      "id": "ig01_022",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_022_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_022_stone_energy_decor_25.png",
+      "bbox": [
+        1204,
+        494,
+        1323,
+        686
+      ],
+      "size": [
+        119,
+        192
+      ]
+    },
+    {
+      "id": "ig01_023",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_023_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_023_stone_energy_decor_25.png",
+      "bbox": [
+        1117,
+        708,
+        1329,
+        814
+      ],
+      "size": [
+        212,
+        106
+      ]
+    },
+    {
+      "id": "ig01_024",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_024_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_024_stone_energy_decor_25.png",
+      "bbox": [
+        7,
+        730,
+        265,
+        905
+      ],
+      "size": [
+        258,
+        175
+      ]
+    },
+    {
+      "id": "ig01_025",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_025_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_025_stone_energy_decor_25.png",
+      "bbox": [
+        252,
+        723,
+        436,
+        913
+      ],
+      "size": [
+        184,
+        190
+      ]
+    },
+    {
+      "id": "ig01_026",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_026_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_026_stone_energy_decor_25.png",
+      "bbox": [
+        432,
+        709,
+        588,
+        911
+      ],
+      "size": [
+        156,
+        202
+      ]
+    },
+    {
+      "id": "ig01_027",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_027_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_027_stone_energy_decor_25.png",
+      "bbox": [
+        609,
+        705,
+        710,
+        925
+      ],
+      "size": [
+        101,
+        220
+      ]
+    },
+    {
+      "id": "ig01_028",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_028_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_028_stone_energy_decor_25.png",
+      "bbox": [
+        747,
+        705,
+        843,
+        925
+      ],
+      "size": [
+        96,
+        220
+      ]
+    },
+    {
+      "id": "ig01_029",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_029_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_029_stone_energy_decor_25.png",
+      "bbox": [
+        875,
+        703,
+        963,
+        925
+      ],
+      "size": [
+        88,
+        222
+      ]
+    },
+    {
+      "id": "ig01_030",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_030_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_030_stone_energy_decor_25.png",
+      "bbox": [
+        973,
+        705,
+        1084,
+        925
+      ],
+      "size": [
+        111,
+        220
+      ]
+    },
+    {
+      "id": "ig01_031",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_031_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_031_stone_energy_decor_25.png",
+      "bbox": [
+        1114,
+        833,
+        1330,
+        929
+      ],
+      "size": [
+        216,
+        96
+      ]
+    },
+    {
+      "id": "ig01_032",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_032_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_032_stone_energy_decor_25.png",
+      "bbox": [
+        8,
+        943,
+        187,
+        1128
+      ],
+      "size": [
+        179,
+        185
+      ]
+    },
+    {
+      "id": "ig01_033",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_033_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_033_stone_energy_decor_25.png",
+      "bbox": [
+        206,
+        942,
+        370,
+        1123
+      ],
+      "size": [
+        164,
+        181
+      ]
+    },
+    {
+      "id": "ig01_034",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_034_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_034_stone_energy_decor_25.png",
+      "bbox": [
+        384,
+        944,
+        533,
+        1124
+      ],
+      "size": [
+        149,
+        180
+      ]
+    },
+    {
+      "id": "ig01_035",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_035_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_035_stone_energy_decor_25.png",
+      "bbox": [
+        591,
+        940,
+        694,
+        1160
+      ],
+      "size": [
+        103,
+        220
+      ]
+    },
+    {
+      "id": "ig01_036",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_036_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_036_stone_energy_decor_25.png",
+      "bbox": [
+        733,
+        940,
+        828,
+        1158
+      ],
+      "size": [
+        95,
+        218
+      ]
+    },
+    {
+      "id": "ig01_037",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_037_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_037_stone_energy_decor_25.png",
+      "bbox": [
+        863,
+        940,
+        953,
+        1158
+      ],
+      "size": [
+        90,
+        218
+      ]
+    },
+    {
+      "id": "ig01_038",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_038_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_038_stone_energy_decor_25.png",
+      "bbox": [
+        973,
+        941,
+        1086,
+        1158
+      ],
+      "size": [
+        113,
+        217
+      ]
+    },
+    {
+      "id": "ig01_039",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_039_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_039_stone_energy_decor_25.png",
+      "bbox": [
+        1115,
+        951,
+        1329,
+        1053
+      ],
+      "size": [
+        214,
+        102
+      ]
+    },
+    {
+      "id": "ig01_040",
+      "source_slug": "ig01",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig01_040_stone_energy_decor.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig01_040_stone_energy_decor_25.png",
+      "bbox": [
+        1115,
+        1073,
+        1328,
+        1159
+      ],
+      "size": [
+        213,
+        86
+      ]
+    },
+    {
+      "id": "ig02_001",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_001_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_001_gray_stone_tiles_25.png",
+      "bbox": [
+        33,
+        32,
+        161,
+        157
+      ],
+      "size": [
+        128,
+        125
+      ]
+    },
+    {
+      "id": "ig02_002",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_002_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_002_gray_stone_tiles_25.png",
+      "bbox": [
+        189,
+        32,
+        314,
+        157
+      ],
+      "size": [
+        125,
+        125
+      ]
+    },
+    {
+      "id": "ig02_003",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_003_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_003_gray_stone_tiles_25.png",
+      "bbox": [
+        346,
+        32,
+        470,
+        157
+      ],
+      "size": [
+        124,
+        125
+      ]
+    },
+    {
+      "id": "ig02_004",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_004_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_004_gray_stone_tiles_25.png",
+      "bbox": [
+        498,
+        32,
+        622,
+        159
+      ],
+      "size": [
+        124,
+        127
+      ]
+    },
+    {
+      "id": "ig02_005",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_005_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_005_gray_stone_tiles_25.png",
+      "bbox": [
+        652,
+        32,
+        783,
+        159
+      ],
+      "size": [
+        131,
+        127
+      ]
+    },
+    {
+      "id": "ig02_006",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_006_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_006_gray_stone_tiles_25.png",
+      "bbox": [
+        805,
+        32,
+        932,
+        157
+      ],
+      "size": [
+        127,
+        125
+      ]
+    },
+    {
+      "id": "ig02_007",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_007_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_007_gray_stone_tiles_25.png",
+      "bbox": [
+        961,
+        32,
+        1090,
+        159
+      ],
+      "size": [
+        129,
+        127
+      ]
+    },
+    {
+      "id": "ig02_008",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_008_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_008_gray_stone_tiles_25.png",
+      "bbox": [
+        1118,
+        32,
+        1245,
+        157
+      ],
+      "size": [
+        127,
+        125
+      ]
+    },
+    {
+      "id": "ig02_009",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_009_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_009_gray_stone_tiles_25.png",
+      "bbox": [
+        1191,
+        107,
+        1241,
+        157
+      ],
+      "size": [
+        50,
+        50
+      ]
+    },
+    {
+      "id": "ig02_010",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_010_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_010_gray_stone_tiles_25.png",
+      "bbox": [
+        1270,
+        32,
+        1396,
+        159
+      ],
+      "size": [
+        126,
+        127
+      ]
+    },
+    {
+      "id": "ig02_011",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_011_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_011_gray_stone_tiles_25.png",
+      "bbox": [
+        1425,
+        32,
+        1502,
+        157
+      ],
+      "size": [
+        77,
+        125
+      ]
+    },
+    {
+      "id": "ig02_012",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_012_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_012_gray_stone_tiles_25.png",
+      "bbox": [
+        35,
+        187,
+        163,
+        313
+      ],
+      "size": [
+        128,
+        126
+      ]
+    },
+    {
+      "id": "ig02_013",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_013_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_013_gray_stone_tiles_25.png",
+      "bbox": [
+        190,
+        187,
+        319,
+        313
+      ],
+      "size": [
+        129,
+        126
+      ]
+    },
+    {
+      "id": "ig02_014",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_014_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_014_gray_stone_tiles_25.png",
+      "bbox": [
+        344,
+        187,
+        470,
+        313
+      ],
+      "size": [
+        126,
+        126
+      ]
+    },
+    {
+      "id": "ig02_015",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_015_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_015_gray_stone_tiles_25.png",
+      "bbox": [
+        495,
+        187,
+        624,
+        313
+      ],
+      "size": [
+        129,
+        126
+      ]
+    },
+    {
+      "id": "ig02_016",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_016_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_016_gray_stone_tiles_25.png",
+      "bbox": [
+        648,
+        188,
+        777,
+        313
+      ],
+      "size": [
+        129,
+        125
+      ]
+    },
+    {
+      "id": "ig02_017",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_017_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_017_gray_stone_tiles_25.png",
+      "bbox": [
+        806,
+        189,
+        935,
+        313
+      ],
+      "size": [
+        129,
+        124
+      ]
+    },
+    {
+      "id": "ig02_018",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_018_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_018_gray_stone_tiles_25.png",
+      "bbox": [
+        958,
+        188,
+        1090,
+        313
+      ],
+      "size": [
+        132,
+        125
+      ]
+    },
+    {
+      "id": "ig02_019",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_019_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_019_gray_stone_tiles_25.png",
+      "bbox": [
+        1113,
+        188,
+        1246,
+        313
+      ],
+      "size": [
+        133,
+        125
+      ]
+    },
+    {
+      "id": "ig02_020",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_020_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_020_gray_stone_tiles_25.png",
+      "bbox": [
+        1269,
+        186,
+        1397,
+        313
+      ],
+      "size": [
+        128,
+        127
+      ]
+    },
+    {
+      "id": "ig02_021",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_021_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_021_gray_stone_tiles_25.png",
+      "bbox": [
+        1317,
+        241,
+        1397,
+        313
+      ],
+      "size": [
+        80,
+        72
+      ]
+    },
+    {
+      "id": "ig02_022",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_022_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_022_gray_stone_tiles_25.png",
+      "bbox": [
+        1424,
+        186,
+        1503,
+        313
+      ],
+      "size": [
+        79,
+        127
+      ]
+    },
+    {
+      "id": "ig02_023",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_023_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_023_gray_stone_tiles_25.png",
+      "bbox": [
+        33,
+        341,
+        161,
+        466
+      ],
+      "size": [
+        128,
+        125
+      ]
+    },
+    {
+      "id": "ig02_024",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_024_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_024_gray_stone_tiles_25.png",
+      "bbox": [
+        192,
+        339,
+        315,
+        466
+      ],
+      "size": [
+        123,
+        127
+      ]
+    },
+    {
+      "id": "ig02_025",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_025_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_025_gray_stone_tiles_25.png",
+      "bbox": [
+        346,
+        341,
+        470,
+        466
+      ],
+      "size": [
+        124,
+        125
+      ]
+    },
+    {
+      "id": "ig02_026",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_026_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_026_gray_stone_tiles_25.png",
+      "bbox": [
+        496,
+        343,
+        626,
+        466
+      ],
+      "size": [
+        130,
+        123
+      ]
+    },
+    {
+      "id": "ig02_027",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_027_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_027_gray_stone_tiles_25.png",
+      "bbox": [
+        648,
+        343,
+        782,
+        466
+      ],
+      "size": [
+        134,
+        123
+      ]
+    },
+    {
+      "id": "ig02_028",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_028_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_028_gray_stone_tiles_25.png",
+      "bbox": [
+        803,
+        343,
+        936,
+        466
+      ],
+      "size": [
+        133,
+        123
+      ]
+    },
+    {
+      "id": "ig02_029",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_029_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_029_gray_stone_tiles_25.png",
+      "bbox": [
+        957,
+        341,
+        1090,
+        466
+      ],
+      "size": [
+        133,
+        125
+      ]
+    },
+    {
+      "id": "ig02_030",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_030_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_030_gray_stone_tiles_25.png",
+      "bbox": [
+        1116,
+        341,
+        1246,
+        466
+      ],
+      "size": [
+        130,
+        125
+      ]
+    },
+    {
+      "id": "ig02_031",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_031_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_031_gray_stone_tiles_25.png",
+      "bbox": [
+        1273,
+        339,
+        1396,
+        468
+      ],
+      "size": [
+        123,
+        129
+      ]
+    },
+    {
+      "id": "ig02_032",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_032_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_032_gray_stone_tiles_25.png",
+      "bbox": [
+        1424,
+        341,
+        1506,
+        466
+      ],
+      "size": [
+        82,
+        125
+      ]
+    },
+    {
+      "id": "ig02_033",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_033_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_033_gray_stone_tiles_25.png",
+      "bbox": [
+        36,
+        497,
+        166,
+        623
+      ],
+      "size": [
+        130,
+        126
+      ]
+    },
+    {
+      "id": "ig02_034",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_034_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_034_gray_stone_tiles_25.png",
+      "bbox": [
+        187,
+        496,
+        317,
+        623
+      ],
+      "size": [
+        130,
+        127
+      ]
+    },
+    {
+      "id": "ig02_035",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_035_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_035_gray_stone_tiles_25.png",
+      "bbox": [
+        342,
+        495,
+        470,
+        625
+      ],
+      "size": [
+        128,
+        130
+      ]
+    },
+    {
+      "id": "ig02_036",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_036_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_036_gray_stone_tiles_25.png",
+      "bbox": [
+        498,
+        495,
+        624,
+        625
+      ],
+      "size": [
+        126,
+        130
+      ]
+    },
+    {
+      "id": "ig02_037",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_037_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_037_gray_stone_tiles_25.png",
+      "bbox": [
+        648,
+        498,
+        783,
+        621
+      ],
+      "size": [
+        135,
+        123
+      ]
+    },
+    {
+      "id": "ig02_038",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_038_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_038_gray_stone_tiles_25.png",
+      "bbox": [
+        802,
+        496,
+        934,
+        620
+      ],
+      "size": [
+        132,
+        124
+      ]
+    },
+    {
+      "id": "ig02_039",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_039_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_039_gray_stone_tiles_25.png",
+      "bbox": [
+        958,
+        497,
+        1094,
+        626
+      ],
+      "size": [
+        136,
+        129
+      ]
+    },
+    {
+      "id": "ig02_040",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_040_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_040_gray_stone_tiles_25.png",
+      "bbox": [
+        1105,
+        510,
+        1254,
+        626
+      ],
+      "size": [
+        149,
+        116
+      ]
+    },
+    {
+      "id": "ig02_041",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_041_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_041_gray_stone_tiles_25.png",
+      "bbox": [
+        1262,
+        497,
+        1397,
+        626
+      ],
+      "size": [
+        135,
+        129
+      ]
+    },
+    {
+      "id": "ig02_042",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_042_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_042_gray_stone_tiles_25.png",
+      "bbox": [
+        1422,
+        496,
+        1506,
+        626
+      ],
+      "size": [
+        84,
+        130
+      ]
+    },
+    {
+      "id": "ig02_043",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_043_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_043_gray_stone_tiles_25.png",
+      "bbox": [
+        30,
+        661,
+        164,
+        790
+      ],
+      "size": [
+        134,
+        129
+      ]
+    },
+    {
+      "id": "ig02_044",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_044_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_044_gray_stone_tiles_25.png",
+      "bbox": [
+        191,
+        661,
+        318,
+        790
+      ],
+      "size": [
+        127,
+        129
+      ]
+    },
+    {
+      "id": "ig02_045",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_045_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_045_gray_stone_tiles_25.png",
+      "bbox": [
+        343,
+        661,
+        471,
+        790
+      ],
+      "size": [
+        128,
+        129
+      ]
+    },
+    {
+      "id": "ig02_046",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_046_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_046_gray_stone_tiles_25.png",
+      "bbox": [
+        496,
+        661,
+        629,
+        790
+      ],
+      "size": [
+        133,
+        129
+      ]
+    },
+    {
+      "id": "ig02_047",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_047_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_047_gray_stone_tiles_25.png",
+      "bbox": [
+        651,
+        661,
+        785,
+        790
+      ],
+      "size": [
+        134,
+        129
+      ]
+    },
+    {
+      "id": "ig02_048",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_048_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_048_gray_stone_tiles_25.png",
+      "bbox": [
+        800,
+        661,
+        939,
+        790
+      ],
+      "size": [
+        139,
+        129
+      ]
+    },
+    {
+      "id": "ig02_049",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_049_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_049_gray_stone_tiles_25.png",
+      "bbox": [
+        958,
+        661,
+        1090,
+        790
+      ],
+      "size": [
+        132,
+        129
+      ]
+    },
+    {
+      "id": "ig02_050",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_050_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_050_gray_stone_tiles_25.png",
+      "bbox": [
+        1113,
+        662,
+        1246,
+        790
+      ],
+      "size": [
+        133,
+        128
+      ]
+    },
+    {
+      "id": "ig02_051",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_051_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_051_gray_stone_tiles_25.png",
+      "bbox": [
+        1269,
+        661,
+        1400,
+        791
+      ],
+      "size": [
+        131,
+        130
+      ]
+    },
+    {
+      "id": "ig02_052",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_052_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_052_gray_stone_tiles_25.png",
+      "bbox": [
+        1422,
+        661,
+        1508,
+        790
+      ],
+      "size": [
+        86,
+        129
+      ]
+    },
+    {
+      "id": "ig02_053",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_053_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_053_gray_stone_tiles_25.png",
+      "bbox": [
+        32,
+        815,
+        163,
+        945
+      ],
+      "size": [
+        131,
+        130
+      ]
+    },
+    {
+      "id": "ig02_054",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_054_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_054_gray_stone_tiles_25.png",
+      "bbox": [
+        191,
+        815,
+        319,
+        945
+      ],
+      "size": [
+        128,
+        130
+      ]
+    },
+    {
+      "id": "ig02_055",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_055_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_055_gray_stone_tiles_25.png",
+      "bbox": [
+        342,
+        815,
+        471,
+        945
+      ],
+      "size": [
+        129,
+        130
+      ]
+    },
+    {
+      "id": "ig02_056",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_056_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_056_gray_stone_tiles_25.png",
+      "bbox": [
+        496,
+        815,
+        625,
+        945
+      ],
+      "size": [
+        129,
+        130
+      ]
+    },
+    {
+      "id": "ig02_057",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_057_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_057_gray_stone_tiles_25.png",
+      "bbox": [
+        652,
+        815,
+        780,
+        945
+      ],
+      "size": [
+        128,
+        130
+      ]
+    },
+    {
+      "id": "ig02_058",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_058_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_058_gray_stone_tiles_25.png",
+      "bbox": [
+        801,
+        815,
+        934,
+        945
+      ],
+      "size": [
+        133,
+        130
+      ]
+    },
+    {
+      "id": "ig02_059",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_059_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_059_gray_stone_tiles_25.png",
+      "bbox": [
+        959,
+        815,
+        1091,
+        945
+      ],
+      "size": [
+        132,
+        130
+      ]
+    },
+    {
+      "id": "ig02_060",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_060_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_060_gray_stone_tiles_25.png",
+      "bbox": [
+        1113,
+        815,
+        1245,
+        946
+      ],
+      "size": [
+        132,
+        131
+      ]
+    },
+    {
+      "id": "ig02_061",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_061_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_061_gray_stone_tiles_25.png",
+      "bbox": [
+        1270,
+        815,
+        1400,
+        945
+      ],
+      "size": [
+        130,
+        130
+      ]
+    },
+    {
+      "id": "ig02_062",
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig02_062_gray_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig02_062_gray_stone_tiles_25.png",
+      "bbox": [
+        1423,
+        815,
+        1507,
+        945
+      ],
+      "size": [
+        84,
+        130
+      ]
+    },
+    {
+      "id": "ig03_001",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_001_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_001_purple_stone_tiles_25.png",
+      "bbox": [
+        40,
+        30,
+        176,
+        166
+      ],
+      "size": [
+        136,
+        136
+      ]
+    },
+    {
+      "id": "ig03_002",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_002_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_002_purple_stone_tiles_25.png",
+      "bbox": [
+        201,
+        30,
+        335,
+        166
+      ],
+      "size": [
+        134,
+        136
+      ]
+    },
+    {
+      "id": "ig03_003",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_003_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_003_purple_stone_tiles_25.png",
+      "bbox": [
+        204,
+        106,
+        256,
+        134
+      ],
+      "size": [
+        52,
+        28
+      ]
+    },
+    {
+      "id": "ig03_004",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_004_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_004_purple_stone_tiles_25.png",
+      "bbox": [
+        366,
+        29,
+        496,
+        166
+      ],
+      "size": [
+        130,
+        137
+      ]
+    },
+    {
+      "id": "ig03_005",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_005_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_005_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        29,
+        655,
+        166
+      ],
+      "size": [
+        131,
+        137
+      ]
+    },
+    {
+      "id": "ig03_006",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_006_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_006_purple_stone_tiles_25.png",
+      "bbox": [
+        684,
+        30,
+        816,
+        166
+      ],
+      "size": [
+        132,
+        136
+      ]
+    },
+    {
+      "id": "ig03_007",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_007_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_007_purple_stone_tiles_25.png",
+      "bbox": [
+        844,
+        30,
+        976,
+        168
+      ],
+      "size": [
+        132,
+        138
+      ]
+    },
+    {
+      "id": "ig03_008",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_008_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_008_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        29,
+        1136,
+        166
+      ],
+      "size": [
+        135,
+        137
+      ]
+    },
+    {
+      "id": "ig03_009",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_009_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_009_purple_stone_tiles_25.png",
+      "bbox": [
+        1032,
+        56,
+        1136,
+        166
+      ],
+      "size": [
+        104,
+        110
+      ]
+    },
+    {
+      "id": "ig03_010",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_010_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_010_purple_stone_tiles_25.png",
+      "bbox": [
+        1164,
+        30,
+        1296,
+        166
+      ],
+      "size": [
+        132,
+        136
+      ]
+    },
+    {
+      "id": "ig03_011",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_011_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_011_purple_stone_tiles_25.png",
+      "bbox": [
+        1220,
+        87,
+        1295,
+        166
+      ],
+      "size": [
+        75,
+        79
+      ]
+    },
+    {
+      "id": "ig03_012",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_012_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_012_purple_stone_tiles_25.png",
+      "bbox": [
+        1251,
+        120,
+        1293,
+        165
+      ],
+      "size": [
+        42,
+        45
+      ]
+    },
+    {
+      "id": "ig03_013",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_013_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_013_purple_stone_tiles_25.png",
+      "bbox": [
+        231,
+        139,
+        285,
+        165
+      ],
+      "size": [
+        54,
+        26
+      ]
+    },
+    {
+      "id": "ig03_014",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_014_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_014_purple_stone_tiles_25.png",
+      "bbox": [
+        51,
+        203,
+        95,
+        238
+      ],
+      "size": [
+        44,
+        35
+      ]
+    },
+    {
+      "id": "ig03_015",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_015_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_015_purple_stone_tiles_25.png",
+      "bbox": [
+        118,
+        226,
+        158,
+        264
+      ],
+      "size": [
+        40,
+        38
+      ]
+    },
+    {
+      "id": "ig03_016",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_016_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_016_purple_stone_tiles_25.png",
+      "bbox": [
+        202,
+        194,
+        338,
+        331
+      ],
+      "size": [
+        136,
+        137
+      ]
+    },
+    {
+      "id": "ig03_017",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_017_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_017_purple_stone_tiles_25.png",
+      "bbox": [
+        366,
+        194,
+        494,
+        331
+      ],
+      "size": [
+        128,
+        137
+      ]
+    },
+    {
+      "id": "ig03_018",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_018_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_018_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        194,
+        654,
+        331
+      ],
+      "size": [
+        130,
+        137
+      ]
+    },
+    {
+      "id": "ig03_019",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_019_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_019_purple_stone_tiles_25.png",
+      "bbox": [
+        684,
+        194,
+        815,
+        331
+      ],
+      "size": [
+        131,
+        137
+      ]
+    },
+    {
+      "id": "ig03_020",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_020_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_020_purple_stone_tiles_25.png",
+      "bbox": [
+        844,
+        194,
+        976,
+        331
+      ],
+      "size": [
+        132,
+        137
+      ]
+    },
+    {
+      "id": "ig03_021",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_021_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_021_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        194,
+        1134,
+        333
+      ],
+      "size": [
+        133,
+        139
+      ]
+    },
+    {
+      "id": "ig03_022",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_022_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_022_purple_stone_tiles_25.png",
+      "bbox": [
+        1239,
+        210,
+        1290,
+        263
+      ],
+      "size": [
+        51,
+        53
+      ]
+    },
+    {
+      "id": "ig03_023",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_023_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_023_purple_stone_tiles_25.png",
+      "bbox": [
+        69,
+        291,
+        106,
+        322
+      ],
+      "size": [
+        37,
+        31
+      ]
+    },
+    {
+      "id": "ig03_024",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_024_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_024_purple_stone_tiles_25.png",
+      "bbox": [
+        1190,
+        287,
+        1247,
+        328
+      ],
+      "size": [
+        57,
+        41
+      ]
+    },
+    {
+      "id": "ig03_025",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_025_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_025_purple_stone_tiles_25.png",
+      "bbox": [
+        41,
+        363,
+        174,
+        503
+      ],
+      "size": [
+        133,
+        140
+      ]
+    },
+    {
+      "id": "ig03_026",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_026_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_026_purple_stone_tiles_25.png",
+      "bbox": [
+        201,
+        362,
+        335,
+        504
+      ],
+      "size": [
+        134,
+        142
+      ]
+    },
+    {
+      "id": "ig03_027",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_027_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_027_purple_stone_tiles_25.png",
+      "bbox": [
+        364,
+        362,
+        492,
+        503
+      ],
+      "size": [
+        128,
+        141
+      ]
+    },
+    {
+      "id": "ig03_028",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_028_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_028_purple_stone_tiles_25.png",
+      "bbox": [
+        392,
+        395,
+        468,
+        474
+      ],
+      "size": [
+        76,
+        79
+      ]
+    },
+    {
+      "id": "ig03_029",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_029_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_029_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        362,
+        656,
+        503
+      ],
+      "size": [
+        132,
+        141
+      ]
+    },
+    {
+      "id": "ig03_030",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_030_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_030_purple_stone_tiles_25.png",
+      "bbox": [
+        684,
+        362,
+        816,
+        503
+      ],
+      "size": [
+        132,
+        141
+      ]
+    },
+    {
+      "id": "ig03_031",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_031_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_031_purple_stone_tiles_25.png",
+      "bbox": [
+        844,
+        362,
+        975,
+        503
+      ],
+      "size": [
+        131,
+        141
+      ]
+    },
+    {
+      "id": "ig03_032",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_032_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_032_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        362,
+        1136,
+        503
+      ],
+      "size": [
+        135,
+        141
+      ]
+    },
+    {
+      "id": "ig03_033",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_033_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_033_purple_stone_tiles_25.png",
+      "bbox": [
+        1163,
+        362,
+        1296,
+        420
+      ],
+      "size": [
+        133,
+        58
+      ]
+    },
+    {
+      "id": "ig03_034",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_034_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_034_purple_stone_tiles_25.png",
+      "bbox": [
+        1164,
+        413,
+        1295,
+        503
+      ],
+      "size": [
+        131,
+        90
+      ]
+    },
+    {
+      "id": "ig03_035",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_035_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_035_purple_stone_tiles_25.png",
+      "bbox": [
+        39,
+        544,
+        175,
+        692
+      ],
+      "size": [
+        136,
+        148
+      ]
+    },
+    {
+      "id": "ig03_036",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_036_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_036_purple_stone_tiles_25.png",
+      "bbox": [
+        203,
+        543,
+        335,
+        694
+      ],
+      "size": [
+        132,
+        151
+      ]
+    },
+    {
+      "id": "ig03_037",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_037_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_037_purple_stone_tiles_25.png",
+      "bbox": [
+        364,
+        544,
+        494,
+        692
+      ],
+      "size": [
+        130,
+        148
+      ]
+    },
+    {
+      "id": "ig03_038",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_038_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_038_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        543,
+        656,
+        692
+      ],
+      "size": [
+        132,
+        149
+      ]
+    },
+    {
+      "id": "ig03_039",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_039_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_039_purple_stone_tiles_25.png",
+      "bbox": [
+        684,
+        544,
+        816,
+        699
+      ],
+      "size": [
+        132,
+        155
+      ]
+    },
+    {
+      "id": "ig03_040",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_040_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_040_purple_stone_tiles_25.png",
+      "bbox": [
+        845,
+        544,
+        975,
+        688
+      ],
+      "size": [
+        130,
+        144
+      ]
+    },
+    {
+      "id": "ig03_041",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_041_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_041_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        544,
+        1134,
+        692
+      ],
+      "size": [
+        133,
+        148
+      ]
+    },
+    {
+      "id": "ig03_042",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_042_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_042_purple_stone_tiles_25.png",
+      "bbox": [
+        1155,
+        553,
+        1301,
+        692
+      ],
+      "size": [
+        146,
+        139
+      ]
+    },
+    {
+      "id": "ig03_043",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_043_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_043_purple_stone_tiles_25.png",
+      "bbox": [
+        39,
+        742,
+        176,
+        896
+      ],
+      "size": [
+        137,
+        154
+      ]
+    },
+    {
+      "id": "ig03_044",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_044_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_044_purple_stone_tiles_25.png",
+      "bbox": [
+        202,
+        742,
+        337,
+        896
+      ],
+      "size": [
+        135,
+        154
+      ]
+    },
+    {
+      "id": "ig03_045",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_045_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_045_purple_stone_tiles_25.png",
+      "bbox": [
+        364,
+        741,
+        496,
+        896
+      ],
+      "size": [
+        132,
+        155
+      ]
+    },
+    {
+      "id": "ig03_046",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_046_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_046_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        742,
+        657,
+        896
+      ],
+      "size": [
+        133,
+        154
+      ]
+    },
+    {
+      "id": "ig03_047",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_047_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_047_purple_stone_tiles_25.png",
+      "bbox": [
+        683,
+        742,
+        816,
+        896
+      ],
+      "size": [
+        133,
+        154
+      ]
+    },
+    {
+      "id": "ig03_048",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_048_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_048_purple_stone_tiles_25.png",
+      "bbox": [
+        843,
+        742,
+        976,
+        896
+      ],
+      "size": [
+        133,
+        154
+      ]
+    },
+    {
+      "id": "ig03_049",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_049_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_049_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        742,
+        1136,
+        896
+      ],
+      "size": [
+        135,
+        154
+      ]
+    },
+    {
+      "id": "ig03_050",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_050_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_050_purple_stone_tiles_25.png",
+      "bbox": [
+        1163,
+        742,
+        1296,
+        896
+      ],
+      "size": [
+        133,
+        154
+      ]
+    },
+    {
+      "id": "ig03_051",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_051_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_051_purple_stone_tiles_25.png",
+      "bbox": [
+        39,
+        934,
+        176,
+        1092
+      ],
+      "size": [
+        137,
+        158
+      ]
+    },
+    {
+      "id": "ig03_052",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_052_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_052_purple_stone_tiles_25.png",
+      "bbox": [
+        202,
+        934,
+        337,
+        1092
+      ],
+      "size": [
+        135,
+        158
+      ]
+    },
+    {
+      "id": "ig03_053",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_053_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_053_purple_stone_tiles_25.png",
+      "bbox": [
+        364,
+        933,
+        496,
+        1092
+      ],
+      "size": [
+        132,
+        159
+      ]
+    },
+    {
+      "id": "ig03_054",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_054_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_054_purple_stone_tiles_25.png",
+      "bbox": [
+        524,
+        934,
+        657,
+        1091
+      ],
+      "size": [
+        133,
+        157
+      ]
+    },
+    {
+      "id": "ig03_055",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_055_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_055_purple_stone_tiles_25.png",
+      "bbox": [
+        684,
+        934,
+        816,
+        1092
+      ],
+      "size": [
+        132,
+        158
+      ]
+    },
+    {
+      "id": "ig03_056",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_056_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_056_purple_stone_tiles_25.png",
+      "bbox": [
+        843,
+        934,
+        976,
+        1092
+      ],
+      "size": [
+        133,
+        158
+      ]
+    },
+    {
+      "id": "ig03_057",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_057_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_057_purple_stone_tiles_25.png",
+      "bbox": [
+        1001,
+        934,
+        1136,
+        1092
+      ],
+      "size": [
+        135,
+        158
+      ]
+    },
+    {
+      "id": "ig03_058",
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/sprites/ig03_058_purple_stone_tiles.png",
+      "preview": "Data/Textures/decor/usable_ig/previews/ig03_058_purple_stone_tiles_25.png",
+      "bbox": [
+        1163,
+        934,
+        1296,
+        1092
+      ],
+      "size": [
+        133,
+        158
+      ]
+    }
+  ],
+  "tilesets": [
+    {
+      "source_slug": "ig02",
+      "path": "Data/Textures/decor/usable_ig/tilesets/ig02_gray_stone_tiles_8x8.png",
+      "preview": "Data/Textures/decor/usable_ig/tilesets/ig02_gray_stone_tiles_8x8_preview.png",
+      "tile_size": 8,
+      "columns": 16,
+      "tile_count": 62,
+      "source_sprite_order": [
+        "ig02_001",
+        "ig02_002",
+        "ig02_003",
+        "ig02_004",
+        "ig02_005",
+        "ig02_006",
+        "ig02_007",
+        "ig02_008",
+        "ig02_009",
+        "ig02_010",
+        "ig02_011",
+        "ig02_012",
+        "ig02_013",
+        "ig02_014",
+        "ig02_015",
+        "ig02_016",
+        "ig02_017",
+        "ig02_018",
+        "ig02_019",
+        "ig02_020",
+        "ig02_021",
+        "ig02_022",
+        "ig02_023",
+        "ig02_024",
+        "ig02_025",
+        "ig02_026",
+        "ig02_027",
+        "ig02_028",
+        "ig02_029",
+        "ig02_030",
+        "ig02_031",
+        "ig02_032",
+        "ig02_033",
+        "ig02_034",
+        "ig02_035",
+        "ig02_036",
+        "ig02_037",
+        "ig02_038",
+        "ig02_039",
+        "ig02_040",
+        "ig02_041",
+        "ig02_042",
+        "ig02_043",
+        "ig02_044",
+        "ig02_045",
+        "ig02_046",
+        "ig02_047",
+        "ig02_048",
+        "ig02_049",
+        "ig02_050",
+        "ig02_051",
+        "ig02_052",
+        "ig02_053",
+        "ig02_054",
+        "ig02_055",
+        "ig02_056",
+        "ig02_057",
+        "ig02_058",
+        "ig02_059",
+        "ig02_060",
+        "ig02_061",
+        "ig02_062"
+      ]
+    },
+    {
+      "source_slug": "ig03",
+      "path": "Data/Textures/decor/usable_ig/tilesets/ig03_purple_stone_tiles_8x8.png",
+      "preview": "Data/Textures/decor/usable_ig/tilesets/ig03_purple_stone_tiles_8x8_preview.png",
+      "tile_size": 8,
+      "columns": 16,
+      "tile_count": 58,
+      "source_sprite_order": [
+        "ig03_001",
+        "ig03_002",
+        "ig03_003",
+        "ig03_004",
+        "ig03_005",
+        "ig03_006",
+        "ig03_007",
+        "ig03_008",
+        "ig03_009",
+        "ig03_010",
+        "ig03_011",
+        "ig03_012",
+        "ig03_013",
+        "ig03_014",
+        "ig03_015",
+        "ig03_016",
+        "ig03_017",
+        "ig03_018",
+        "ig03_019",
+        "ig03_020",
+        "ig03_021",
+        "ig03_022",
+        "ig03_023",
+        "ig03_024",
+        "ig03_025",
+        "ig03_026",
+        "ig03_027",
+        "ig03_028",
+        "ig03_029",
+        "ig03_030",
+        "ig03_031",
+        "ig03_032",
+        "ig03_033",
+        "ig03_034",
+        "ig03_035",
+        "ig03_036",
+        "ig03_037",
+        "ig03_038",
+        "ig03_039",
+        "ig03_040",
+        "ig03_041",
+        "ig03_042",
+        "ig03_043",
+        "ig03_044",
+        "ig03_045",
+        "ig03_046",
+        "ig03_047",
+        "ig03_048",
+        "ig03_049",
+        "ig03_050",
+        "ig03_051",
+        "ig03_052",
+        "ig03_053",
+        "ig03_054",
+        "ig03_055",
+        "ig03_056",
+        "ig03_057",
+        "ig03_058"
+      ]
+    }
+  ]
+}

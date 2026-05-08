@@ -496,11 +496,38 @@ Rectangle Character::spriteRectForBody(Rectangle bodyRect) const {
     };
 }
 
+void Character::drawAdiHud(Rectangle bodyRect) const {
+    if (adiCount_ <= 0) return;
+
+    constexpr float dotSize = 2.0f;
+    constexpr float dotSpacing = 4.0f;
+    constexpr float yOffset = 5.0f;
+
+    float totalWidth = dotSize + static_cast<float>(adiCount_ - 1) * dotSpacing;
+    float startX = bodyRect.x + bodyRect.width * 0.5f - totalWidth * 0.5f;
+    float y = bodyRect.y - yOffset;
+
+    for (int i = 0; i < adiCount_; ++i) {
+        float x = startX + static_cast<float>(i) * dotSpacing;
+        DrawRectangle(static_cast<int>(std::round(x - 1.0f)),
+                      static_cast<int>(std::round(y - 1.0f)),
+                      4,
+                      4,
+                      Color{0, 18, 26, 220});
+        DrawRectangle(static_cast<int>(std::round(x)),
+                      static_cast<int>(std::round(y)),
+                      static_cast<int>(dotSize),
+                      static_cast<int>(dotSize),
+                      Color{30, 229, 234, 255});
+    }
+}
+
 void Character::draw() {
     if (!shouldDrawDuringDeath()) return;
 
     updateSpriteRotation();
     current_anim_->draw(spriteRectForBody(body_->getSurface()));
+    drawAdiHud(body_->getSurface());
 }
 
 void Character::drawAtBody(Rectangle bodyRect) {
@@ -508,6 +535,7 @@ void Character::drawAtBody(Rectangle bodyRect) {
 
     updateSpriteRotation();
     current_anim_->draw(spriteRectForBody(bodyRect));
+    drawAdiHud(bodyRect);
 }
 
 void Character::collectDebugSprites(std::vector<Sprite*>& sprites) {

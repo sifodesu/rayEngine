@@ -41,6 +41,7 @@ public:
     // Gestion de l'état interne
     void setActivated(bool activated);
     bool getActivated() const { return isActivated; }
+    int clearStoredAdi(Character* refundTarget = nullptr);
     
     // Gestion du trigger externe (venant d'autres objets)
     void setTriggered(bool triggered);
@@ -57,15 +58,18 @@ public:
     std::function<void(int oldAdi, int newAdi)> onAdiChanged;
     std::function<void(bool activated)> onActivationChanged;
     std::function<void(bool triggered)> onTriggered;
+    std::function<void(const std::string& sourceId, bool triggered)> onTriggeredBy;
     
     // Fonctions utilitaires pour les interactions entre objets
     static void registerForTrigger(const std::string& id, AdiComponent* component);
     static void unregisterForTrigger(const std::string& id);
+    static AdiComponent* findRegistered(const std::string& id);
     static void clearTriggerRegistry();
     
 private:
     void updateActivation();
     void triggerTargets(bool activated);
+    void setTriggeredBy(const std::string& sourceId, bool triggered);
     
     bool wasActivated = false;
     std::string ldtkId_; // ID LDtk pour l'enregistrement dans le registre
