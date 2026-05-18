@@ -867,6 +867,10 @@ void spawnEntity(const json& e, int worldX, int worldY, int layer,
         std::string identifier = e["__identifier"].get<string>();
         d.entityType = stringToEntityType(identifier);
         d.typeDetail = identifier;
+        if (d.entityType == EntityType::Light) {
+            d.light = LightDesc{};
+            d.light->enabled = true;
+        }
     }
     
     // Fill entity data from LDtk fields

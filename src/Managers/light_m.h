@@ -15,6 +15,9 @@ public:
         float ambient{0.42f};
         float globalIntensity{1.0f};
         float falloff{1.55f};
+        bool ditherEnabled{true};
+        float ditherAmount{1.0f};
+        int ditherLevels{6};
     };
 
     static constexpr int MAX_SHADER_LIGHTS = 64;

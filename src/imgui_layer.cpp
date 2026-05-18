@@ -458,6 +458,10 @@ static void drawLightingWindow()
   ImGui::SliderFloat("Ambient", &params.ambient, 0.0f, 1.5f, "%.2f");
   ImGui::SliderFloat("Global intensity", &params.globalIntensity, 0.0f, 4.0f, "%.2f");
   ImGui::SliderFloat("Falloff", &params.falloff, 0.1f, 5.0f, "%.2f");
+  ImGui::SeparatorText("Light Disks");
+  ImGui::Checkbox("Concentric disks", &params.ditherEnabled);
+  ImGui::SliderFloat("Disk blend", &params.ditherAmount, 0.0f, 1.0f, "%.2f");
+  ImGui::SliderInt("Disk count", &params.ditherLevels, 1, 24);
 
   ImGui::End();
 }
@@ -508,7 +512,7 @@ void DrawWindows() {
     // drawParticleWindow();
     // drawStillWaterWindow();
     // drawFogWindow();
-    // drawLightingWindow();
+    drawLightingWindow();
 }
 
 } // namespace ImGuiLayer

@@ -15,6 +15,7 @@ enum class EntityType {
     FriablePlatform,
     Water,
     Fog,
+    Light,
     Shooter,
     Checkpoint,
     Kill,
@@ -44,6 +45,7 @@ inline EntityType stringToEntityType(const std::string& typeStr) {
     if (typeStr == "Water" || typeStr == "water") return EntityType::Water;
     if (typeStr == "Waterfall" || typeStr == "waterfall") return EntityType::Water;
     if (typeStr == "Fog" || typeStr == "fog") return EntityType::Fog;
+    if (typeStr == "Light" || typeStr == "light") return EntityType::Light;
     if (typeStr == "Shooter") return EntityType::Shooter;
     if (typeStr == "Checkpoint") return EntityType::Checkpoint;
     if (typeStr == "Kill") return EntityType::Kill;

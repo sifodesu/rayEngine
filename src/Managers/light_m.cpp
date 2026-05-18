@@ -94,6 +94,12 @@ void Light_m::upload(Shader shader) {
     if (loc >= 0) SetShaderValue(shader, loc, &p.ambient, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "lightFalloff");
     if (loc >= 0) SetShaderValue(shader, loc, &p.falloff, SHADER_UNIFORM_FLOAT);
+    float ditherAmount = p.ditherEnabled ? p.ditherAmount : 0.0f;
+    float ditherLevels = static_cast<float>(p.ditherLevels);
+    loc = GetShaderLocation(shader, "lightDitherAmount");
+    if (loc >= 0) SetShaderValue(shader, loc, &ditherAmount, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "lightDitherLevels");
+    if (loc >= 0) SetShaderValue(shader, loc, &ditherLevels, SHADER_UNIFORM_FLOAT);
 }
 
 void Light_m::drawDebug() {

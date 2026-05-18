@@ -16,6 +16,8 @@ uniform vec4 lights[MAX_LIGHTS];
 uniform vec4 lightColors[MAX_LIGHTS];
 uniform float ambientLight;
 uniform float lightFalloff;
+uniform float lightDitherAmount;
+uniform float lightDitherLevels;
 
 out vec4 finalColor;
 
@@ -27,6 +29,24 @@ vec2 uvToNativePx(vec2 uv) {
 bool insideNativeFrame(vec2 nativePx) {
     return nativePx.x >= 0.0 && nativePx.y >= 0.0 &&
            nativePx.x < nativeResolution.x && nativePx.y < nativeResolution.y;
+}
+
+float smoothLightAttenuation(float dist01, float falloff) {
+    float attenuation = pow(max(1.0 - dist01, 0.0), falloff);
+    attenuation *= 1.0 - smoothstep(0.0, 1.0, dist01);
+    return attenuation;
+}
+
+float diskLightAttenuation(float dist01, float falloff) {
+    float smoothAttenuation = smoothLightAttenuation(dist01, falloff);
+    float amount = clamp(lightDitherAmount, 0.0, 1.0);
+    if (amount <= 0.001) return smoothAttenuation;
+
+    float diskCount = max(floor(lightDitherLevels + 0.5), 1.0);
+    float diskIndex = min(floor(clamp(dist01, 0.0, 0.999999) * diskCount), diskCount - 1.0);
+    float diskDist01 = (diskIndex + 0.5) / diskCount;
+    float diskAttenuation = smoothLightAttenuation(diskDist01, falloff);
+    return mix(smoothAttenuation, diskAttenuation, amount);
 }
 
 void main() {
@@ -47,9 +67,9 @@ void main() {
         vec4 lightData = lights[i];
         float radius = max(lightData.z, 0.001);
         float intensity = max(lightData.w, 0.0);
-        float dist01 = clamp(length(nativePx - lightData.xy) / radius, 0.0, 1.0);
-        float attenuation = pow(1.0 - dist01, falloff);
-        attenuation *= 1.0 - smoothstep(0.0, 1.0, dist01);
+        float dist01 = length(nativePx - lightData.xy) / radius;
+        if (dist01 >= 1.0) continue;
+        float attenuation = diskLightAttenuation(dist01, falloff);
         light += lightColors[i].rgb * lightColors[i].a * intensity * attenuation;
     }
 

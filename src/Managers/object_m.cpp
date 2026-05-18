@@ -20,6 +20,7 @@
 #include "modelEnt.h"
 #include "water.h"
 #include "fog.h"
+#include "lightSource.h"
 #include "playerClone.h"
 #include "cloneTrigger.h"
 #include "cloneButton.h"
@@ -146,6 +147,9 @@ GObject* Object_m::createFromSpawn(const SpawnData& data)
             break;
         case EntityType::Fog:
             obj = std::make_unique<Fog>(data);
+            break;
+        case EntityType::Light:
+            obj = std::make_unique<LightSource>(data);
             break;
         case EntityType::Shooter:
             obj = std::make_unique<Shooter>(data);
