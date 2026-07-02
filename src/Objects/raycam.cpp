@@ -1,6 +1,6 @@
 #include "raycam.h"
 #include "rigidBody.h"
-#include "portal.h"
+#include "portal_m.h"
 #include "raymath.h"
 #include <cmath>
 #include "definitions.h"
@@ -30,7 +30,7 @@ void Raycam::routine() {
     if (to_follow_) {
         auto coords = to_follow_->getCenterCoord();
         if (GObject* followed = to_follow_->getFather()) {
-            if (auto visibleCenter = Portal::getTransitVisibleCenter(followed)) {
+            if (auto visibleCenter = Portal_m::visibleCenter(followed)) {
                 coords = *visibleCenter;
             }
         }

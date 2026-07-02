@@ -5,6 +5,7 @@
 #include "adiComponent.h"
 #include "object_m.h"
 #include "portal.h"
+#include "portal_m.h"
 #include <algorithm>
 #include <cmath>
 
@@ -153,9 +154,9 @@ void moveBodyThroughPortals(
     toRect.x += deltaMove.x;
     toRect.y += deltaMove.y;
 
-    Portal::prepareMovement(owner, body, fromRect, toRect);
+    Portal_m::prepareMovement(owner, body, fromRect, toRect);
     body->setSurface(toRect);
-    Portal::syncTransit(owner);
+    Portal_m::sync(owner);
 }
 
 }
@@ -231,9 +232,9 @@ std::vector<Plateforme::CarriedObject> Plateforme::findRidingObjects() const {
     std::vector<CarriedObject> carryList;
     std::vector<Rectangle> platformSurfaces;
     platformSurfaces.push_back(body_->getSurface());
-    bool platformInTransit = Portal::isEntityInTransit(const_cast<Plateforme*>(this));
+    bool platformInTransit = Portal_m::isInTransit(const_cast<Plateforme*>(this));
 
-    if (auto targetSurface = Portal::getTransitTargetSurface(const_cast<Plateforme*>(this))) {
+    if (auto targetSurface = Portal_m::targetSurface(const_cast<Plateforme*>(this))) {
         platformSurfaces.push_back(*targetSurface);
     }
 
@@ -297,7 +298,7 @@ void Plateforme::rememberCarriedObjects(const std::vector<CarriedObject>& object
 
 void Plateforme::attachCarriedObjects(const std::vector<CarriedObject>& objects) {
     Rectangle sourceSurface = body_->getSurface();
-    std::optional<Rectangle> targetSurface = Portal::getTransitTargetSurface(this);
+    std::optional<Rectangle> targetSurface = Portal_m::targetSurface(this);
 
     for (const CarriedObject& carried : objects) {
         CollisionRect* rect = carried.body;
@@ -313,13 +314,13 @@ void Plateforme::attachCarriedObjects(const std::vector<CarriedObject>& objects)
 
         if (!carried.targetSide &&
             targetSurface.has_value() &&
-            !Portal::isTransitSourceVisible(this, supportPoint(newR, gravityDirectionFor(rect)))) {
-            if (auto targetRect = Portal::transformTransitRect(this, newR)) {
+            !Portal_m::isSourceVisible(this, supportPoint(newR, gravityDirectionFor(rect)))) {
+            if (auto targetRect = Portal_m::transformRect(this, newR)) {
                 newR = *targetRect;
             }
         }
 
-        Portal::cancelTransit(rect->getFather());
+        Portal_m::cancel(rect->getFather());
         rect->setSurface(newR);
         cancelFallIntoSupport(rect);
     }

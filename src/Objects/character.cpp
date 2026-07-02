@@ -14,6 +14,7 @@
 #include "adiComponent.h"
 #include "definitions.h"
 #include "portal.h"
+#include "portal_m.h"
 #include "oneWayPlatform.h"
 #include "particle_m.h"
 #include "water.h"
@@ -49,6 +50,7 @@ Character::Character(const SpawnData& data) : GObject(data.id) {
     CollisionDesc col = data.physics.collision.value_or(CollisionDesc{});
     BodyDesc body = data.physics.body.value_or(BodyDesc{});
     body_ = new RigidBody(col, body, this);
+    respawnPos_ = body_->getCoord();
     dashing_ = 0;
     if (data.setAsCameraTarget) {
         Raycam_m::setTarget(body_, true);
@@ -581,7 +583,7 @@ void Character::respawn() {
     if (dying_) return;
 
     if (body_) {
-        Portal::cancelTransit(this);
+        Portal_m::cancel(this);
         body_->setSpeed({0,0});
         body_->setGravityEnabled(false);
         dashing_ = 0.0;
@@ -605,6 +607,9 @@ void Character::updateDeathRespawn(double delta) {
 
 void Character::finishRespawn() {
     if (body_) {
+        body_->setGravityDirection(GravityDirection::DOWN);
+        lastGravityDir_ = GravityDirection::DOWN;
+        updateHitboxRotation();
         body_->setCoord(respawnPos_);
         body_->setSpeed({0,0});
         body_->setGravityEnabled(true);
@@ -631,8 +636,8 @@ bool Character::shouldDrawDuringDeath() const {
 }
 
 void Character::separateFromCollisions() {
-    if (Portal::isEntityInTransit(this)) {
-        Portal::separateTransitCollisions(this, body_);
+    if (Portal_m::isInTransit(this)) {
+        Portal_m::separateCollisions(this, body_);
         return;
     }
 
@@ -648,7 +653,7 @@ void Character::separateFromCollisions() {
             if (!other->isSolid() || other->getId() == body_->getId()) continue;
             GObject* owner = other->getFather();
             if (owner && !owner->blocksMovementFor(this)) continue;
-            if (Portal::shouldIgnoreTransitCollision(this, other)) continue;
+            if (Portal_m::shouldIgnoreCollision(this, other)) continue;
             if (OneWayPlatform::isOneWayPlatformBody(other) &&
                 !OneWayPlatform::supportsBody(body_, other)) continue;
             
@@ -712,12 +717,12 @@ bool Character::isOnGround() const {
             break;
     }
 
-    if (Portal::isEntityInTransit(const_cast<Character*>(this))) {
-        return Portal::isTransitProbeBlocked(const_cast<Character*>(this), body_, probe);
+    if (Portal_m::isInTransit(const_cast<Character*>(this))) {
+        return Portal_m::isProbeBlocked(const_cast<Character*>(this), body_, probe);
     }
     
     for (CollisionRect* other : CollisionRect::query(probe, true)) {
-        if (Portal::shouldIgnoreTransitCollision(const_cast<Character*>(this), other)) continue;
+        if (Portal_m::shouldIgnoreCollision(const_cast<Character*>(this), other)) continue;
         if (!other || other->getId() == body_->getId()) continue;
         GObject* owner = other->getFather();
         if (owner && !owner->blocksMovementFor(const_cast<Character*>(this))) continue;

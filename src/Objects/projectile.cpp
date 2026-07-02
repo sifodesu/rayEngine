@@ -1,7 +1,7 @@
 #include "projectile.h"
 #include "clock.h"
 #include "collisionRect.h" // For getting surface
-#include "portal.h"
+#include "portal_m.h"
 #include "rigidBody.h"
 #include <algorithm>
 #include <cmath>
@@ -56,7 +56,7 @@ void Projectile::routine() {
             GObject* otherFather = other->getFather();
             if (!otherFather) continue;
             if (otherFather->id_ == sourceObjectId_) continue;
-            if (Portal::shouldIgnoreTransitCollision(this, other)) continue;
+            if (Portal_m::shouldIgnoreCollision(this, other)) continue;
             if (!CheckCollisionRecs(probe, other->getSurface())) continue;
 
             // Always prioritize kill test before generic solid handling.

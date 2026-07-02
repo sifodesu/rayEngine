@@ -17,7 +17,7 @@
 #include "spawn.h"
 #include "definitions.h"
 #include "sprite_m.h"
-#include "portal.h"
+#include "portal_m.h"
 
 using json = nlohmann::json;
 using namespace std;
@@ -990,7 +990,7 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     }
     
     // After all entities are loaded, setup portal links
-    Portal::setupPortalLinks();
+    Portal_m::setupLinks();
 }
 
 void Ldtk_m::drawBackgrounds(const Rectangle& viewRect) {

@@ -1,7 +1,7 @@
 #include "playerClone.h"
 
 #include "object_m.h"
-#include "portal.h"
+#include "portal_m.h"
 #include "raycam_m.h"
 
 #include <utility>
@@ -36,8 +36,8 @@ bool touchesPlayer(CollisionRect* cloneBody, float padding) {
 
     GObject* clone = cloneBody->getFather();
     GObject* player = playerBody->getFather();
-    std::vector<Rectangle> cloneSurfaces = Portal::getVisibleCollisionSurfaces(clone);
-    std::vector<Rectangle> playerSurfaces = Portal::getVisibleCollisionSurfaces(player);
+    std::vector<Rectangle> cloneSurfaces = Portal_m::visibleSurfaces(clone);
+    std::vector<Rectangle> playerSurfaces = Portal_m::visibleSurfaces(player);
     if (cloneSurfaces.empty()) cloneSurfaces.push_back(cloneBody->getSurface());
     if (playerSurfaces.empty()) playerSurfaces.push_back(playerBody->getSurface());
 

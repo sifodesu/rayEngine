@@ -5,6 +5,7 @@
 #include "character.h"
 #include "upgradePickup.h"
 #include "collisionRect.h"
+#include "clock.h"
 #include "raycam_m.h"
 #include <raylib.h>
 #include "kill.h"
@@ -16,6 +17,7 @@
 #include "friablePlatform.h"
 #include "shooter.h"
 #include "portal.h"
+#include "portal_m.h"
 #include "projectile.h"
 #include "modelEnt.h"
 #include "water.h"
@@ -217,21 +219,21 @@ void Object_m::eraseObj(int id)
     auto entIt = level_ents_.find(id);
     if (entIt != level_ents_.end()) {
         if (isPlayerObject(entIt->second.get())) return;
-        Portal::cancelTransit(entIt->second.get());
+        Portal_m::cancel(entIt->second.get());
         level_ents_.erase(entIt);
         return;
     }
 
     auto tileIt = level_tiles_.find(id);
     if (tileIt != level_tiles_.end()) {
-        Portal::cancelTransit(tileIt->second.get());
+        Portal_m::cancel(tileIt->second.get());
         level_tiles_.erase(tileIt);
     }
 }
 
 void Object_m::resetRoom(Rectangle room)
 {
-    Portal::releaseAllDisabledTiles();
+    Portal_m::restoreTiles();
 
     std::vector<int> runtimeToDelete;
     for (auto& [id, obj] : level_ents_) {
@@ -259,7 +261,7 @@ void Object_m::resetRoom(Rectangle room)
         createFromSpawn(spawn);
     }
 
-    Portal::setupPortalLinks();
+    Portal_m::setupLinks();
 }
 
 void Object_m::updateActiveRoom()
@@ -279,7 +281,7 @@ void Object_m::updateActiveRoom()
 
     Rectangle nextRoom = Raycam_m::getRayCam().getRect();
     if (player) {
-        if (active_room_initialized_ && Portal::isEntityInTransit(player)) {
+        if (active_room_initialized_ && Portal_m::isInTransit(player)) {
             nextRoom = active_room_;
         } else if (CollisionRect* body = player->getCollisionBody()) {
             nextRoom = roomFromPoint(body->getCenterCoord());
@@ -348,7 +350,7 @@ void Object_m::routine()
         }
     }
 
-    Portal::updateTransits();
+    Portal_m::update(Clock::getLap());
 
     // Apply kill rules from rigidbody swept contacts (pre-correction physics contacts)
     for (auto& [id, obj] : level_ents_) {
@@ -384,8 +386,8 @@ void Object_m::routine()
                 Rectangle bRect = bBody->getSurface();
                 if (!CheckCollisionRecs(aRect, bRect)) continue;
                 if (!a || !b || a == b) continue;
-                if (!aBody->isRenderProxy() && Portal::isEntityInTransit(a)) continue;
-                if (!bBody->isRenderProxy() && Portal::isEntityInTransit(b)) continue;
+                if (!aBody->isRenderProxy() && Portal_m::isInTransit(a)) continue;
+                if (!bBody->isRenderProxy() && Portal_m::isInTransit(b)) continue;
                 a->onCollision(b);
                 a->applyKillOnCollision(b);
                 b->onCollision(a);
@@ -402,8 +404,8 @@ void Object_m::routine()
 
 void Object_m::unload()
 {
-    Portal::clearTransits();
-    Portal::releaseAllDisabledTiles();
+    Portal_m::clear();
+    Portal_m::restoreTiles();
     TriggerButton::clearPersistentState();
     Door::clearPersistentState();
     Water::clear();
@@ -418,7 +420,7 @@ void Object_m::unload()
 
 void Object_m::clearTiles()
 {
-    Portal::releaseAllDisabledTiles();
+    Portal_m::restoreTiles();
     // Safely destroy tiles and let CollisionRect dtor remove from quadtree
     level_tiles_.clear();
 }

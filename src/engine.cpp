@@ -18,6 +18,7 @@
 #include "shader_m.h"
 #include "collisionRect.h"
 #include "portal.h"
+#include "portal_m.h"
 #include "water.h"
 #include "fog.h"
 #include "particle_m.h"
@@ -226,14 +227,14 @@ void Engine::render()
                 GObject* obj = body->getFather();
                 if (!obj) continue;
 
-                if (body->isRenderProxy() || Portal::isEntityInTransit(obj)) continue;
+                if (body->isRenderProxy() || Portal_m::isInTransit(obj)) continue;
                 if (Portal* portal = dynamic_cast<Portal*>(obj)) {
                     portals.push_back(portal);
                     continue;
                 }
                 obj->draw();
             }
-            Portal::drawTransitsForLayer(layer);
+            Portal_m::drawForLayer(layer);
             for (Portal* portal : portals) portal->draw();
 
             Water::drawOcclusionMasks();

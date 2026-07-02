@@ -1,5 +1,5 @@
 #include "rigidBody.h"
-#include "portal.h"
+#include "portal_m.h"
 #include <algorithm>
 #include <cmath>
 #include <cfloat>
@@ -108,7 +108,7 @@ void RigidBody::fixSpeed() {
     }
     if (speed_.x != 0.0f) {
         addSweepContacts(probeRect);
-        if (Portal::isMovementBlocked(father_, this, probeRect)) speed_.x = 0.0f;
+        if (Portal_m::isMovementBlocked(father_, this, probeRect)) speed_.x = 0.0f;
     }
 
     // Probe slightly ahead in Y
@@ -121,7 +121,7 @@ void RigidBody::fixSpeed() {
     }
     if (speed_.y != 0.0f) {
         addSweepContacts(probeRect);
-        if (Portal::isMovementBlocked(father_, this, probeRect)) speed_.y = 0.0f;
+        if (Portal_m::isMovementBlocked(father_, this, probeRect)) speed_.y = 0.0f;
     }
 }
 
@@ -133,15 +133,15 @@ void RigidBody::routine() {
     if (delta > 0.2)
         return;
 
-    bool inPortalTransit = Portal::isEntityInTransit(father_);
+    bool inPortalTransit = Portal_m::isInTransit(father_);
     if (inPortalTransit) {
-        Portal::separateTransitCollisions(father_, this);
+        Portal_m::separateCollisions(father_, this);
     }
 
     // Gravity must keep running through portal transit; otherwise traversal
     // duration changes the height reached after exiting.
     if (gravityEnabled_) {
-        if (auto transitGravityStep = Portal::getTransitGravityStep(father_, gravityDirection_, mass_, delta)) {
+        if (auto transitGravityStep = Portal_m::gravityStep(father_, gravityDirection_, mass_, delta)) {
             speed_.x += transitGravityStep->x;
             speed_.y += transitGravityStep->y;
         } else {
@@ -191,8 +191,8 @@ void RigidBody::routine() {
             next.y += unitDir.y * advance;
             addSweepContacts(next);
 
-            Portal::prepareMovement(father_, this, lastFree, next);
-            if (Portal::isMovementBlocked(father_, this, next)) {
+            Portal_m::prepareMovement(father_, this, lastFree, next);
+            if (Portal_m::isMovementBlocked(father_, this, next)) {
                 break; // stop right before collision
             }
             lastFree = next;
@@ -200,7 +200,7 @@ void RigidBody::routine() {
         }
 
         setSurface(lastFree);
-        discontinuousMovement_ = Portal::syncTransit(father_);
+        discontinuousMovement_ = Portal_m::sync(father_);
     }
 
     add();
