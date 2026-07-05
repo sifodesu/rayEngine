@@ -56,3 +56,14 @@ std::vector<CollisionRect*> CollisionRect::query(Rectangle rect, bool with_solid
     }
     return ret;
 }
+
+std::vector<CollisionRect*> CollisionRect::all(bool with_solid) {
+    std::vector<CollisionRect*> ret;
+    ret.reserve(pool.size());
+    for (auto& [id, body] : pool) {
+        if (!body) continue;
+        if (with_solid && !body->solid_) continue;
+        ret.push_back(body);
+    }
+    return ret;
+}

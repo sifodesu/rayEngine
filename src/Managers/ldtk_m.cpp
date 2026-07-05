@@ -937,10 +937,28 @@ void Ldtk_m::loadLevel(const string& filename, bool skipCharacters) {
     currentProjectFile = filename; // track for hot reload
     auto tilesetInfo = collectTilesetInfo(root);
     auto entityDefTags = collectEntityDefTags(root);
+    worldBounds_ = Rectangle{0.0f, 0.0f, 0.0f, 0.0f};
+    hasWorldBounds_ = false;
 
     for (auto& level : root["levels"]) { // Each LDtk level (supports multi-level worlds)
         int worldX = level.value("worldX", 0);
         int worldY = level.value("worldY", 0);
+        Rectangle levelRect{
+            static_cast<float>(worldX),
+            static_cast<float>(worldY),
+            static_cast<float>(level.value("pxWid", 0)),
+            static_cast<float>(level.value("pxHei", 0))
+        };
+        if (!hasWorldBounds_) {
+            worldBounds_ = levelRect;
+            hasWorldBounds_ = true;
+        } else {
+            const float minX = std::min(worldBounds_.x, levelRect.x);
+            const float minY = std::min(worldBounds_.y, levelRect.y);
+            const float maxX = std::max(worldBounds_.x + worldBounds_.width, levelRect.x + levelRect.width);
+            const float maxY = std::max(worldBounds_.y + worldBounds_.height, levelRect.y + levelRect.height);
+            worldBounds_ = Rectangle{minX, minY, maxX - minX, maxY - minY};
+        }
         auto intGrid = extractIntGrid(level);
 
         if (auto background = makeLevelBackground(level, filename)) {
@@ -1026,6 +1044,12 @@ void Ldtk_m::unload() {
         }
     }
     backgrounds.clear();
+    worldBounds_ = Rectangle{0.0f, 0.0f, 0.0f, 0.0f};
+    hasWorldBounds_ = false;
+}
+
+Rectangle Ldtk_m::getWorldBounds() {
+    return hasWorldBounds_ ? worldBounds_ : Rectangle{0.0f, 0.0f, 0.0f, 0.0f};
 }
 
 

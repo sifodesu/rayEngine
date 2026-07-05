@@ -20,6 +20,7 @@ public:
     Rectangle getRect() { return body_->getSurface(); }
     CollisionRect* getCollisionBody() override { return body_; }
     void collectDebugSprites(std::vector<Sprite*>& sprites) override;
+    const Sprite* getSprite() const { return sprite_; }
     
     CollisionRect *body_;
 

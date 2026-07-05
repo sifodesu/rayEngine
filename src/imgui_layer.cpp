@@ -508,7 +508,7 @@ void DrawWindows() {
     // drawVisibleModelWindow();
     // drawGlitchSpriteWindow();
     // drawCRTWindow();
-    Shader_m::resetCRTParams();
+    // Shader_m::resetCRTParams();
     // drawParticleWindow();
     // drawStillWaterWindow();
     // drawFogWindow();

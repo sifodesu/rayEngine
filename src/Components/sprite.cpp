@@ -34,6 +34,11 @@ SpriteGlitchParams& Sprite::glitchParams() {
     return params;
 }
 
+Rectangle Sprite::getCurrentSourceRect() const {
+    if (frameRects_.empty()) return Rectangle{0, 0, 0, 0};
+    return frameRects_[current_frame_ % frameRects_.size()];
+}
+
 void Sprite::resetGlitchParams() {
     glitchParams() = SpriteGlitchParams{};
 }

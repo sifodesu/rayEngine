@@ -21,6 +21,7 @@
 #include "portal_m.h"
 #include "water.h"
 #include "fog.h"
+#include "fps3d_m.h"
 #include "particle_m.h"
 #include "light_m.h"
 #include "sprite.h"
@@ -84,6 +85,7 @@ void Engine::loadGameContent()
     InputMap::init();
     UpgradeRegistry::initDefaults();
     Ldtk_m::loadLevel("ldtk_test.ldtk");
+    Fps3D_m::initFromCurrentLevel();
     // SaveManager::load(); // load save file (if exists)
     // SaveManager::applyToWorld(); // move player to saved checkpoint
     Shader_m::load();
@@ -93,6 +95,7 @@ void Engine::loadGameContent()
 
 void Engine::unloadGameContent()
 {
+    Fps3D_m::unload();
     Object_m::unload();
     Ldtk_m::unload();
     Shader_m::unload();
@@ -113,25 +116,33 @@ void Engine::game_loop()
 {
     while (!WindowShouldClose()) {
         Clock::lap();
+        const float dt = static_cast<float>(Clock::getLap());
 
         if (IsKeyPressed(KEY_R)) {
             reloadGame();
+        }
+
+        if (IsKeyPressed(KEY_F3)) {
+            Fps3D_m::toggle();
         }
 
         Shader_m::routine();
 
         Shader_m::begin();
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});
-            Object_m::routine();
-            Particle_m::update(static_cast<float>(Clock::getLap()));
-            Raycam_m::getRayCam().routine();
+            Fps3D_m::update(dt);
+            if (!Fps3D_m::isFully3D()) {
+                Object_m::routine();
+                Particle_m::update(dt);
+                Raycam_m::getRayCam().routine();
+            }
             render();
         Shader_m::end();
 
         BeginDrawing();
             ClearBackground(BLACK);
             // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
-            if (Shader_m::has("lighting") && Light_m::hasActiveLights()) Shader_m::addFullscreen("lighting");
+            if (!Fps3D_m::isVisible() && Shader_m::has("lighting") && Light_m::hasActiveLights()) Shader_m::addFullscreen("lighting");
             if (Shader_m::has("crt")) Shader_m::addFullscreen("crt");
             Shader_m::present();
             DrawFPS(10, 10);
@@ -146,6 +157,11 @@ void Engine::game_loop()
 
 void Engine::render()
 {
+    if (Fps3D_m::isVisible()) {
+        Fps3D_m::draw();
+        return;
+    }
+
     if (IsKeyPressed(KEY_C)) {
         showCollisionBoxes = !showCollisionBoxes;
     }

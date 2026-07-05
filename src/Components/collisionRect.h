@@ -21,6 +21,7 @@ public:
 
     // Single quadtree query: returns all rects intersecting rect; filter by solidity if requested
     static std::vector<CollisionRect*> query(Rectangle rect, bool with_solid = false);
+    static std::vector<CollisionRect*> all(bool with_solid = false);
     std::vector<CollisionRect*> getCollisions(bool with_solid) {
         return query(surface_, with_solid);
     }

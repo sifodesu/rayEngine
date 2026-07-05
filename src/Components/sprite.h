@@ -24,7 +24,9 @@ public:
     void draw(Rectangle targetRect);  // Draw sprite stretched to fit target rectangle
     void routine();
     void setTint(Color tint) { tint_ = tint; };
-    Color getTint() { return tint_; };
+    Color getTint() const { return tint_; };
+    Texture2D getTexture() const { return sprite_sheet_; }
+    Rectangle getCurrentSourceRect() const;
     void setFlipX(bool v) { flipX_ = v; }
     void setFlipY(bool v) { flipY_ = v; }
     bool getFlipX() const { return flipX_; }

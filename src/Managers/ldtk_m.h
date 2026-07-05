@@ -42,6 +42,11 @@ public:
      * @brief Release LDtk-owned background textures
      */
     static void unload();
+
+    /**
+     * @brief Bounds of all currently loaded LDtk levels in world coordinates
+     */
+    static Rectangle getWorldBounds();
     
     /**
      * @brief Enable/disable hot reload functionality
@@ -77,4 +82,6 @@ private:
     static inline std::filesystem::file_time_type lastWrite{};
     static inline std::string currentProjectFile{"ldtk_test.ldtk"};
     static inline std::map<std::string, int> ldtkIdToEngineId_;
+    static inline Rectangle worldBounds_{0.0f, 0.0f, 0.0f, 0.0f};
+    static inline bool hasWorldBounds_{false};
 };
