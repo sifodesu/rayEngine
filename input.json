@@ -1,0 +1,15 @@
+{
+  "bindings": {
+    "left": ["A", "LEFT"],
+    "right": ["D", "RIGHT"],
+    "up": ["W", "UP"],
+    "down": ["S", "DOWN"],
+    "r1": "N",
+    "r2": "J",
+    "r3": "K",
+    "r4": "L",
+    "dash": ["LEFT_SHIFT", "RIGHT_SHIFT"],
+    "reload": "R",
+    "toggle_collision": "C"
+  }
+}

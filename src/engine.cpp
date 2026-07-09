@@ -114,7 +114,7 @@ void Engine::game_loop()
     while (!WindowShouldClose()) {
         Clock::lap();
 
-        if (IsKeyPressed(KEY_R)) {
+        if (InputMap::checkPressed("reload")) {
             reloadGame();
         }
 
@@ -146,7 +146,7 @@ void Engine::game_loop()
 
 void Engine::render()
 {
-    if (IsKeyPressed(KEY_C)) {
+    if (InputMap::checkPressed("toggle_collision")) {
         showCollisionBoxes = !showCollisionBoxes;
     }
 
