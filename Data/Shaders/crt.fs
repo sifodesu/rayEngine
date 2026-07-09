@@ -92,7 +92,7 @@ float gridYPitch() {
     return mix(1.0, 0.8660254, hexAmount());
 }
 
-vec4 sampleCrtSimComposite(vec2 uv) {
+vec4 sampleCRTComposite(vec2 uv) {
     vec2 nativeStep = max((displayRect.zw / max(nativeResolution, vec2(1.0))) / max(resolution, vec2(1.0)),
                           1.0 / max(resolution, vec2(1.0)));
     vec2 sourcePx = uv * resolution;
@@ -143,7 +143,7 @@ vec4 sampleNativeDot(vec2 cell) {
         (cell.x + 0.5 + rowShift) * gridSize(),
         (cell.y + 0.5) * gridSize() * gridYPitch()
     );
-    return sampleCrtSimComposite(nativeToUv(nativeCenter));
+    return sampleCRTComposite(nativeToUv(nativeCenter));
 }
 
 vec4 sampleNativePhosphorDot(vec2 cell) {
@@ -183,7 +183,7 @@ void main() {
     vec2 sourceUv = warpedCentered * 0.5 + 0.5;
     sourceUv = (sourceUv - vec2(0.5)) / max(overscan, 0.001) + vec2(0.5);
     float insideSource = step(0.0, sourceUv.x) * step(0.0, sourceUv.y) * step(sourceUv.x, 1.0) * step(sourceUv.y, 1.0);
-    vec4 source = sampleCrtSimComposite(sourceUv);
+    vec4 source = sampleCRTComposite(sourceUv);
 
     vec2 sourcePx = sourceUv * resolution;
     vec2 nativePx = ((sourcePx - displayRect.xy) / max(displayRect.zw, vec2(1.0))) * nativeResolution;

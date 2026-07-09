@@ -294,7 +294,7 @@ static void clearRenderTexture(RenderTexture2D target) {
     EndTextureMode();
 }
 
-static Texture2D loadCrtSimTexture(const std::filesystem::path& path, int filter) {
+static Texture2D loadCRTTexture(const std::filesystem::path& path, int filter) {
     Texture2D tex = LoadTexture(path.string().c_str());
     if (tex.id) {
         SetTextureFilter(tex, filter);
@@ -356,9 +356,8 @@ void Shader_m::load(const std::filesystem::path& dir) {
     clearRenderTexture(prevSceneRT_);
     clearRenderTexture(phosphorRT_[0]);
     clearRenderTexture(phosphorRT_[1]);
-    const std::filesystem::path crtSimBin = dir_ / "CRTSim" / "CRTSim" / "bin";
-    crtMaskTexture_ = loadCrtSimTexture(crtSimBin / "mask.bmp", TEXTURE_FILTER_BILINEAR);
-    crtArtifactsTexture_ = loadCrtSimTexture(crtSimBin / "artifacts.bmp", TEXTURE_FILTER_POINT);
+    crtMaskTexture_ = loadCRTTexture(dir_ / "mask.bmp", TEXTURE_FILTER_BILINEAR);
+    crtArtifactsTexture_ = loadCRTTexture(dir_ / "artifacts.bmp", TEXTURE_FILTER_POINT);
     for (auto &pr : collect()) {
         std::string vsPath = pr.second.vs.empty() ? std::string{} : pr.second.vs.string();
         std::string fsPath = pr.second.fs.empty() ? std::string{} : pr.second.fs.string();

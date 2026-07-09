@@ -238,7 +238,7 @@ static void drawCRTWindow() {
     ImGui::SliderFloat("Scanlines", &params.scanline, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Aberration RGB", &params.chromaticAberration, 0.0f, 3.0f, "%.2f");
     ImGui::SliderFloat("Luminosite", &params.brightness, 0.25f, 2.25f, "%.2f");
-    ImGui::SeparatorText("CRTSim");
+    ImGui::SeparatorText("CRT");
     ImGui::SliderFloat("Sharpness", &params.sharpness, 0.0f, 1.5f, "%.2f");
     ImGui::SeparatorText("Phosphore");
     ImGui::SliderFloat("Trainee phosphore", &params.phosphorTrail, 0.0f, 1.0f, "%.2f");
