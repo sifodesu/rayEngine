@@ -10,35 +10,63 @@
 class Shader_m {
 public:
     struct CRTParams {
-        float curvature{0.0f};
-        float vignette{0.0f};
-        float edgeSoftness{0.0f};
-        float glow{0.0f};
-        float dotMask{0.0f};
-        float dotBlur{0.82f};
-        float bleed{0.0f};
-        float dotGridSize{1.0f};
-        float hexGrid{0.0f};
-        float alternateLineShift{0.5f};
-        float scanline{0.0f};
-        float chromaticAberration{0.0f};
-        float brightness{1.0f};
-        float sharpness{0.0f};
-        float persistence{0.0f};
-        float phosphorTrail{0.42f};
-        float phosphorDecayR{0.0060f};
-        float phosphorDecayG{0.0030f};
-        float phosphorDecayB{0.0012f};
-        float phosphorSpread{0.55f};
-        float ntscArtifacts{0.0f};
-        float overscan{1.0f};
-        float saturation{1.0f};
-        float maskBrightness{0.0f};
-        float maskOpacity{0.0f};
-        float maskScale{1.0f};
-        float bloomIntensity{0.0f};
-        float bloomSpread{0.025f};
-        float bloomPower{2.0f};
+        float outputGamma{2.2f};
+
+        // Hitachi CT-1358 composite input and LA7621-era NTSC decoder.
+        float ntscLumaBandwidthMHz{3.00f};
+        float ntscChromaBandwidthIMHz{1.10f};
+        float ntscChromaBandwidthQMHz{0.45f};
+        float ntscChromaGain{0.92f};
+        float ntscChromaDelayNs{75.0f};
+        float ntscLumaPeaking{0.075f};
+        float ntscNoise{0.0035f};
+        float ntscHum{0.0015f};
+        Vector3 videoGain{1.015f, 1.000f, 0.985f};
+        Vector3 videoCutoff{0.010f, 0.008f, 0.012f};
+        Vector3 gunGamma{2.34f, 2.38f, 2.30f};
+
+        float beamMinWidth{0.20f};
+        float beamMaxWidth{0.54f};
+        float beamShape{2.2f};
+        float beamIntensityWeight{0.38f};
+        float beamScanlineStrength{0.94f};
+        float beamHorizontalSigma{0.72f};
+        float focusEdgeSoftness{0.42f};
+        float astigmatism{0.18f};
+        float misconvergence{0.18f};
+        float horizontalJitter{0.08f};
+
+        float maskStrength{0.42f};
+        float maskTriadsAcross{430.0f};
+        float maskType{1.0f};
+
+        Vector3 phosphorFastDecay{0.0014f, 0.0017f, 0.0010f};
+        Vector3 phosphorSlowDecay{0.018f, 0.024f, 0.012f};
+        float phosphorSlowWeight{0.028f};
+        float phosphorSpread{0.28f};
+        float observerIntegration{0.018f};
+
+        float bloomThreshold{0.62f};
+        float bloomIntensity{0.18f};
+        float wideBloomIntensity{0.075f};
+        float bloomRadius{1.35f};
+        float halation{0.038f};
+
+        float curvatureX{0.055f};
+        float curvatureY{0.075f};
+        float pincushion{0.012f};
+        float highVoltageBloom{0.014f};
+        float overscan{1.035f};
+        float cornerRadius{0.105f};
+        float vignette{0.20f};
+        float glassTransmission{0.82f};
+        Vector3 glassTint{0.94f, 0.965f, 0.92f};
+        float reflection{0.018f};
+        float blackLevel{0.0015f};
+        float brightness{1.32f};
+        float saturation{1.03f};
+        float flicker{0.002f};
+        float noise{0.0015f};
     };
 
     struct WaterParams {
@@ -115,15 +143,19 @@ private:
     static std::filesystem::path dir_;
     static RenderTexture2D sceneRT_;
     static RenderTexture2D postRT_;
-    static RenderTexture2D prevSceneRT_; // previous presented post-scaled frame (for temporal shaders)
+    static RenderTexture2D prevSceneRT_; // previous unprocessed video frame
     static RenderTexture2D phosphorRT_[2];
+    static RenderTexture2D phosphorSlowRT_[2];
+    static RenderTexture2D observerRT_[2];
     static RenderTexture2D nativePing_[2];
     static RenderTexture2D ping_[2];
-    static Texture2D crtMaskTexture_;
-    static Texture2D crtArtifactsTexture_;
+    static RenderTexture2D bloomRT_[2];
+    static RenderTexture2D bloomWideRT_[2];
     static int nativePingIndex_;
     static int pingIndex_;
     static int phosphorIndex_;
+    static int observerIndex_;
+    static bool videoHistoryValid_;
     static int lastW_, lastH_;
     static int lastScreenW_, lastScreenH_;
     static std::vector<Pass> queue_;
@@ -138,6 +170,17 @@ private:
     static void uploadPassUniforms(Shader shader, const std::string& name, Texture2D source);
     static void bindTemporalTextures(Shader shader, const std::string& name);
     static Texture2D updatePhosphorState(Texture2D source);
+    static Texture2D updateObserverState(Texture2D source);
+    static Texture2D runFullscreenPass(
+        const std::string& name,
+        Texture2D source,
+        RenderTexture2D& target,
+        const char* extraUniform = nullptr,
+        Texture2D extraTexture = {},
+        const char* secondExtraUniform = nullptr,
+        Texture2D secondExtraTexture = {}
+    );
+    static Texture2D applyCRTPipeline(Texture2D source);
     static Texture2D applyPasses(Texture2D base, const std::vector<Pass>& passes, RenderTexture2D targets[2], int& targetIndex);
     static std::vector<std::pair<std::string, ShaderPair>> collect();
 };

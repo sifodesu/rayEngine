@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <fstream>
 #include <nlohmann/json.hpp>
+#include <rlgl.h>
 #include "definitions.h"
 #include "light_m.h"
 
@@ -14,13 +15,17 @@ RenderTexture2D Shader_m::sceneRT_{};
 RenderTexture2D Shader_m::postRT_{};
 RenderTexture2D Shader_m::prevSceneRT_{};
 RenderTexture2D Shader_m::phosphorRT_[2] = {};
+RenderTexture2D Shader_m::phosphorSlowRT_[2] = {};
+RenderTexture2D Shader_m::observerRT_[2] = {};
 RenderTexture2D Shader_m::nativePing_[2] = {};
 RenderTexture2D Shader_m::ping_[2] = {};
-Texture2D Shader_m::crtMaskTexture_{};
-Texture2D Shader_m::crtArtifactsTexture_{};
+RenderTexture2D Shader_m::bloomRT_[2] = {};
+RenderTexture2D Shader_m::bloomWideRT_[2] = {};
 int Shader_m::nativePingIndex_ = 0;
 int Shader_m::pingIndex_ = 0;
 int Shader_m::phosphorIndex_ = 0;
+int Shader_m::observerIndex_ = 0;
+bool Shader_m::videoHistoryValid_ = false;
 int Shader_m::lastW_ = 0;
 int Shader_m::lastH_ = 0;
 int Shader_m::lastScreenW_ = 0;
@@ -39,6 +44,24 @@ bool fogParamsLoaded = false;
 float readFloat(const json& j, const char* key, float fallback) {
     if (!j.contains(key) || !j[key].is_number()) return fallback;
     return j[key].get<float>();
+}
+
+json vector3ToJson(Vector3 value) {
+    return {value.x, value.y, value.z};
+}
+
+Vector3 readVector3(const json& j, const char* key, Vector3 fallback) {
+    if (!j.contains(key) || !j[key].is_array() || j[key].size() != 3) {
+        return fallback;
+    }
+    for (const json& component : j[key]) {
+        if (!component.is_number()) return fallback;
+    }
+    return {
+        j[key][0].get<float>(),
+        j[key][1].get<float>(),
+        j[key][2].get<float>()
+    };
 }
 
 json colorToJson(Color color) {
@@ -98,35 +121,74 @@ void Shader_m::resetFogParams() {
 bool Shader_m::saveCRTParams() {
     const CRTParams& params = crtParams();
     json j = {
-        {"curvature", params.curvature},
-        {"vignette", params.vignette},
-        {"edgeSoftness", params.edgeSoftness},
-        {"glow", params.glow},
-        {"dotMask", params.dotMask},
-        {"dotBlur", params.dotBlur},
-        {"bleed", params.bleed},
-        {"dotGridSize", params.dotGridSize},
-        {"hexGrid", params.hexGrid},
-        {"alternateLineShift", params.alternateLineShift},
-        {"scanline", params.scanline},
-        {"chromaticAberration", params.chromaticAberration},
-        {"brightness", params.brightness},
-        {"sharpness", params.sharpness},
-        {"persistence", params.persistence},
-        {"phosphorTrail", params.phosphorTrail},
-        {"phosphorDecayR", params.phosphorDecayR},
-        {"phosphorDecayG", params.phosphorDecayG},
-        {"phosphorDecayB", params.phosphorDecayB},
+        {"profile", {
+            {"manufacturer", "Hitachi"},
+            {"model", "CT-1358"},
+            {"year", 1985},
+            {"market", "North America"},
+            {"input", "composite NTSC"},
+            {"jungleIC", "Sanyo LA7621"},
+            {"combFilter", false},
+            {"tube", "Philips A34JLN60X"},
+            {"tubeSizeInches", 13.0},
+            {"mask", "slot"},
+            {"deflectionDegrees", 90.0},
+            {"anodeVoltageKv", 22.0},
+            {"horizontalRateHz", 15734.264},
+            {"fieldRateHz", 59.94006},
+            {"subcarrierMHz", 3.579545},
+            {"note", "tube pitch, phosphor decay and optical coefficients are calibrated estimates"}
+        }},
+        {"outputGamma", params.outputGamma},
+        {"ntscLumaBandwidthMHz", params.ntscLumaBandwidthMHz},
+        {"ntscChromaBandwidthIMHz", params.ntscChromaBandwidthIMHz},
+        {"ntscChromaBandwidthQMHz", params.ntscChromaBandwidthQMHz},
+        {"ntscChromaGain", params.ntscChromaGain},
+        {"ntscChromaDelayNs", params.ntscChromaDelayNs},
+        {"ntscLumaPeaking", params.ntscLumaPeaking},
+        {"ntscNoise", params.ntscNoise},
+        {"ntscHum", params.ntscHum},
+        {"videoGain", vector3ToJson(params.videoGain)},
+        {"videoCutoff", vector3ToJson(params.videoCutoff)},
+        {"gunGamma", vector3ToJson(params.gunGamma)},
+        {"beamMinWidth", params.beamMinWidth},
+        {"beamMaxWidth", params.beamMaxWidth},
+        {"beamShape", params.beamShape},
+        {"beamIntensityWeight", params.beamIntensityWeight},
+        {"beamScanlineStrength", params.beamScanlineStrength},
+        {"beamHorizontalSigma", params.beamHorizontalSigma},
+        {"focusEdgeSoftness", params.focusEdgeSoftness},
+        {"astigmatism", params.astigmatism},
+        {"misconvergence", params.misconvergence},
+        {"horizontalJitter", params.horizontalJitter},
+        {"maskStrength", params.maskStrength},
+        {"maskTriadsAcross", params.maskTriadsAcross},
+        {"maskType", params.maskType},
+        {"phosphorFastDecay", vector3ToJson(params.phosphorFastDecay)},
+        {"phosphorSlowDecay", vector3ToJson(params.phosphorSlowDecay)},
+        {"phosphorSlowWeight", params.phosphorSlowWeight},
         {"phosphorSpread", params.phosphorSpread},
-        {"ntscArtifacts", params.ntscArtifacts},
-        {"overscan", params.overscan},
-        {"saturation", params.saturation},
-        {"maskBrightness", params.maskBrightness},
-        {"maskOpacity", params.maskOpacity},
-        {"maskScale", params.maskScale},
+        {"observerIntegration", params.observerIntegration},
+        {"bloomThreshold", params.bloomThreshold},
         {"bloomIntensity", params.bloomIntensity},
-        {"bloomSpread", params.bloomSpread},
-        {"bloomPower", params.bloomPower},
+        {"wideBloomIntensity", params.wideBloomIntensity},
+        {"bloomRadius", params.bloomRadius},
+        {"halation", params.halation},
+        {"curvatureX", params.curvatureX},
+        {"curvatureY", params.curvatureY},
+        {"pincushion", params.pincushion},
+        {"highVoltageBloom", params.highVoltageBloom},
+        {"overscan", params.overscan},
+        {"cornerRadius", params.cornerRadius},
+        {"vignette", params.vignette},
+        {"glassTransmission", params.glassTransmission},
+        {"glassTint", vector3ToJson(params.glassTint)},
+        {"reflection", params.reflection},
+        {"blackLevel", params.blackLevel},
+        {"brightness", params.brightness},
+        {"saturation", params.saturation},
+        {"flicker", params.flicker},
+        {"noise", params.noise},
     };
 
     std::ofstream f(CRT_PARAMS_PATH, std::ios::trunc);
@@ -143,35 +205,56 @@ bool Shader_m::loadCRTParams() {
         json j;
         f >> j;
         CRTParams& params = crtParams();
-        params.curvature = readFloat(j, "curvature", params.curvature);
-        params.vignette = readFloat(j, "vignette", params.vignette);
-        params.edgeSoftness = readFloat(j, "edgeSoftness", params.edgeSoftness);
-        params.glow = readFloat(j, "glow", params.glow);
-        params.dotMask = readFloat(j, "dotMask", params.dotMask);
-        params.dotBlur = readFloat(j, "dotBlur", params.dotBlur);
-        params.bleed = readFloat(j, "bleed", params.bleed);
-        params.dotGridSize = readFloat(j, "dotGridSize", params.dotGridSize);
-        params.hexGrid = readFloat(j, "hexGrid", params.hexGrid);
-        params.alternateLineShift = readFloat(j, "alternateLineShift", params.alternateLineShift);
-        params.scanline = readFloat(j, "scanline", params.scanline);
-        params.chromaticAberration = readFloat(j, "chromaticAberration", params.chromaticAberration);
-        params.brightness = readFloat(j, "brightness", params.brightness);
-        params.sharpness = readFloat(j, "sharpness", params.sharpness);
-        params.persistence = readFloat(j, "persistence", params.persistence);
-        params.phosphorTrail = readFloat(j, "phosphorTrail", params.phosphorTrail);
-        params.phosphorDecayR = readFloat(j, "phosphorDecayR", params.phosphorDecayR);
-        params.phosphorDecayG = readFloat(j, "phosphorDecayG", params.phosphorDecayG);
-        params.phosphorDecayB = readFloat(j, "phosphorDecayB", params.phosphorDecayB);
+        params.outputGamma = readFloat(j, "outputGamma", params.outputGamma);
+        params.ntscLumaBandwidthMHz = readFloat(j, "ntscLumaBandwidthMHz", params.ntscLumaBandwidthMHz);
+        params.ntscChromaBandwidthIMHz = readFloat(j, "ntscChromaBandwidthIMHz", params.ntscChromaBandwidthIMHz);
+        params.ntscChromaBandwidthQMHz = readFloat(j, "ntscChromaBandwidthQMHz", params.ntscChromaBandwidthQMHz);
+        params.ntscChromaGain = readFloat(j, "ntscChromaGain", params.ntscChromaGain);
+        params.ntscChromaDelayNs = readFloat(j, "ntscChromaDelayNs", params.ntscChromaDelayNs);
+        params.ntscLumaPeaking = readFloat(j, "ntscLumaPeaking", params.ntscLumaPeaking);
+        params.ntscNoise = readFloat(j, "ntscNoise", params.ntscNoise);
+        params.ntscHum = readFloat(j, "ntscHum", params.ntscHum);
+        params.videoGain = readVector3(j, "videoGain", params.videoGain);
+        params.videoCutoff = readVector3(j, "videoCutoff", params.videoCutoff);
+        params.gunGamma = readVector3(j, "gunGamma", params.gunGamma);
+        params.beamMinWidth = readFloat(j, "beamMinWidth", params.beamMinWidth);
+        params.beamMaxWidth = readFloat(j, "beamMaxWidth", params.beamMaxWidth);
+        params.beamShape = readFloat(j, "beamShape", params.beamShape);
+        params.beamIntensityWeight = readFloat(j, "beamIntensityWeight", params.beamIntensityWeight);
+        params.beamScanlineStrength = readFloat(j, "beamScanlineStrength", params.beamScanlineStrength);
+        params.beamHorizontalSigma = readFloat(j, "beamHorizontalSigma", params.beamHorizontalSigma);
+        params.focusEdgeSoftness = readFloat(j, "focusEdgeSoftness", params.focusEdgeSoftness);
+        params.astigmatism = readFloat(j, "astigmatism", params.astigmatism);
+        params.misconvergence = readFloat(j, "misconvergence", params.misconvergence);
+        params.horizontalJitter = readFloat(j, "horizontalJitter", params.horizontalJitter);
+        params.maskStrength = readFloat(j, "maskStrength", params.maskStrength);
+        params.maskTriadsAcross = readFloat(j, "maskTriadsAcross", params.maskTriadsAcross);
+        params.maskType = readFloat(j, "maskType", params.maskType);
+        params.phosphorFastDecay = readVector3(j, "phosphorFastDecay", params.phosphorFastDecay);
+        params.phosphorSlowDecay = readVector3(j, "phosphorSlowDecay", params.phosphorSlowDecay);
+        params.phosphorSlowWeight = readFloat(j, "phosphorSlowWeight", params.phosphorSlowWeight);
         params.phosphorSpread = readFloat(j, "phosphorSpread", params.phosphorSpread);
-        params.ntscArtifacts = readFloat(j, "ntscArtifacts", params.ntscArtifacts);
-        params.overscan = readFloat(j, "overscan", params.overscan);
-        params.saturation = readFloat(j, "saturation", params.saturation);
-        params.maskBrightness = readFloat(j, "maskBrightness", params.maskBrightness);
-        params.maskOpacity = readFloat(j, "maskOpacity", params.maskOpacity);
-        params.maskScale = readFloat(j, "maskScale", params.maskScale);
+        params.observerIntegration = readFloat(j, "observerIntegration", params.observerIntegration);
+        params.bloomThreshold = readFloat(j, "bloomThreshold", params.bloomThreshold);
         params.bloomIntensity = readFloat(j, "bloomIntensity", params.bloomIntensity);
-        params.bloomSpread = readFloat(j, "bloomSpread", params.bloomSpread);
-        params.bloomPower = readFloat(j, "bloomPower", params.bloomPower);
+        params.wideBloomIntensity = readFloat(j, "wideBloomIntensity", params.wideBloomIntensity);
+        params.bloomRadius = readFloat(j, "bloomRadius", params.bloomRadius);
+        params.halation = readFloat(j, "halation", params.halation);
+        params.curvatureX = readFloat(j, "curvatureX", params.curvatureX);
+        params.curvatureY = readFloat(j, "curvatureY", params.curvatureY);
+        params.pincushion = readFloat(j, "pincushion", params.pincushion);
+        params.highVoltageBloom = readFloat(j, "highVoltageBloom", params.highVoltageBloom);
+        params.overscan = readFloat(j, "overscan", params.overscan);
+        params.cornerRadius = readFloat(j, "cornerRadius", params.cornerRadius);
+        params.vignette = readFloat(j, "vignette", params.vignette);
+        params.glassTransmission = readFloat(j, "glassTransmission", params.glassTransmission);
+        params.glassTint = readVector3(j, "glassTint", params.glassTint);
+        params.reflection = readFloat(j, "reflection", params.reflection);
+        params.blackLevel = readFloat(j, "blackLevel", params.blackLevel);
+        params.brightness = readFloat(j, "brightness", params.brightness);
+        params.saturation = readFloat(j, "saturation", params.saturation);
+        params.flicker = readFloat(j, "flicker", params.flicker);
+        params.noise = readFloat(j, "noise", params.noise);
         return true;
     } catch (...) {
         return false;
@@ -287,20 +370,54 @@ static RenderTexture2D loadPointRenderTexture(int width, int height) {
     return target;
 }
 
+static RenderTexture2D loadHDRRenderTexture(int width, int height) {
+    RenderTexture2D target{};
+    target.id = rlLoadFramebuffer();
+    unsigned int textureId = rlLoadTexture(
+        nullptr,
+        width,
+        height,
+        RL_PIXELFORMAT_UNCOMPRESSED_R16G16B16A16,
+        1
+    );
+    if (!target.id || !textureId) {
+        if (textureId) rlUnloadTexture(textureId);
+        if (target.id) rlUnloadFramebuffer(target.id);
+        TraceLog(LOG_WARNING, "CRT: RGBA16F target unavailable, using RGBA8");
+        return loadPointRenderTexture(width, height);
+    }
+
+    target.texture = {
+        textureId,
+        width,
+        height,
+        1,
+        PIXELFORMAT_UNCOMPRESSED_R16G16B16A16
+    };
+    rlFramebufferAttach(
+        target.id,
+        target.texture.id,
+        RL_ATTACHMENT_COLOR_CHANNEL0,
+        RL_ATTACHMENT_TEXTURE2D,
+        0
+    );
+    if (!rlFramebufferComplete(target.id)) {
+        rlUnloadTexture(target.texture.id);
+        rlUnloadFramebuffer(target.id);
+        TraceLog(LOG_WARNING, "CRT: incomplete RGBA16F framebuffer, using RGBA8");
+        return loadPointRenderTexture(width, height);
+    }
+
+    SetTextureFilter(target.texture, TEXTURE_FILTER_BILINEAR);
+    SetTextureWrap(target.texture, TEXTURE_WRAP_CLAMP);
+    return target;
+}
+
 static void clearRenderTexture(RenderTexture2D target) {
     if (!target.id) return;
     BeginTextureMode(target);
         ClearBackground(BLACK);
     EndTextureMode();
-}
-
-static Texture2D loadCRTTexture(const std::filesystem::path& path, int filter) {
-    Texture2D tex = LoadTexture(path.string().c_str());
-    if (tex.id) {
-        SetTextureFilter(tex, filter);
-        SetTextureWrap(tex, TEXTURE_WRAP_REPEAT);
-    }
-    return tex;
 }
 
 // Helper: collect shader pairs
@@ -347,17 +464,37 @@ void Shader_m::load(const std::filesystem::path& dir) {
     nativePing_[1] = loadPointRenderTexture(lastW_, lastH_);
     postRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
     prevSceneRT_ = loadPointRenderTexture(lastScreenW_, lastScreenH_);
-    phosphorRT_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
-    phosphorRT_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
-    ping_[0] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
-    ping_[1] = loadPointRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorRT_[0] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorRT_[1] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorSlowRT_[0] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    phosphorSlowRT_[1] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    observerRT_[0] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    observerRT_[1] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    ping_[0] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    ping_[1] = loadHDRRenderTexture(lastScreenW_, lastScreenH_);
+    int bloomW = std::max(lastScreenW_ / 4, 1);
+    int bloomH = std::max(lastScreenH_ / 4, 1);
+    bloomRT_[0] = loadHDRRenderTexture(bloomW, bloomH);
+    bloomRT_[1] = loadHDRRenderTexture(bloomW, bloomH);
+    int wideBloomW = std::max(lastScreenW_ / 16, 1);
+    int wideBloomH = std::max(lastScreenH_ / 16, 1);
+    bloomWideRT_[0] = loadHDRRenderTexture(wideBloomW, wideBloomH);
+    bloomWideRT_[1] = loadHDRRenderTexture(wideBloomW, wideBloomH);
     nativePingIndex_ = 0;
     phosphorIndex_ = 0;
+    observerIndex_ = 0;
+    videoHistoryValid_ = false;
     clearRenderTexture(prevSceneRT_);
     clearRenderTexture(phosphorRT_[0]);
     clearRenderTexture(phosphorRT_[1]);
-    crtMaskTexture_ = loadCRTTexture(dir_ / "mask.bmp", TEXTURE_FILTER_BILINEAR);
-    crtArtifactsTexture_ = loadCRTTexture(dir_ / "artifacts.bmp", TEXTURE_FILTER_POINT);
+    clearRenderTexture(phosphorSlowRT_[0]);
+    clearRenderTexture(phosphorSlowRT_[1]);
+    clearRenderTexture(observerRT_[0]);
+    clearRenderTexture(observerRT_[1]);
+    clearRenderTexture(bloomRT_[0]);
+    clearRenderTexture(bloomRT_[1]);
+    clearRenderTexture(bloomWideRT_[0]);
+    clearRenderTexture(bloomWideRT_[1]);
     for (auto &pr : collect()) {
         std::string vsPath = pr.second.vs.empty() ? std::string{} : pr.second.vs.string();
         std::string fsPath = pr.second.fs.empty() ? std::string{} : pr.second.fs.string();
@@ -374,10 +511,12 @@ void Shader_m::unload() {
     if (postRT_.id) { UnloadRenderTexture(postRT_); postRT_.id = 0; }
     if (prevSceneRT_.id) { UnloadRenderTexture(prevSceneRT_); prevSceneRT_.id = 0; }
     for (auto &r : phosphorRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
+    for (auto &r : phosphorSlowRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
+    for (auto &r : observerRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     for (auto &r : nativePing_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     for (auto &r : ping_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
-    if (crtMaskTexture_.id) { UnloadTexture(crtMaskTexture_); crtMaskTexture_.id = 0; }
-    if (crtArtifactsTexture_.id) { UnloadTexture(crtArtifactsTexture_); crtArtifactsTexture_.id = 0; }
+    for (auto &r : bloomRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
+    for (auto &r : bloomWideRT_) if (r.id) { UnloadRenderTexture(r); r.id = 0; }
     for (auto &kv : shaders_) if (kv.second.id) UnloadShader(kv.second);
     shaders_.clear();
     queue_.clear();
@@ -405,22 +544,55 @@ void Shader_m::ensureTargets() {
         lastW_ = w; lastH_ = h;
     }
 
-    if (sw == lastScreenW_ && sh == lastScreenH_ && postRT_.id && prevSceneRT_.id && phosphorRT_[0].id && phosphorRT_[1].id && ping_[0].id && ping_[1].id) return;
+    if (sw == lastScreenW_ && sh == lastScreenH_ && postRT_.id &&
+        prevSceneRT_.id && phosphorRT_[0].id && phosphorRT_[1].id &&
+        phosphorSlowRT_[0].id && phosphorSlowRT_[1].id &&
+        observerRT_[0].id && observerRT_[1].id &&
+        ping_[0].id && ping_[1].id && bloomRT_[0].id && bloomRT_[1].id &&
+        bloomWideRT_[0].id && bloomWideRT_[1].id) {
+        return;
+    }
 
     if (postRT_.id) UnloadRenderTexture(postRT_);
     if (prevSceneRT_.id) UnloadRenderTexture(prevSceneRT_);
     for (auto &r: phosphorRT_) if (r.id) UnloadRenderTexture(r);
+    for (auto &r: phosphorSlowRT_) if (r.id) UnloadRenderTexture(r);
+    for (auto &r: observerRT_) if (r.id) UnloadRenderTexture(r);
     for (auto &r: ping_) if (r.id) UnloadRenderTexture(r);
+    for (auto &r: bloomRT_) if (r.id) UnloadRenderTexture(r);
+    for (auto &r: bloomWideRT_) if (r.id) UnloadRenderTexture(r);
     postRT_ = loadPointRenderTexture(sw,sh);
     prevSceneRT_ = loadPointRenderTexture(sw,sh);
-    phosphorRT_[0] = loadPointRenderTexture(sw,sh);
-    phosphorRT_[1] = loadPointRenderTexture(sw,sh);
-    ping_[0] = loadPointRenderTexture(sw,sh);
-    ping_[1] = loadPointRenderTexture(sw,sh);
+    phosphorRT_[0] = loadHDRRenderTexture(sw,sh);
+    phosphorRT_[1] = loadHDRRenderTexture(sw,sh);
+    phosphorSlowRT_[0] = loadHDRRenderTexture(sw,sh);
+    phosphorSlowRT_[1] = loadHDRRenderTexture(sw,sh);
+    observerRT_[0] = loadHDRRenderTexture(sw,sh);
+    observerRT_[1] = loadHDRRenderTexture(sw,sh);
+    ping_[0] = loadHDRRenderTexture(sw,sh);
+    ping_[1] = loadHDRRenderTexture(sw,sh);
+    int bloomW = std::max(sw / 4, 1);
+    int bloomH = std::max(sh / 4, 1);
+    bloomRT_[0] = loadHDRRenderTexture(bloomW, bloomH);
+    bloomRT_[1] = loadHDRRenderTexture(bloomW, bloomH);
+    int wideBloomW = std::max(sw / 16, 1);
+    int wideBloomH = std::max(sh / 16, 1);
+    bloomWideRT_[0] = loadHDRRenderTexture(wideBloomW, wideBloomH);
+    bloomWideRT_[1] = loadHDRRenderTexture(wideBloomW, wideBloomH);
     phosphorIndex_ = 0;
+    observerIndex_ = 0;
+    videoHistoryValid_ = false;
     clearRenderTexture(prevSceneRT_);
     clearRenderTexture(phosphorRT_[0]);
     clearRenderTexture(phosphorRT_[1]);
+    clearRenderTexture(phosphorSlowRT_[0]);
+    clearRenderTexture(phosphorSlowRT_[1]);
+    clearRenderTexture(observerRT_[0]);
+    clearRenderTexture(observerRT_[1]);
+    clearRenderTexture(bloomRT_[0]);
+    clearRenderTexture(bloomRT_[1]);
+    clearRenderTexture(bloomWideRT_[0]);
+    clearRenderTexture(bloomWideRT_[1]);
     lastScreenW_ = sw; lastScreenH_ = sh;
 }
 
@@ -496,12 +668,17 @@ void Shader_m::applyFogAreasToScene(const std::vector<Rectangle>& areas) {
 }
 
 static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH);
+static Rectangle getCRTDisplayRect(int targetW, int targetH);
 
 void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Texture2D source) {
     float time = (float)GetTime();
     float frameTime = std::clamp((float)GetFrameTime(), 1.0f / 240.0f, 1.0f / 24.0f);
     float resolution[2] = { (float)source.width, (float)source.height };
-    Rectangle display = getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, source.width, source.height);
+    bool crtStage = name == "crt" || name == "phosphor_state" ||
+                    name.rfind("crt_", 0) == 0;
+    Rectangle display = crtStage
+        ? getCRTDisplayRect(source.width, source.height)
+        : getLetterboxRect(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, source.width, source.height);
     float nativeResolution[2] = { (float)NATIVE_RES_WIDTH, (float)NATIVE_RES_HEIGHT };
     float displayRect[4] = { display.x, display.y, display.width, display.height };
 
@@ -521,72 +698,79 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
         return;
     }
 
-    if (name != "crt" && name != "phosphor_state") return;
+    if (!crtStage) return;
 
     CRTParams& params = crtParams();
-    float phosphorDecay[3] = { params.phosphorDecayR, params.phosphorDecayG, params.phosphorDecayB };
-    loc = GetShaderLocation(shader, "curvature");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.curvature, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "vignette");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.vignette, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "edgeSoftness");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.edgeSoftness, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "glow");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.glow, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "dotMask");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.dotMask, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "dotBlur");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.dotBlur, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "bleed");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.bleed, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "dotGridSize");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.dotGridSize, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "hexGrid");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.hexGrid, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "alternateLineShift");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.alternateLineShift, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "scanline");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.scanline, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "chromaticAberration");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.chromaticAberration, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "brightness");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.brightness, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "sharpness");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.sharpness, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "persistence");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.persistence, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "phosphorTrail");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.phosphorTrail, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "phosphorDecay");
-    if (loc >= 0) SetShaderValue(shader, loc, phosphorDecay, SHADER_UNIFORM_VEC3);
-    loc = GetShaderLocation(shader, "phosphorSpread");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.phosphorSpread, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "ntscArtifacts");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.ntscArtifacts, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "overscan");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.overscan, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "saturation");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.saturation, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "maskBrightness");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.maskBrightness, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "maskOpacity");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.maskOpacity, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "maskScale");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.maskScale, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "bloomIntensity");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomIntensity, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "bloomSpread");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomSpread, SHADER_UNIFORM_FLOAT);
-    loc = GetShaderLocation(shader, "bloomPower");
-    if (loc >= 0) SetShaderValue(shader, loc, &params.bloomPower, SHADER_UNIFORM_FLOAT);
-    if (crtMaskTexture_.id) {
-        loc = GetShaderLocation(shader, "shadowMaskTexture");
-        if (loc >= 0) SetShaderValueTexture(shader, loc, crtMaskTexture_);
-    }
-    if (crtArtifactsTexture_.id) {
-        loc = GetShaderLocation(shader, "ntscArtifactTexture");
-        if (loc >= 0) SetShaderValueTexture(shader, loc, crtArtifactsTexture_);
-    }
+    auto setFloat = [&](const char* uniform, float value) {
+        int uniformLoc = GetShaderLocation(shader, uniform);
+        if (uniformLoc >= 0) {
+            SetShaderValue(shader, uniformLoc, &value, SHADER_UNIFORM_FLOAT);
+        }
+    };
+    auto setVec3 = [&](const char* uniform, Vector3 value) {
+        int uniformLoc = GetShaderLocation(shader, uniform);
+        if (uniformLoc >= 0) {
+            float components[3] = {value.x, value.y, value.z};
+            SetShaderValue(shader, uniformLoc, components, SHADER_UNIFORM_VEC3);
+        }
+    };
+
+    // Fixed timing and electrical facts for the North-American CT-1358.
+    setFloat("ntscSubcarrierMHz", 3.579545f);
+    setFloat("ntscLineRateHz", 15734.264f);
+    setFloat("ntscFrameRateHz", 59.94006f);
+    setFloat("ntscActiveVideoUs", 52.655f);
+    setFloat("videoHistoryValid", videoHistoryValid_ ? 1.0f : 0.0f);
+    setFloat("outputGamma", params.outputGamma);
+    setFloat("ntscLumaBandwidthMHz", params.ntscLumaBandwidthMHz);
+    setFloat("ntscChromaBandwidthIMHz", params.ntscChromaBandwidthIMHz);
+    setFloat("ntscChromaBandwidthQMHz", params.ntscChromaBandwidthQMHz);
+    setFloat("ntscChromaGain", params.ntscChromaGain);
+    setFloat("ntscChromaDelayNs", params.ntscChromaDelayNs);
+    setFloat("ntscLumaPeaking", params.ntscLumaPeaking);
+    setFloat("ntscNoise", params.ntscNoise);
+    setFloat("ntscHum", params.ntscHum);
+    setVec3("videoGain", params.videoGain);
+    setVec3("videoCutoff", params.videoCutoff);
+    setVec3("gunGamma", params.gunGamma);
+    setFloat("beamMinWidth", params.beamMinWidth);
+    setFloat("beamMaxWidth", params.beamMaxWidth);
+    setFloat("beamShape", params.beamShape);
+    setFloat("beamIntensityWeight", params.beamIntensityWeight);
+    setFloat("beamScanlineStrength", params.beamScanlineStrength);
+    setFloat("beamHorizontalSigma", params.beamHorizontalSigma);
+    setFloat("focusEdgeSoftness", params.focusEdgeSoftness);
+    setFloat("astigmatism", params.astigmatism);
+    setFloat("misconvergence", params.misconvergence);
+    setFloat("horizontalJitter", params.horizontalJitter);
+    setFloat("maskStrength", params.maskStrength);
+    setFloat("maskTriadsAcross", params.maskTriadsAcross);
+    setFloat("maskType", params.maskType);
+    setVec3("phosphorFastDecay", params.phosphorFastDecay);
+    setVec3("phosphorSlowDecay", params.phosphorSlowDecay);
+    setFloat("phosphorSlowWeight", params.phosphorSlowWeight);
+    setFloat("phosphorSpread", params.phosphorSpread);
+    setFloat("observerIntegration", params.observerIntegration);
+    setFloat("bloomThreshold", params.bloomThreshold);
+    setFloat("bloomIntensity", params.bloomIntensity);
+    setFloat("wideBloomIntensity", params.wideBloomIntensity);
+    setFloat("bloomRadius", params.bloomRadius);
+    setFloat("halation", params.halation);
+    setFloat("curvatureX", params.curvatureX);
+    setFloat("curvatureY", params.curvatureY);
+    setFloat("pincushion", params.pincushion);
+    setFloat("highVoltageBloom", params.highVoltageBloom);
+    setFloat("overscan", params.overscan);
+    setFloat("cornerRadius", params.cornerRadius);
+    setFloat("vignette", params.vignette);
+    setFloat("glassTransmission", params.glassTransmission);
+    setVec3("glassTint", params.glassTint);
+    setFloat("reflection", params.reflection);
+    setFloat("blackLevel", params.blackLevel);
+    setFloat("brightness", params.brightness);
+    setFloat("saturation", params.saturation);
+    setFloat("flicker", params.flicker);
+    setFloat("noise", params.noise);
 }
 
 void Shader_m::bindTemporalTextures(Shader shader, const std::string& name) {
@@ -598,31 +782,195 @@ void Shader_m::bindTemporalTextures(Shader shader, const std::string& name) {
         if (loc >= 0) SetShaderValueTexture(shader, loc, previousFrame);
     }
 
-    if (name == "crt" && phosphorRT_[phosphorIndex_].id) {
-        int loc = GetShaderLocation(shader, "phosphorTexture");
-        if (loc >= 0) SetShaderValueTexture(shader, loc, phosphorRT_[phosphorIndex_].texture);
-    }
 }
 
 Texture2D Shader_m::updatePhosphorState(Texture2D source) {
-    if (!has("phosphor_state") || !phosphorRT_[0].id || !phosphorRT_[1].id) return source;
+    if (!has("phosphor_state") || !has("crt_phosphor_combine") ||
+        !phosphorRT_[0].id || !phosphorRT_[1].id ||
+        !phosphorSlowRT_[0].id || !phosphorSlowRT_[1].id) {
+        return source;
+    }
 
     Shader shader = get("phosphor_state");
-    RenderTexture2D& prev = phosphorRT_[phosphorIndex_];
-    RenderTexture2D& dst = phosphorRT_[phosphorIndex_ ^ 1];
+    auto updateLayer = [&](RenderTexture2D states[2], Vector3 decay) {
+        RenderTexture2D& prev = states[phosphorIndex_];
+        RenderTexture2D& dst = states[phosphorIndex_ ^ 1];
 
-    BeginTextureMode(dst);
-        ClearBackground(BLACK);
-        BeginShaderMode(shader);
-            uploadPassUniforms(shader, "phosphor_state", source);
-            int loc = GetShaderLocation(shader, "prevTexture");
-            if (loc >= 0) SetShaderValueTexture(shader, loc, prev.texture);
-            DrawTextureRec(source, {0,0,(float)source.width, -(float)source.height}, {0,0}, WHITE);
-        EndShaderMode();
-    EndTextureMode();
+        BeginTextureMode(dst);
+            ClearBackground(BLACK);
+            BeginShaderMode(shader);
+                uploadPassUniforms(shader, "phosphor_state", source);
+                int loc = GetShaderLocation(shader, "prevTexture");
+                if (loc >= 0) SetShaderValueTexture(shader, loc, prev.texture);
+                loc = GetShaderLocation(shader, "stateDecay");
+                if (loc >= 0) {
+                    float value[3] = {decay.x, decay.y, decay.z};
+                    SetShaderValue(shader, loc, value, SHADER_UNIFORM_VEC3);
+                }
+                DrawTextureRec(source, {0,0,(float)source.width, -(float)source.height}, {0,0}, WHITE);
+            EndShaderMode();
+        EndTextureMode();
+    };
+
+    const CRTParams& params = crtParams();
+    updateLayer(phosphorRT_, params.phosphorFastDecay);
+    updateLayer(phosphorSlowRT_, params.phosphorSlowDecay);
 
     phosphorIndex_ ^= 1;
-    return phosphorRT_[phosphorIndex_].texture;
+    return runFullscreenPass(
+        "crt_phosphor_combine",
+        phosphorRT_[phosphorIndex_].texture,
+        ping_[0],
+        "slowTexture",
+        phosphorSlowRT_[phosphorIndex_].texture
+    );
+}
+
+Texture2D Shader_m::updateObserverState(Texture2D source) {
+    if (!has("crt_observer_response") ||
+        !observerRT_[0].id || !observerRT_[1].id) {
+        return source;
+    }
+
+    RenderTexture2D& previous = observerRT_[observerIndex_];
+    RenderTexture2D& target = observerRT_[observerIndex_ ^ 1];
+    runFullscreenPass(
+        "crt_observer_response",
+        source,
+        target,
+        "prevTexture",
+        previous.texture
+    );
+    observerIndex_ ^= 1;
+    return observerRT_[observerIndex_].texture;
+}
+
+Texture2D Shader_m::runFullscreenPass(
+    const std::string& name,
+    Texture2D source,
+    RenderTexture2D& target,
+    const char* extraUniform,
+    Texture2D extraTexture,
+    const char* secondExtraUniform,
+    Texture2D secondExtraTexture
+) {
+    if (!has(name) || !source.id || !target.id) return source;
+
+    Shader shader = get(name);
+    BeginTextureMode(target);
+        ClearBackground(BLACK);
+        BeginShaderMode(shader);
+            uploadPassUniforms(shader, name, source);
+            if (extraUniform && extraTexture.id) {
+                int loc = GetShaderLocation(shader, extraUniform);
+                if (loc >= 0) {
+                    SetShaderValueTexture(shader, loc, extraTexture);
+                }
+            }
+            if (secondExtraUniform && secondExtraTexture.id) {
+                int loc = GetShaderLocation(shader, secondExtraUniform);
+                if (loc >= 0) {
+                    SetShaderValueTexture(shader, loc, secondExtraTexture);
+                }
+            }
+            DrawTexturePro(
+                source,
+                {0, 0, (float)source.width, -(float)source.height},
+                {0, 0, (float)target.texture.width, (float)target.texture.height},
+                {0, 0},
+                0.0f,
+                WHITE
+            );
+        EndShaderMode();
+    EndTextureMode();
+    return target.texture;
+}
+
+Texture2D Shader_m::applyCRTPipeline(Texture2D source) {
+    const char* required[] = {
+        "crt_ntsc_encode",
+        "crt_ntsc_decode",
+        "crt_scan_vertical",
+        "crt_emission",
+        "phosphor_state",
+        "crt_phosphor_combine",
+        "crt_observer_response",
+        "crt_brightpass",
+        "crt_bloom_downsample",
+        "crt_bloom_h",
+        "crt_bloom_v",
+        "crt"
+    };
+    for (const char* name : required) {
+        if (!has(name)) {
+            TraceLog(LOG_WARNING, "CRT: required stage '%s' is unavailable", name);
+            return source;
+        }
+    }
+
+    Texture2D composite = runFullscreenPass(
+        "crt_ntsc_encode",
+        source,
+        ping_[0],
+        "prevTexture",
+        prevSceneRT_.texture
+    );
+    Texture2D signal = runFullscreenPass(
+        "crt_ntsc_decode",
+        composite,
+        ping_[1]
+    );
+    Texture2D vertical = runFullscreenPass(
+        "crt_scan_vertical",
+        signal,
+        ping_[0]
+    );
+    Texture2D emission = runFullscreenPass(
+        "crt_emission",
+        vertical,
+        ping_[1]
+    );
+    Texture2D phosphor = updatePhosphorState(emission);
+    Texture2D observed = updateObserverState(phosphor);
+    Texture2D bright = runFullscreenPass(
+        "crt_brightpass",
+        observed,
+        bloomRT_[0]
+    );
+    Texture2D bloomHorizontal = runFullscreenPass(
+        "crt_bloom_h",
+        bright,
+        bloomRT_[1]
+    );
+    Texture2D bloom = runFullscreenPass(
+        "crt_bloom_v",
+        bloomHorizontal,
+        bloomRT_[0]
+    );
+    Texture2D wideSeed = runFullscreenPass(
+        "crt_bloom_downsample",
+        bloom,
+        bloomWideRT_[0]
+    );
+    Texture2D wideHorizontal = runFullscreenPass(
+        "crt_bloom_h",
+        wideSeed,
+        bloomWideRT_[1]
+    );
+    Texture2D wideBloom = runFullscreenPass(
+        "crt_bloom_v",
+        wideHorizontal,
+        bloomWideRT_[0]
+    );
+    return runFullscreenPass(
+        "crt",
+        observed,
+        ping_[1],
+        "bloomTexture",
+        bloom,
+        "wideBloomTexture",
+        wideBloom
+    );
 }
 
 static void drawFullscreenTexture(Texture2D tex) {
@@ -642,6 +990,24 @@ static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH) 
     int dy = (targetH - dh) / 2;
 
     return {(float)dx, (float)dy, (float)dw, (float)dh};
+}
+
+static Rectangle getCRTDisplayRect(int targetW, int targetH) {
+    if (targetW <= 0 || targetH <= 0) return {0, 0, 0, 0};
+
+    constexpr float tubeAspect = 4.0f / 3.0f;
+    float width = static_cast<float>(targetW);
+    float height = width / tubeAspect;
+    if (height > static_cast<float>(targetH)) {
+        height = static_cast<float>(targetH);
+        width = height * tubeAspect;
+    }
+    return {
+        (static_cast<float>(targetW) - width) * 0.5f,
+        (static_cast<float>(targetH) - height) * 0.5f,
+        width,
+        height
+    };
 }
 
 static void drawTextureLetterboxed(Texture2D tex, int targetW, int targetH) {
@@ -897,24 +1263,26 @@ void Shader_m::present() {
 
     BeginTextureMode(postRT_);
         ClearBackground(BLACK);
-        drawTextureLetterboxed(nativeTex, postRT_.texture.width, postRT_.texture.height);
+        if (displayPasses.empty()) {
+            drawTextureLetterboxed(nativeTex, postRT_.texture.width, postRT_.texture.height);
+        } else {
+            Rectangle sourceRect{0, 0, (float)nativeTex.width, -(float)nativeTex.height};
+            Rectangle tubeRect = getCRTDisplayRect(postRT_.texture.width, postRT_.texture.height);
+            DrawTexturePro(nativeTex, sourceRect, tubeRect, {0, 0}, 0.0f, WHITE);
+        }
     EndTextureMode();
-
-    if (!displayPasses.empty()) {
-        updatePhosphorState(postRT_.texture);
-    }
 
     Texture2D outTex = displayPasses.empty()
         ? postRT_.texture
-        : applyPasses(postRT_.texture, displayPasses, ping_, pingIndex_);
+        : applyCRTPipeline(postRT_.texture);
     // Post-process output is already in final window resolution.
     drawFullscreenTexture(outTex);
-    // After presenting, keep copy as prev for temporal shaders.
+    // Keep the previous raw video frame, never the already simulated tube.
     if (prevSceneRT_.id) {
         BeginTextureMode(prevSceneRT_);
-            // Copy 1:1 into prev texture (same post-scaled resolution)
-            drawFullscreenTexture(outTex);
+            drawFullscreenTexture(postRT_.texture);
         EndTextureMode();
+        videoHistoryValid_ = true;
     }
     queue_.clear();
 }
