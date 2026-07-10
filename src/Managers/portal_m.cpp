@@ -21,10 +21,7 @@ constexpr float kMinPieceSize = 0.01f;
 constexpr float kCrossEpsilon = 0.001f;
 constexpr float kApertureTolerance = 0.05f;
 constexpr float kExitClearance = 0.05f;
-constexpr float kProgressDistance = 0.05f;
 constexpr float kMinimumExitSpeed = 40.0f;
-constexpr double kStallTimeout = 0.35;
-constexpr double kMaximumTransitTime = 3.0;
 
 struct PortalFrame {
     Rectangle rect{};
@@ -49,9 +46,6 @@ struct Transit {
     std::optional<Rectangle> sourcePiece;
     std::optional<Rectangle> targetPiece;
     bool blockedEntering = false;
-    float progressAnchor = 0.0f;
-    double stalledFor = 0.0;
-    double elapsed = 0.0;
 };
 
 struct DisabledTile {
@@ -691,8 +685,6 @@ bool startTransit(Portal* source, GObject* entity, Rectangle fromRect) {
     transit.targetFrame = *targetFrame;
     transit.previousRect = fromRect;
     refresh(transit, entity, fromRect);
-    transit.progressAnchor =
-        openSideDistance(centerOf(transit.sourceRect), transit.sourceFrame);
     transits.emplace(entity->id_, std::move(transit));
     return true;
 }
@@ -858,27 +850,6 @@ RecoveryResult recover(
         rigidBody->setSpeed({});
     }
     return RecoveryResult::Recovered;
-}
-
-bool hasStalled(
-    Transit& transit,
-    CollisionRect* body,
-    const PortalFrame& sourceFrame,
-    double delta
-) {
-    delta = std::isfinite(delta) ? std::clamp(delta, 0.0, 0.2) : 0.0;
-    transit.elapsed += delta;
-    if (transit.elapsed >= kMaximumTransitTime) return true;
-
-    float distance = openSideDistance(centerOf(body->getSurface()), sourceFrame);
-    if (std::fabs(distance - transit.progressAnchor) >= kProgressDistance) {
-        transit.progressAnchor = distance;
-        transit.stalledFor = 0.0;
-        return false;
-    }
-
-    transit.stalledFor += delta;
-    return transit.stalledFor >= kStallTimeout;
 }
 
 void finishTransit(int entityId, bool respawn) {
@@ -1227,7 +1198,7 @@ std::optional<Vector2> Portal_m::gravityStep(
     return Vector2{sourceGravity.x * delta, sourceGravity.y * delta};
 }
 
-void Portal_m::update(double delta) {
+void Portal_m::update(double) {
     std::vector<PendingEnd> endings;
 
     for (auto& [entityId, transit] : transits) {
@@ -1257,19 +1228,6 @@ void Portal_m::update(double delta) {
         if (transit.blockedEntering) {
             bool respawn =
                 recover(transit, entity, body, {}, true) ==
-                RecoveryResult::Respawn;
-            endings.push_back({entityId, respawn});
-            continue;
-        }
-
-        if (hasStalled(transit, body, transit.sourceFrame, delta)) {
-            bool preferTarget =
-                openSideDistance(
-                    centerOf(body->getSurface()),
-                    transit.sourceFrame
-                ) < 0.0f;
-            bool respawn =
-                recover(transit, entity, body, {}, preferTarget) ==
                 RecoveryResult::Respawn;
             endings.push_back({entityId, respawn});
             continue;
