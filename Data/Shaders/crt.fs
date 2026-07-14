@@ -204,7 +204,12 @@ void main() {
     float wideHalo = exp(-dist * dist * mix(2.8, 0.72, dotBlur));
     float roundPixel = clamp(core * 0.58 + halo * 0.70 + wideHalo * bleed * 0.26, 0.0, 1.55);
     float aperture = mix(1.0, roundPixel * 1.03, clamp(dotMask, 0.0, 1.0));
-    float scan = 1.0 - scanline * (0.5 + 0.5 * cos((nativePx.y + 0.15 * sin(time * 1.7)) * 6.2831853));
+    // Center the beam profile inside every displayed dot. Basing this on the
+    // native raster made a 0.5-native-pixel dot inherit only one half of the
+    // scanline curve, and the animated phase shifted energy between its top
+    // and bottom halves.
+    float scanProfile = 0.5 - 0.5 * cos(pixelLocal.y * 6.2831853);
+    float scan = 1.0 - scanline * scanProfile;
 
     vec3 bloom = vec3(0.0);
     bloom += brightPart(sampleNativePhosphorDot(cell + vec2( 1.0,  0.0)).rgb) * 1.15;

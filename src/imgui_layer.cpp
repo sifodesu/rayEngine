@@ -527,12 +527,12 @@ void DrawWindows() {
     // drawPlayerWindow();
     // drawVisibleModelWindow();
     // drawGlitchSpriteWindow();
-    // drawCRTWindow();
+    drawCRTWindow();
     // drawParticleWindow();
     // drawStillWaterWindow();
     // drawFogWindow();
-    drawLightingWindow();
-    drawScreenshotWindow();
+    // drawLightingWindow();
+    // drawScreenshotWindow();
 }
 
 } // namespace ImGuiLayer
