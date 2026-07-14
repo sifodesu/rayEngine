@@ -1,0 +1,52 @@
+{
+  "capturePoint": "final framebuffer before FPS and ImGui",
+  "capturedAtUnixMs": 1784026661513,
+  "crtEnabled": true,
+  "crtProfile": {
+    "calibrationStatus": "provisional_unmeasured",
+    "frameRateHz": 60.0544427480916,
+    "manufacturer": "Hitachi",
+    "measuredSerial": "",
+    "model": "CT-1358",
+    "timing": "rayEngine-320x192-262p"
+  },
+  "height": 768,
+  "image": "01-game-crt.png",
+  "parameterSnapshot": "crt_params.json",
+  "receiverState": {
+    "burstMeasurement": [
+      0.50537109375,
+      1.0,
+      0.08099365234375,
+      1.0
+    ],
+    "burstPll": [
+      0.5048828125,
+      0.499755859375,
+      0.998046875,
+      0.61376953125
+    ],
+    "powerApl": [
+      0.030975341796875,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "verticalPll": [
+      0.5,
+      0.5,
+      0.9970703125,
+      1.0
+    ],
+    "videoAgcAfc": [
+      0.299560546875,
+      0.49853515625,
+      0.9970703125,
+      0.51708984375
+    ]
+  },
+  "schema": "rayengine.screenshot.v1",
+  "testPattern": 0,
+  "testPatternName": "game",
+  "width": 1280
+}

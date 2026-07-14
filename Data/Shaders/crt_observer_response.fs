@@ -14,7 +14,7 @@ out vec4 finalColor;
 void main() {
     vec3 instantaneous = max(texture(texture0, fragTexCoord).rgb, vec3(0.0));
     vec3 previousExposure = max(texture(prevTexture, fragTexCoord).rgb, vec3(0.0));
-    float dt = clamp(frameTime, 1.0 / 240.0, 1.0 / 24.0);
+    float dt = max(frameTime, 0.0);
     float exposureTime = max(observerIntegration, 0.00025);
     float response = 1.0 - exp(-dt / exposureTime);
     vec3 observedRadiance = mix(previousExposure, instantaneous, response);

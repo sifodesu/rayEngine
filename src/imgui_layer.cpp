@@ -224,16 +224,44 @@ static void drawCRTWindow() {
 
     Shader_m::CRTParams& params = Shader_m::crtParams();
 
-    ImGui::TextUnformatted("Hitachi CT-1358 / Philips A34JLN60X / composite NTSC");
+    ImGui::TextUnformatted("Hitachi CT-1358 / 240p natif 262 lignes / composite NTSC");
+    ImGui::Text("Calibration: %s%s%s",
+        params.calibrationStatus.c_str(),
+        params.measuredSerial.empty() ? "" : " / serial ",
+        params.measuredSerial.c_str());
+    int testPattern = std::clamp((int)std::lround(params.testPattern), 0, 6);
+    const char* testPatterns[] = {
+        "Jeu", "Barres + PLUGE", "Convergence", "Multiburst",
+        "Demi-ecran", "Zone plate", "Rampe niveaux"
+    };
+    if (ImGui::Combo("Mire", &testPattern, testPatterns, 7)) {
+        params.testPattern = (float)testPattern;
+    }
+    ImGui::TextUnformatted("Signal: 262 total / 240 actives / source 320x192 en 5:3 / 60.05444 Hz");
     ImGui::SeparatorText("Decodeur composite sans comb filter");
+    ImGui::SliderFloat("Source bande Y (Nyquist 3,04)",
+        &params.ntscSourceLumaBandwidthMHz, 1.5f, 3.04f, "%.2f MHz");
+    ImGui::SliderFloat("Source bande I", &params.ntscSourceIBandwidthMHz, 0.2f, 1.5f, "%.2f MHz");
+    ImGui::SliderFloat("Source bande Q", &params.ntscSourceQBandwidthMHz, 0.2f, 0.8f, "%.2f MHz");
     ImGui::SliderFloat("Bande passante Y", &params.ntscLumaBandwidthMHz, 1.5f, 4.2f, "%.2f MHz");
     ImGui::SliderFloat("Bande passante I", &params.ntscChromaBandwidthIMHz, 0.2f, 1.5f, "%.2f MHz");
     ImGui::SliderFloat("Bande passante Q", &params.ntscChromaBandwidthQMHz, 0.2f, 1.5f, "%.2f MHz");
     ImGui::SliderFloat("Gain chroma", &params.ntscChromaGain, 0.0f, 1.8f, "%.2f");
     ImGui::SliderFloat("Retard chroma", &params.ntscChromaDelayNs, -250.0f, 250.0f, "%.0f ns");
+    ImGui::SliderFloat("Suppression cross-color 2 lignes",
+        &params.ntscLineCombStrength, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Peaking luminance", &params.ntscLumaPeaking, 0.0f, 0.35f, "%.3f");
+    ImGui::SliderFloat("Gain differentiel", &params.ntscDifferentialGain, -0.20f, 0.20f, "%.3f");
+    ImGui::SliderFloat("Phase differentielle", &params.ntscDifferentialPhaseDeg, -10.0f, 10.0f, "%.2f deg");
     ImGui::SliderFloat("Bruit composite", &params.ntscNoise, 0.0f, 0.03f, "%.4f");
     ImGui::SliderFloat("Ronflette secteur", &params.ntscHum, 0.0f, 0.02f, "%.4f");
+    ImGui::SliderFloat("Constante AGC", &params.ntscAgcResponse, 0.010f, 0.500f, "%.3fs");
+    ImGui::SliderFloat("Constante clamp", &params.ntscClampResponse, 0.001f, 0.050f, "%.3fs");
+    ImGui::SliderFloat("Bande PLL burst", &params.ntscBurstPllBandwidthHz, 1.0f, 80.0f, "%.1f Hz");
+    ImGui::SliderFloat("Bande PLL horizontale", &params.ntscHorizontalPllBandwidthHz, 10.0f, 500.0f, "%.0f Hz");
+    ImGui::SliderFloat("Bande PLL verticale", &params.ntscVerticalPllBandwidthHz, 0.5f, 30.0f, "%.1f Hz");
+    ImGui::SliderFloat("Constante ACC", &params.ntscAccResponse, 0.010f, 0.500f, "%.3fs");
+    ImGui::SliderFloat("Seuil color killer", &params.ntscColorKillerThreshold, 0.0f, 0.8f, "%.2f");
     ImGui::SliderFloat3("Gain canons RGB", &params.videoGain.x, 0.75f, 1.25f, "%.3f");
     ImGui::SliderFloat3("Cutoff RGB", &params.videoCutoff.x, 0.0f, 0.08f, "%.3f");
     ImGui::SliderFloat3("Gamma canons RGB", &params.gunGamma.x, 1.8f, 2.8f, "%.2f");
@@ -245,6 +273,13 @@ static void drawCRTWindow() {
     ImGui::SliderFloat("Poids intensite", &params.beamIntensityWeight, 0.05f, 1.5f, "%.2f");
     ImGui::SliderFloat("Force balayage", &params.beamScanlineStrength, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Flou horizontal", &params.beamHorizontalSigma, 0.15f, 2.5f, "%.2f px");
+    ImGui::SliderFloat("Limite courant faisceau", &params.beamCurrentLimit, 0.20f, 2.0f, "%.2f");
+    ImGui::SliderFloat("Compression courant", &params.beamCurrentCompression, 0.0f, 2.0f, "%.2f");
+    ImGui::SliderFloat("Bande ampli video", &params.videoOutputBandwidthMHz, 1.0f, 8.0f, "%.2f MHz");
+    ImGui::SliderFloat("Marge cathodes", &params.cathodeDriveHeadroom, 0.5f, 2.0f, "%.2f");
+    ImGui::SliderFloat("Charge d'espace", &params.spaceChargeCompression, 0.0f, 1.0f, "%.3f");
+    ImGui::SliderFloat("Bloom du spot", &params.spotBloom, 0.0f, 1.5f, "%.2f");
+    ImGui::SliderFloat("Focus dynamique", &params.dynamicFocus, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Defocus aux bords", &params.focusEdgeSoftness, 0.0f, 1.5f, "%.2f");
     ImGui::SliderFloat("Astigmatisme", &params.astigmatism, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Defaut convergence", &params.misconvergence, 0.0f, 1.5f, "%.2f px");
@@ -258,18 +293,27 @@ static void drawCRTWindow() {
     if (ImGui::Combo("Disposition", &maskType, maskTypes, 3)) {
         params.maskType = (float)maskType;
     }
+    ImGui::SliderFloat("Echauffement masque", &params.maskHeating, 0.0f, 0.30f, "%.3f");
+    ImGui::SliderFloat("Inertie thermique masque", &params.maskThermalTau, 0.5f, 60.0f, "%.1fs");
+    ImGui::SliderFloat("Diffusion thermique masque", &params.maskThermalDiffusion, 0.0f, 1.0f, "%.3f");
+    ImGui::SliderFloat("Doming masque", &params.maskDoming, 0.0f, 0.25f, "%.3f triade");
+    ImGui::SliderFloat("Diaphotie masque", &params.maskCrosstalk, 0.0f, 0.15f, "%.3f");
     ImGui::SeparatorText("Phosphore");
     ImGui::SliderFloat3("Decay rapide RGB", &params.phosphorFastDecay.x, 0.00025f, 0.010f, "%.4fs");
+    ImGui::SliderFloat3("Decay moyen RGB", &params.phosphorMediumDecay.x, 0.001f, 0.030f, "%.4fs");
     ImGui::SliderFloat3("Decay lent RGB", &params.phosphorSlowDecay.x, 0.002f, 0.080f, "%.4fs");
+    ImGui::SliderFloat("Poids remanence moyenne", &params.phosphorMediumWeight, 0.0f, 0.30f, "%.3f");
     ImGui::SliderFloat("Poids remanence lente", &params.phosphorSlowWeight, 0.0f, 0.20f, "%.3f");
     ImGui::SliderFloat("Diffusion", &params.phosphorSpread, 0.0f, 2.5f, "%.2f px");
-    ImGui::SliderFloat("Integration oeil/camera", &params.observerIntegration, 0.001f, 0.050f, "%.3fs");
+    ImGui::SliderFloat("Saturation phosphore", &params.phosphorSaturation, 0.25f, 8.0f, "%.2f");
+    ImGui::SliderFloat("Integration oeil/camera", &params.observerIntegration, 0.0f, 0.050f, "%.3fs");
 
     ImGui::SeparatorText("Optique");
     ImGui::SliderFloat("Seuil bloom", &params.bloomThreshold, 0.0f, 2.0f, "%.2f");
     ImGui::SliderFloat("Bloom local", &params.bloomIntensity, 0.0f, 1.5f, "%.2f");
     ImGui::SliderFloat("Bloom large", &params.wideBloomIntensity, 0.0f, 1.0f, "%.3f");
     ImGui::SliderFloat("Rayon bloom", &params.bloomRadius, 0.0f, 4.0f, "%.2f");
+    ImGui::SliderFloat3("Rayon bloom RGB", &params.bloomRadiusRGB.x, 0.5f, 1.8f, "%.2f");
     ImGui::SliderFloat("Halation", &params.halation, 0.0f, 0.5f, "%.3f");
     ImGui::SliderFloat("Reflet verre", &params.reflection, 0.0f, 0.25f, "%.3f");
 
@@ -278,17 +322,46 @@ static void drawCRTWindow() {
     ImGui::SliderFloat("Courbure Y", &params.curvatureY, 0.0f, 0.25f, "%.3f");
     ImGui::SliderFloat("Pincushion", &params.pincushion, 0.0f, 0.10f, "%.3f");
     ImGui::SliderFloat("Bloom haute tension", &params.highVoltageBloom, 0.0f, 0.08f, "%.3f");
-    ImGui::SliderFloat("Overscan", &params.overscan, 0.75f, 1.35f, "%.2f");
+    ImGui::SliderFloat("Reponse haute tension", &params.highVoltageResponse, 0.005f, 0.5f, "%.3fs");
+    ImGui::SliderFloat("Chute haute tension", &params.highVoltageSag, 0.0f, 0.30f, "%.3f");
+    ImGui::SliderFloat("Ripple haute tension", &params.highVoltageRipple, 0.0f, 0.02f, "%.4f");
+    ImGui::SliderFloat("Reponse B+", &params.bPlusResponse, 0.002f, 0.25f, "%.3fs");
+    ImGui::SliderFloat("Chute B+", &params.bPlusSag, 0.0f, 0.20f, "%.3f");
+    ImGui::SliderFloat("Ripple B+", &params.bPlusRipple, 0.0f, 0.02f, "%.4f");
     ImGui::SliderFloat("Coins", &params.cornerRadius, 0.001f, 0.35f, "%.3f");
     ImGui::SliderFloat("Vignette", &params.vignette, 0.0f, 0.8f, "%.2f");
     ImGui::SliderFloat("Transmission verre", &params.glassTransmission, 0.3f, 1.0f, "%.2f");
     ImGui::SliderFloat3("Teinte verre RGB", &params.glassTint.x, 0.5f, 1.1f, "%.3f");
+    ImGui::SliderFloat("Dispersion verre", &params.glassDispersion, 0.0f, 1.5f, "%.2f px");
+    ImGui::SliderFloat("Indice verre", &params.glassRefractiveIndex, 1.35f, 1.75f, "%.3f");
+    ImGui::SliderFloat("Epaisseur verre", &params.glassThicknessMm, 1.0f, 25.0f, "%.1f mm");
+    ImGui::SliderFloat3("Absorption verre RGB", &params.glassAbsorption.x, 0.0f, 0.03f, "%.4f/mm");
+    ImGui::SliderFloat("Reflexion interne", &params.internalReflection, 0.0f, 0.10f, "%.3f");
+    ImGui::SliderFloat("Eclairement ambiant", &params.ambientIlluminance, 0.0f, 500.0f, "%.0f lux");
+    ImGui::SliderFloat("Courbure faceplate X", &params.faceplateCurvatureX, 0.0f, 0.08f, "%.3f");
+    ImGui::SliderFloat("Courbure faceplate Y", &params.faceplateCurvatureY, 0.0f, 0.08f, "%.3f");
+    ImGui::SliderFloat3("Matrice tube R", &params.tubeColorMatrixR.x, -0.5f, 1.5f, "%.3f");
+    ImGui::SliderFloat3("Matrice tube G", &params.tubeColorMatrixG.x, -0.5f, 1.5f, "%.3f");
+    ImGui::SliderFloat3("Matrice tube B", &params.tubeColorMatrixB.x, -0.5f, 1.5f, "%.3f");
     ImGui::SliderFloat("Niveau noir", &params.blackLevel, 0.0f, 0.05f, "%.4f");
     ImGui::SliderFloat("Luminosite", &params.brightness, 0.25f, 2.5f, "%.2f");
     ImGui::SliderFloat("Saturation", &params.saturation, 0.0f, 2.5f, "%.2f");
     ImGui::SliderFloat("Gamma sortie", &params.outputGamma, 1.6f, 3.0f, "%.2f");
+    ImGui::SliderFloat("Pic tube", &params.tubePeakNits, 40.0f, 250.0f, "%.0f nits");
+    ImGui::SliderFloat("Pic ecran hote", &params.hostPeakNits, 80.0f, 1500.0f, "%.0f nits");
+    ImGui::SliderFloat("Radiance blanc de reference",
+        &params.referenceWhiteRadiance, 0.10f, 1.50f, "%.3f");
     ImGui::SliderFloat("Flicker", &params.flicker, 0.0f, 0.04f, "%.4f");
     ImGui::SliderFloat("Bruit", &params.noise, 0.0f, 0.04f, "%.4f");
+
+    if (ImGui::Button("Screenshot sans overlays")) {
+        Shader_m::requestScreenshot("manual");
+    }
+    if (!Shader_m::lastScreenshotPath().empty()) {
+        ImGui::Text("Derniere capture: %s%s",
+            Shader_m::lastScreenshotPath().string().c_str(),
+            Shader_m::lastScreenshotSucceeded() ? "" : " (echec)");
+    }
 
     if (ImGui::Button("Save parameters")) {
         saveStatus = Shader_m::saveCRTParams() ? "Saved crt_params.json" : "Save failed";

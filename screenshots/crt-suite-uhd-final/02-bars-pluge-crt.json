@@ -1,0 +1,79 @@
+{
+  "capturePoint": "fixed reference raster before FPS and ImGui",
+  "capturedAtUnixMs": 1784047508699,
+  "crtEnabled": true,
+  "crtProfile": {
+    "calibrationStatus": "provisional_unmeasured",
+    "frameRateHz": 60.0544427480916,
+    "manufacturer": "Hitachi",
+    "measuredSerial": "",
+    "model": "CT-1358",
+    "timing": "rayEngine-320x192-262p"
+  },
+  "height": 2160,
+  "image": "02-bars-pluge-crt.png",
+  "parameterSnapshot": "crt_params.json",
+  "previewHeight": 2002,
+  "previewWidth": 3840,
+  "receiverState": {
+    "burstMeasurement": [
+      0.50537109375,
+      1.0,
+      0.0809326171875,
+      1.0
+    ],
+    "burstPll": [
+      0.50537109375,
+      0.5,
+      1.0,
+      0.6162109375
+    ],
+    "powerApl": [
+      0.19482421875,
+      0.986328125,
+      0.99462890625,
+      1.0
+    ],
+    "verticalPll": [
+      0.5,
+      0.5,
+      1.0,
+      1.0
+    ],
+    "videoAgcAfc": [
+      0.299560546875,
+      0.498779296875,
+      1.0,
+      0.5185546875
+    ]
+  },
+  "renderLayout": {
+    "contentLines": 192,
+    "contentStartLine": 44,
+    "finalFilterAtReferenceSize": "none_1_to_1",
+    "nativePresentationScale": 11,
+    "raster": {
+      "format": "RGBA16F",
+      "height": 2160,
+      "width": 3840
+    },
+    "signal": {
+      "height": 262,
+      "width": 910
+    },
+    "source": {
+      "height": 192,
+      "width": 320
+    },
+    "tubeRect": {
+      "height": 2112,
+      "width": 3520,
+      "x": 160,
+      "y": 24
+    }
+  },
+  "schema": "rayengine.screenshot.v1",
+  "testPattern": 1,
+  "testPatternName": "bars_pluge",
+  "width": 3840
+}

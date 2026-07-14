@@ -27,6 +27,7 @@ BindingMap defaultBindings() {
         {"r4", {KEY_L}},
         {"dash", {KEY_LEFT_SHIFT}},
         {"reload", {KEY_R}},
+        {"screenshot", {KEY_PRINT_SCREEN}},
         {"toggle_collision", {KEY_C}},
     };
 }

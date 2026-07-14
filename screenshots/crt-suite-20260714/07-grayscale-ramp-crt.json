@@ -1,0 +1,52 @@
+{
+  "capturePoint": "final framebuffer before FPS and ImGui",
+  "capturedAtUnixMs": 1784026668198,
+  "crtEnabled": true,
+  "crtProfile": {
+    "calibrationStatus": "provisional_unmeasured",
+    "frameRateHz": 60.0544427480916,
+    "manufacturer": "Hitachi",
+    "measuredSerial": "",
+    "model": "CT-1358",
+    "timing": "rayEngine-320x192-262p"
+  },
+  "height": 768,
+  "image": "07-grayscale-ramp-crt.png",
+  "parameterSnapshot": "crt_params.json",
+  "receiverState": {
+    "burstMeasurement": [
+      0.505859375,
+      1.0,
+      0.08099365234375,
+      1.0
+    ],
+    "burstPll": [
+      0.50537109375,
+      0.5,
+      0.998046875,
+      0.61376953125
+    ],
+    "powerApl": [
+      0.250732421875,
+      0.97900390625,
+      0.99169921875,
+      1.0
+    ],
+    "verticalPll": [
+      0.5,
+      0.5,
+      0.9970703125,
+      1.0
+    ],
+    "videoAgcAfc": [
+      0.299560546875,
+      0.4990234375,
+      0.9970703125,
+      0.51806640625
+    ]
+  },
+  "schema": "rayengine.screenshot.v1",
+  "testPattern": 6,
+  "testPatternName": "grayscale_ramp",
+  "width": 1280
+}

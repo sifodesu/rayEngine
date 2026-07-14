@@ -10,6 +10,7 @@
     "r4": "L",
     "dash": ["LEFT_SHIFT", "RIGHT_SHIFT"],
     "reload": "R",
+    "screenshot": "PRINT_SCREEN",
     "toggle_collision": "C"
   }
 }

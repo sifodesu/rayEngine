@@ -5,12 +5,25 @@ in vec4 fragColor;
 
 uniform sampler2D texture0;
 uniform vec4 colDiffuse;
+uniform vec2 resolution;
 uniform float bloomThreshold;
 
 out vec4 finalColor;
 
 void main() {
-    vec3 color = texture(texture0, fragTexCoord).rgb;
+    // This pass renders at quarter resolution. Integrate the phosphor slots
+    // before thresholding so one subpixel peak cannot alias into a bloom ray.
+    vec2 texel = 1.0 / max(resolution, vec2(1.0));
+    vec3 color = vec3(0.0);
+    for (int y = -2; y <= 2; ++y) {
+        for (int x = -2; x <= 2; ++x) {
+            float weight = (3.0 - abs(float(x))) *
+                (3.0 - abs(float(y)));
+            color += texture(texture0,
+                fragTexCoord + vec2(float(x), float(y)) * texel).rgb * weight;
+        }
+    }
+    color /= 81.0;
     float peak = max(max(color.r, color.g), color.b);
     float threshold = max(bloomThreshold, 0.0);
     float knee = max(threshold * 0.35, 0.001);

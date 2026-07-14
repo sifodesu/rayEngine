@@ -1,8 +1,14 @@
+#include <array>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <map>
 #include <algorithm>
 #include <set>
+#include <stdexcept>
 #include <string>
 #include <vector>
+#include <nlohmann/json.hpp>
 
 #include "engine.h"
 #include "raylib.h"
@@ -34,6 +40,28 @@
 
 namespace {
 
+using json = nlohmann::json;
+
+struct CaptureSuiteStep {
+    const char* fileName;
+    const char* modeName;
+    bool crtEnabled;
+    float testPattern;
+    double settleSeconds;
+    int minimumFrames;
+};
+
+constexpr std::array<CaptureSuiteStep, 8> CRT_CAPTURE_STEPS = {{
+    {"00-game-raw.png", "game_raw", false, 0.0f, 0.20, 2},
+    {"01-game-crt.png", "game_crt", true, 0.0f, 1.00, 8},
+    {"02-bars-pluge-crt.png", "bars_pluge", true, 1.0f, 1.00, 8},
+    {"03-convergence-crt.png", "convergence", true, 2.0f, 1.00, 8},
+    {"04-multiburst-crt.png", "multiburst", true, 3.0f, 1.00, 8},
+    {"05-half-screen-crt.png", "half_screen", true, 4.0f, 1.00, 8},
+    {"06-zone-plate-crt.png", "zone_plate", true, 5.0f, 1.00, 8},
+    {"07-grayscale-ramp-crt.png", "grayscale_ramp", true, 6.0f, 1.00, 8},
+}};
+
 // Debug visualization state
 bool showCollisionBoxes = false;
 constexpr float IMGUI_SCALE = 2.0f;
@@ -54,16 +82,28 @@ void clearDepthBufferOnly()
 
 } // namespace
 
-Engine::Engine()
+Engine::Engine(int argc, char** argv)
 {
+    configureCaptureSuite(argc, argv);
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, "rayEngine");
     SetTargetFPS(120);
     
-    int scale = std::max(1, int(GetMonitorHeight(GetCurrentMonitor())*0.90 / NATIVE_RES_HEIGHT));
-    SetWindowSize(NATIVE_RES_WIDTH * scale, NATIVE_RES_HEIGHT * scale);
-    SetWindowPosition((GetMonitorWidth(GetCurrentMonitor()) - GetScreenWidth()) / 2, (GetMonitorHeight(GetCurrentMonitor()) - GetScreenHeight()) / 2);
+    if (captureSuiteEnabled_) {
+        SetWindowSize(captureWidth_, captureHeight_);
+    } else {
+        int scale = std::max(1, int(
+            GetMonitorHeight(GetCurrentMonitor()) * 0.90 /
+            NATIVE_RES_HEIGHT));
+        SetWindowSize(NATIVE_RES_WIDTH * scale,
+            NATIVE_RES_HEIGHT * scale);
+    }
+    SetWindowPosition(
+        std::max(0, (GetMonitorWidth(GetCurrentMonitor()) -
+            GetScreenWidth()) / 2),
+        std::max(0, (GetMonitorHeight(GetCurrentMonitor()) -
+            GetScreenHeight()) / 2));
     
     InitAudioDevice();
 
@@ -72,6 +112,179 @@ Engine::Engine()
     rlImGuiSetup(true);
     ImGui::GetStyle().ScaleAllSizes(IMGUI_SCALE);
     ImGui::GetStyle().FontScaleMain = IMGUI_SCALE;
+
+    if (captureSuiteEnabled_) beginCaptureSuite();
+}
+
+void Engine::configureCaptureSuite(int argc, char** argv)
+{
+    captureSuiteDirectory_ = std::filesystem::path("screenshots") /
+        "crt-suite-latest";
+    for (int index = 1; index < argc; ++index) {
+        const std::string argument = argv[index] ? argv[index] : "";
+        if (argument == "--capture-crt-suite") {
+            captureSuiteEnabled_ = true;
+            if (index + 1 < argc && argv[index + 1] &&
+                std::string(argv[index + 1]).rfind("--", 0) != 0) {
+                captureSuiteDirectory_ = argv[++index];
+            }
+        } else if (argument == "--capture-size" && index + 1 < argc &&
+                   argv[index + 1]) {
+            const std::string dimensions = argv[++index];
+            const std::size_t separator = dimensions.find_first_of("xX");
+            try {
+                if (separator == std::string::npos) throw std::invalid_argument("size");
+                const int width = std::stoi(dimensions.substr(0, separator));
+                const int height = std::stoi(dimensions.substr(separator + 1));
+                if (width <= 0 || height <= 0) throw std::invalid_argument("size");
+                captureWidth_ = width;
+                captureHeight_ = height;
+            } catch (const std::exception&) {
+                std::cerr << "Invalid --capture-size '" << dimensions
+                          << "'; expected WIDTHxHEIGHT\n";
+            }
+        }
+    }
+}
+
+void Engine::beginCaptureSuite()
+{
+    std::error_code error;
+    std::filesystem::create_directories(captureSuiteDirectory_, error);
+    if (error) {
+        std::cerr << "CRT capture: cannot create "
+                  << captureSuiteDirectory_ << ": " << error.message()
+                  << '\n';
+        captureSuiteEnabled_ = false;
+        return;
+    }
+    std::filesystem::copy_file(
+        "crt_params.json",
+        captureSuiteDirectory_ / "crt_params.json",
+        std::filesystem::copy_options::overwrite_existing,
+        error
+    );
+    if (error) {
+        std::cerr << "CRT capture: parameter snapshot failed: "
+                  << error.message() << '\n';
+    }
+
+    captureOriginalTestPattern_ = Shader_m::crtParams().testPattern;
+    Clock::setSimulationPaused(true);
+    Shader_m::setSceneTimeFrozen(true);
+    captureStepIndex_ = 0;
+    beginCaptureStep();
+    std::cout << "CRT capture suite: "
+              << std::filesystem::absolute(captureSuiteDirectory_).string()
+              << '\n';
+}
+
+void Engine::beginCaptureStep()
+{
+    if (captureStepIndex_ < 0 ||
+        captureStepIndex_ >= static_cast<int>(CRT_CAPTURE_STEPS.size())) {
+        return;
+    }
+    const CaptureSuiteStep& step = CRT_CAPTURE_STEPS[captureStepIndex_];
+    Shader_m::crtParams().testPattern = step.testPattern;
+    if (step.crtEnabled) Shader_m::resetCRTHistory();
+    captureStepStartedAt_ = GetTime();
+    captureStepFrames_ = 0;
+    captureQueued_ = false;
+    captureAttempts_ = 0;
+}
+
+void Engine::queueCaptureForCurrentFrame()
+{
+    if (!captureSuiteEnabled_ || captureQueued_ || captureStepIndex_ < 0 ||
+        captureStepIndex_ >= static_cast<int>(CRT_CAPTURE_STEPS.size())) {
+        return;
+    }
+    const CaptureSuiteStep& step = CRT_CAPTURE_STEPS[captureStepIndex_];
+    if (GetTime() - captureStepStartedAt_ < step.settleSeconds) return;
+    if (captureStepFrames_ < step.minimumFrames) return;
+    Shader_m::requestScreenshotTo(captureSuiteDirectory_ / step.fileName);
+    captureQueued_ = true;
+}
+
+bool Engine::finishCaptureFrame()
+{
+    if (!captureSuiteEnabled_ || !captureQueued_) return false;
+    const CaptureSuiteStep& step = CRT_CAPTURE_STEPS[captureStepIndex_];
+    const std::filesystem::path expected = captureSuiteDirectory_ / step.fileName;
+    if (!Shader_m::lastScreenshotSucceeded() ||
+        Shader_m::lastScreenshotPath() != expected) {
+        ++captureAttempts_;
+        captureQueued_ = false;
+        captureStepStartedAt_ = GetTime();
+        if (captureAttempts_ < 3) return false;
+        std::cerr << "CRT capture: failed after 3 attempts: "
+                  << expected.string() << '\n';
+        Shader_m::crtParams().testPattern = captureOriginalTestPattern_;
+        Clock::setSimulationPaused(false);
+        Shader_m::setSceneTimeFrozen(false);
+        writeCaptureManifest(false);
+        captureSuiteEnabled_ = false;
+        return true;
+    }
+
+    std::cout << "CRT capture: " << step.modeName << " -> "
+              << expected.string() << '\n';
+    ++captureStepIndex_;
+    if (captureStepIndex_ >= static_cast<int>(CRT_CAPTURE_STEPS.size())) {
+        Shader_m::crtParams().testPattern = captureOriginalTestPattern_;
+        Clock::setSimulationPaused(false);
+        Shader_m::setSceneTimeFrozen(false);
+        writeCaptureManifest(true);
+        captureSuiteEnabled_ = false;
+        return true;
+    }
+    beginCaptureStep();
+    return false;
+}
+
+bool Engine::captureSuiteUsesCRT() const
+{
+    if (!captureSuiteEnabled_ || captureStepIndex_ < 0 ||
+        captureStepIndex_ >= static_cast<int>(CRT_CAPTURE_STEPS.size())) {
+        return true;
+    }
+    return CRT_CAPTURE_STEPS[captureStepIndex_].crtEnabled;
+}
+
+void Engine::writeCaptureManifest(bool complete) const
+{
+    json entries = json::array();
+    for (const CaptureSuiteStep& step : CRT_CAPTURE_STEPS) {
+        const std::filesystem::path imagePath =
+            captureSuiteDirectory_ / step.fileName;
+        entries.push_back({
+            {"file", step.fileName},
+            {"mode", step.modeName},
+            {"crtEnabled", step.crtEnabled},
+            {"testPattern", step.testPattern},
+            {"settleSeconds", step.settleSeconds},
+            {"minimumFrames", step.minimumFrames},
+            {"captured", std::filesystem::is_regular_file(imagePath)}
+        });
+    }
+    json manifest = {
+        {"schema", "rayengine.crt-capture-suite.v1"},
+        {"complete", complete},
+        {"overlayFree", true},
+        {"gameSimulationFrozen", true},
+        {"sceneShaderTimeFrozen", true},
+        {"crtTemporalStateResetPerMode", true},
+        {"captureWidth", captureWidth_},
+        {"captureHeight", captureHeight_},
+        {"referenceRasterWidth", 3840},
+        {"referenceRasterHeight", 2160},
+        {"parameterSnapshot", "crt_params.json"},
+        {"entries", entries}
+    };
+    std::ofstream file(captureSuiteDirectory_ / "manifest.json",
+        std::ios::trunc);
+    if (file.good()) file << manifest.dump(2);
 }
 
 void Engine::loadGameContent()
@@ -117,6 +330,8 @@ void Engine::game_loop()
         if (InputMap::checkPressed("reload")) {
             reloadGame();
         }
+        const bool screenshotRequested = InputMap::checkPressed("screenshot");
+        queueCaptureForCurrentFrame();
 
         Shader_m::routine();
 
@@ -132,7 +347,10 @@ void Engine::game_loop()
             ClearBackground(BLACK);
             // if (Shader_m::has("roundpixels")) Shader_m::addFullscreen("roundpixels");
             if (Shader_m::has("lighting") && Light_m::hasActiveLights()) Shader_m::addFullscreen("lighting");
-            if (Shader_m::has("crt")) Shader_m::addFullscreen("crt");
+            if (Shader_m::has("crt") && captureSuiteUsesCRT()) {
+                Shader_m::addFullscreen("crt");
+            }
+            if (screenshotRequested) Shader_m::requestScreenshot("manual");
             Shader_m::present();
             DrawFPS(10, 10);
 
@@ -141,6 +359,8 @@ void Engine::game_loop()
             ImGuiLayer::DrawWindows();
             ImGuiLayer::EndFrame();
         EndDrawing();
+        if (captureSuiteEnabled_) ++captureStepFrames_;
+        if (finishCaptureFrame()) break;
     }
 }
 
@@ -269,6 +489,8 @@ void Engine::render()
 
 Engine::~Engine()
 {
+    if (Clock::isSimulationPaused()) Clock::setSimulationPaused(false);
+    Shader_m::setSceneTimeFrozen(false);
     unloadGameContent();
     rlImGuiShutdown();
     CloseWindow();

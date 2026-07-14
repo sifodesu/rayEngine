@@ -1,0 +1,52 @@
+{
+  "capturePoint": "final framebuffer before FPS and ImGui",
+  "capturedAtUnixMs": 1784026662626,
+  "crtEnabled": true,
+  "crtProfile": {
+    "calibrationStatus": "provisional_unmeasured",
+    "frameRateHz": 60.0544427480916,
+    "manufacturer": "Hitachi",
+    "measuredSerial": "",
+    "model": "CT-1358",
+    "timing": "rayEngine-320x192-262p"
+  },
+  "height": 768,
+  "image": "02-bars-pluge-crt.png",
+  "parameterSnapshot": "crt_params.json",
+  "receiverState": {
+    "burstMeasurement": [
+      0.50537109375,
+      1.0,
+      0.0810546875,
+      1.0
+    ],
+    "burstPll": [
+      0.50537109375,
+      0.5,
+      0.998046875,
+      0.61376953125
+    ],
+    "powerApl": [
+      0.17919921875,
+      0.99609375,
+      0.99853515625,
+      1.0
+    ],
+    "verticalPll": [
+      0.5,
+      0.5,
+      0.9970703125,
+      1.0
+    ],
+    "videoAgcAfc": [
+      0.299560546875,
+      0.498291015625,
+      0.9970703125,
+      0.51708984375
+    ]
+  },
+  "schema": "rayengine.screenshot.v1",
+  "testPattern": 1,
+  "testPatternName": "bars_pluge",
+  "width": 1280
+}

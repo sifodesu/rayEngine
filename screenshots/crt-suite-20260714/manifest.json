@@ -1,0 +1,83 @@
+{
+  "complete": true,
+  "crtTemporalStateResetPerMode": true,
+  "entries": [
+    {
+      "captured": true,
+      "crtEnabled": false,
+      "file": "00-game-raw.png",
+      "minimumFrames": 2,
+      "mode": "game_raw",
+      "settleSeconds": 0.2,
+      "testPattern": 0.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "01-game-crt.png",
+      "minimumFrames": 8,
+      "mode": "game_crt",
+      "settleSeconds": 1.0,
+      "testPattern": 0.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "02-bars-pluge-crt.png",
+      "minimumFrames": 8,
+      "mode": "bars_pluge",
+      "settleSeconds": 1.0,
+      "testPattern": 1.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "03-convergence-crt.png",
+      "minimumFrames": 8,
+      "mode": "convergence",
+      "settleSeconds": 1.0,
+      "testPattern": 2.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "04-multiburst-crt.png",
+      "minimumFrames": 8,
+      "mode": "multiburst",
+      "settleSeconds": 1.0,
+      "testPattern": 3.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "05-half-screen-crt.png",
+      "minimumFrames": 8,
+      "mode": "half_screen",
+      "settleSeconds": 1.0,
+      "testPattern": 4.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "06-zone-plate-crt.png",
+      "minimumFrames": 8,
+      "mode": "zone_plate",
+      "settleSeconds": 1.0,
+      "testPattern": 5.0
+    },
+    {
+      "captured": true,
+      "crtEnabled": true,
+      "file": "07-grayscale-ramp-crt.png",
+      "minimumFrames": 8,
+      "mode": "grayscale_ramp",
+      "settleSeconds": 1.0,
+      "testPattern": 6.0
+    }
+  ],
+  "gameSimulationFrozen": true,
+  "overlayFree": true,
+  "parameterSnapshot": "crt_params.json",
+  "sceneShaderTimeFrozen": true,
+  "schema": "rayengine.crt-capture-suite.v1"
+}

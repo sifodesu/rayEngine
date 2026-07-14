@@ -1,0 +1,116 @@
+Hitachi CT-1358 calibration contract
+====================================
+
+The emulator separates documented NTSC constants from parameters that must be
+measured on one physical television. crt_params.json must remain marked
+provisional_unmeasured until all measurements below refer to the same serial
+number and control settings.
+
+Required measurements
+---------------------
+
+1. Record composite input and LA7621 video/chroma outputs with PLUGE, SMPTE
+   bars, multiburst and a zone plate. Fit luma/chroma bandwidth, group delay,
+   peaking, clamp, AGC attack/release, horizontal AFC, ACC, differential
+   gain/phase, burst PLL bandwidth and color-killer thresholds.
+2. Measure R/G/B luminance at 16 drive levels with a colorimeter. Fit gain,
+   cutoff and gamma, then derive the three tubeColorMatrix rows from XYZ
+   measurements of the primaries and white.
+3. Photograph the A34JLN60X faceplate orthogonally with a calibrated macro
+   scale. Measure triad pitch, slot aspect, row stagger and black-matrix duty.
+4. Record isolated R/G/B impulses with a fast photodiode. Fit the fast/slow
+   decay constants and weights of all three temporal components without the
+   observer integration stage.
+5. Measure geometry, focus and convergence grids at 10%, 50% and 100% APL.
+   Record raster expansion versus APL and fit highVoltageBloom plus
+   highVoltageResponse. Measure nominal anode voltage with a rated high-voltage
+   probe under the documented safety procedure; never infer it from the service
+   ceiling.
+6. Measure the optical point-spread function from dim and bright isolated spots
+   in a dark room and per primary, then fit RGB bloom radii, wide bloom,
+   halation, faceplate dispersion and saturation independently.
+7. Calibrate the host display with a colorimeter. Record peak luminance, black
+   level, EOTF and primary chromaticities; an uncalibrated host display cannot
+   reproduce the measured tube radiance absolutely. The provisional SDR
+   presentation uses 160 nits rather than a panel-advertised maximum: an
+   ordinary PNG/backbuffer carries no HDR luminance metadata, so treating a
+   nominal 250-nit panel maximum as SDR reference white compresses the tube
+   into a visibly dark and dull code range.
+8. With the simulator's half-white reference pattern settled, measure the mean
+   linear pre-output radiance of the white half and store it as
+   referenceWhiteRadiance. This converts the arbitrary internal beam/phosphor
+   units into the front-of-faceplate tubePeakNits measurement. It must not be
+   replaced by an extra brightness boost, which would count mask and glass
+   losses twice and make the result depend on the host display peak.
+
+Implemented physical state model
+--------------------------------
+
+- The source is native progressive 240p: 262 complete lines per frame, 240
+  active lines and a 60.054443 Hz frame clock
+  derived directly from the 15.734264 kHz line clock. Carrier phase repeats at
+  every frame boundary because the progressive line count is even.
+- The 320x192 framebuffer occupies 192 source-bearing lines (44 through 235);
+  the other active electrical lines remain setup black
+  and presented in its native 5:3 aspect. There is no 4:3 letterbox and no
+  overscan crop; the complete source rectangle remains visible.
+- Raster strikes use the physical active line and horizontal active-video
+  time. The endpoint state and displayed exposure are two outputs of the same
+  closed-form sum of beam impulses. Display exposure is integrated over one
+  complete 60.054 Hz CRT cycle, not the jittering host-frame duration, so the
+  raster cannot alias into whole-image flicker or a rolling dark band. The
+  geometric sum remains exact after frame skips without a fixed loop limit.
+- The engine framebuffer is double-buffered at progressive vertical blank.
+  Prior/current emission histories preserve the correct image when one host
+  update interval crosses one or several frame boundaries, including
+  top-to-bottom beam race and low host frame rates.
+- Composite sync is not assumed after encoding: separate persistent horizontal
+  AFC and vertical-oscillator states measure the actual waveform. The vertical
+  loop detects the three serrated broad-sync lines and its phase determines
+  which source raster line the decoder displays.
+- The physical CT-1358 path remains identified as a no-comb receiver. For the
+  320x192 presentation profile, ntscLineCombStrength optionally blends a
+  two-line software comb after the chroma band-pass. Its default 0.90 suppresses
+  most monochrome cross-colour in multiburst and zone-plate tests while leaving
+  only a small residual no-comb signature; set it to zero for strict hardware
+  fidelity.
+- Cathode cutoff, RGB output bandwidth, gun power law, space charge and beam
+  current limiting are solved before electron deflection.
+- EHT and B+ use separate load-dependent attack/recovery states. Prior/current
+  drive histories make their load follow the progressive spot instead of
+  changing the whole screen at once. Their voltage drives raster size, focus,
+  cathode headroom and phosphor efficiency.
+- Every persistent analog state receives actual wall-clock elapsed time. A
+  suspend, debugger stop or dragged window therefore settles phosphor, AGC,
+  PLL, EHT, B+ and thermal memory instead of preserving 250 ms slices of stale
+  history. Mains ripple is sampled at each pixel's raster time, not at a
+  spatial surrogate or one global host-frame phase.
+- Mains hum and rail ripple remain implemented at raster time but default to
+  zero while the profile is unmeasured. Enabling guessed asynchronous ripple
+  would manufacture a moving hum bar rather than reproduce this CT-1358.
+- Slot-mask heating is a persistent low-resolution thermal field with lateral
+  diffusion and local doming/landing error.
+- The faceplate includes a curved surface normal, Snell displacement,
+  angle-dependent Fresnel loss, Beer-Lambert absorption and internal return.
+- Absolute luminance uses the spatial mean of the settled 50%-APL white
+  reference. tubePeakNits therefore describes light measured in front of the
+  faceplate, while referenceWhiteRadiance removes only the arbitrary scale of
+  the internal current/radiance units. Mask texture, scan structure, APL sag,
+  glass angle and vignetting keep their relative physical effects.
+
+These equations are physically structured but their tube/circuit coefficients
+remain provisional until the measurements above are performed on one CT-1358.
+The service supplement does not establish a measured nominal anode voltage for
+this unit, so the profile deliberately stores null rather than the former 22 kV
+estimate. Likewise, rayEngine-320x192-262p names this engine's fixed source
+timing; it is not a claim that every console's informal "240p" timing is equal.
+
+Reproducibility
+---------------
+
+- Warm the set for at least 30 minutes.
+- Record serial number, brightness, contrast, color, tint, room illuminance,
+  probe model, camera exposure and input source levels.
+- Keep raw captures outside the generated profile and version their checksums.
+- Run `python3 scripts/validate_crt_profile.py --require-measured` before
+  claiming a measured profile.

@@ -1,0 +1,47 @@
+In-game and CRT comparison screenshots
+======================================
+
+Manual capture
+--------------
+
+- Press Print Screen (the configurable `screenshot` action in input.json), or
+  use "Screenshot sans overlays" in the CRT Debug window.
+- PNG files are written under screenshots/ with a timestamp and label.
+- A JSON sidecar records output dimensions, whether CRT was enabled, the test
+  pattern, timing profile and calibration status.
+- Capture occurs after final post-processing but before FPS and ImGui, so the
+  PNG contains the actual game/CRT framebuffer without diagnostic overlays.
+
+Deterministic CRT suite
+-----------------------
+
+Run:
+
+    ./rayEngine --capture-crt-suite [output-directory] [--capture-size 3840x2160]
+
+The default directory is screenshots/crt-suite-latest; relative and absolute
+output paths are supported. The suite freezes game simulation and non-CRT
+shader time and defaults to the 3840x2160 reference framebuffer, then captures:
+
+1. game without CRT;
+2. the identical game frame through CRT;
+3. bars and PLUGE;
+4. convergence grid;
+5. multiburst;
+6. half-screen load transition;
+7. zone plate;
+8. grayscale ramp, steps and near-black patches.
+
+CRT temporal state is cleared between modes and allowed to settle for one
+second and at least eight fully rendered frames. The process exits after all
+PNGs are written. manifest.json describes the suite and crt_params.json is
+copied beside it so later visual analysis can be tied to the exact profile.
+
+Validate dimensions, layout metadata and receiver lock with:
+
+    python3 scripts/validate_crt_capture.py screenshots/crt-suite-latest
+
+The 3 and 4 MHz multiburst bands and the zone plate intentionally cross the
+NTSC chroma region. A narrow residual cross-colour pattern there is expected
+from the CT-1358 path without a comb filter; broad rainbow contamination in
+ordinary gameplay is not.
