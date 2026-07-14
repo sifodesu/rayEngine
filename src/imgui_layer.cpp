@@ -13,6 +13,7 @@
 #include "Managers/light_m.h"
 #include "Managers/raycam_m.h"
 #include "Managers/shader_m.h"
+#include "Managers/screenshot_m.h"
 #include "Objects/character.h"
 #include "Objects/modelEnt.h"
 #include "Components/sprite.h"
@@ -276,6 +277,25 @@ static void drawCRTWindow() {
     ImGui::End();
 }
 
+static void drawScreenshotWindow() {
+    if (!ImGui::Begin("Screenshots")) {
+        ImGui::End();
+        return;
+    }
+
+    if (ImGui::Button("Screenshot sans overlays")) {
+        Screenshot_m::request("manual");
+    }
+    ImGui::TextUnformatted("Raccourci: Print Screen");
+    if (!Screenshot_m::lastPath().empty()) {
+        ImGui::TextWrapped("Derniere capture: %s%s",
+            Screenshot_m::lastPath().string().c_str(),
+            Screenshot_m::lastSucceeded() ? "" : " (echec)");
+    }
+
+    ImGui::End();
+}
+
 static void drawParticleWindow()
 {
   if (!ImGui::Begin("Particles Debug")) {
@@ -508,11 +528,11 @@ void DrawWindows() {
     // drawVisibleModelWindow();
     // drawGlitchSpriteWindow();
     // drawCRTWindow();
-    Shader_m::resetCRTParams();
     // drawParticleWindow();
     // drawStillWaterWindow();
     // drawFogWindow();
     drawLightingWindow();
+    drawScreenshotWindow();
 }
 
 } // namespace ImGuiLayer

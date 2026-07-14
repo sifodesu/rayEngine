@@ -1,10 +1,12 @@
 #include "shader_m.h"
 #include "raycam_m.h"
 #include <algorithm>
+#include <cctype>
 #include <fstream>
 #include <nlohmann/json.hpp>
 #include "definitions.h"
 #include "light_m.h"
+#include "screenshot_m.h"
 
 using json = nlohmann::json;
 
@@ -392,8 +394,10 @@ Shader Shader_m::get(const std::string& name) { auto it = shaders_.find(name); r
 void Shader_m::ensureTargets() {
     int w = NATIVE_RES_WIDTH;
     int h = NATIVE_RES_HEIGHT;
-    int sw = std::max(GetScreenWidth(), 1);
-    int sh = std::max(GetScreenHeight(), 1);
+    const Screenshot_m::OutputSize outputSize = Screenshot_m::outputSize(
+        GetScreenWidth(), GetScreenHeight());
+    int sw = outputSize.width;
+    int sh = outputSize.height;
 
     if (w != lastW_ || h != lastH_ || !sceneRT_.id || !nativePing_[0].id || !nativePing_[1].id) {
         if (sceneRT_.id) UnloadRenderTexture(sceneRT_);
@@ -627,6 +631,25 @@ Texture2D Shader_m::updatePhosphorState(Texture2D source) {
 
 static void drawFullscreenTexture(Texture2D tex) {
     DrawTextureRec(tex, {0,0,(float)tex.width, -(float)tex.height}, {0,0}, WHITE);
+}
+
+static void drawTextureFittedToScreen(Texture2D tex) {
+    const float screenWidth = static_cast<float>(std::max(GetScreenWidth(), 1));
+    const float screenHeight = static_cast<float>(std::max(GetScreenHeight(), 1));
+    const float scale = std::min(
+        screenWidth / static_cast<float>(std::max(tex.width, 1)),
+        screenHeight / static_cast<float>(std::max(tex.height, 1)));
+    const float width = static_cast<float>(tex.width) * scale;
+    const float height = static_cast<float>(tex.height) * scale;
+    const Rectangle source{0.0f, 0.0f,
+        static_cast<float>(tex.width), -static_cast<float>(tex.height)};
+    const Rectangle destination{
+        (screenWidth - width) * 0.5f,
+        (screenHeight - height) * 0.5f,
+        width,
+        height,
+    };
+    DrawTexturePro(tex, source, destination, {0.0f, 0.0f}, 0.0f, WHITE);
 }
 
 static Rectangle getLetterboxRect(int srcW, int srcH, int targetW, int targetH) {
@@ -900,6 +923,9 @@ void Shader_m::present() {
         drawTextureLetterboxed(nativeTex, postRT_.texture.width, postRT_.texture.height);
     EndTextureMode();
 
+    Screenshot_m::capture(
+        Screenshot_m::Stage::BeforeDisplayShaders, postRT_.texture, false);
+
     if (!displayPasses.empty()) {
         updatePhosphorState(postRT_.texture);
     }
@@ -907,8 +933,11 @@ void Shader_m::present() {
     Texture2D outTex = displayPasses.empty()
         ? postRT_.texture
         : applyPasses(postRT_.texture, displayPasses, ping_, pingIndex_);
-    // Post-process output is already in final window resolution.
-    drawFullscreenTexture(outTex);
+    // The off-screen output may use a fixed capture resolution; only the
+    // preview is fitted to the visible window.
+    drawTextureFittedToScreen(outTex);
+    Screenshot_m::capture(
+        Screenshot_m::Stage::Final, outTex, !displayPasses.empty());
     // After presenting, keep copy as prev for temporal shaders.
     if (prevSceneRT_.id) {
         BeginTextureMode(prevSceneRT_);

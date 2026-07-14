@@ -1,11 +1,9 @@
 #include "engine.h"
-#include <iostream>
-#include <typeinfo>
 
-
-int main(void) {
-    Engine engine;
+int main(int argc, char** argv)
+{
+    Engine engine(argc, argv);
     engine.game_loop();
-        
-    return 0;
+
+    return engine.exitCode();
 }

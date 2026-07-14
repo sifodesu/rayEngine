@@ -61,3 +61,5 @@ save.json
 /Data/Shaders/CRTSim
 /Data/Shaders/glsl-shaders
 *.md
+/screenshots
+docs/screenshot_capture.txt

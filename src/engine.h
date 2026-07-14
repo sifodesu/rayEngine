@@ -1,11 +1,10 @@
 #pragma once
-#include "object_m.h"
-#include "texture_m.h"
 
 class Engine {
 public:
-    Engine();
+    Engine(int argc = 0, char** argv = nullptr);
     void game_loop();
+    int exitCode() const;
     ~Engine();
 
 private:

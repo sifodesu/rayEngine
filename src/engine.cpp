@@ -16,6 +16,7 @@
 #include "ldtk_m.h"
 #include "upgradeRegistry.h"
 #include "shader_m.h"
+#include "screenshot_m.h"
 #include "collisionRect.h"
 #include "portal.h"
 #include "portal_m.h"
@@ -54,8 +55,9 @@ void clearDepthBufferOnly()
 
 } // namespace
 
-Engine::Engine()
+Engine::Engine(int argc, char** argv)
 {
+    Screenshot_m::configure(argc, argv);
     SetTraceLogLevel(LOG_WARNING);
     SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
     InitWindow(NATIVE_RES_WIDTH, NATIVE_RES_HEIGHT, "rayEngine");
@@ -72,6 +74,8 @@ Engine::Engine()
     rlImGuiSetup(true);
     ImGui::GetStyle().ScaleAllSizes(IMGUI_SCALE);
     ImGui::GetStyle().FontScaleMain = IMGUI_SCALE;
+
+    Screenshot_m::initialize();
 }
 
 void Engine::loadGameContent()
@@ -112,13 +116,18 @@ void Engine::reloadGame()
 void Engine::game_loop()
 {
     while (!WindowShouldClose()) {
+        if (Screenshot_m::shouldClose()) break;
         Clock::lap();
 
         if (InputMap::checkPressed("reload")) {
             reloadGame();
         }
+        const bool screenshotRequested =
+            InputMap::checkPressed("screenshot");
 
         Shader_m::routine();
+        if (screenshotRequested) Screenshot_m::request("manual");
+        Screenshot_m::beginFrame();
 
         Shader_m::begin();
             ClearBackground(CLITERAL(Color){0, 0, 0, 255});
@@ -141,7 +150,14 @@ void Engine::game_loop()
             ImGuiLayer::DrawWindows();
             ImGuiLayer::EndFrame();
         EndDrawing();
+
+        if (Screenshot_m::endFrame()) break;
     }
+}
+
+int Engine::exitCode() const
+{
+    return Screenshot_m::exitCode();
 }
 
 void Engine::render()
@@ -270,6 +286,7 @@ void Engine::render()
 Engine::~Engine()
 {
     unloadGameContent();
+    Screenshot_m::shutdown();
     rlImGuiShutdown();
     CloseWindow();
 }
