@@ -55751,7 +55751,7 @@
 					"entityInstances": [
 						{
 							"__identifier": "Chara",
-							"__grid": [295,182],
+							"__grid": [191,252],
 							"__pivot": [0,0],
 							"__tags": ["chara"],
 							"__tile": { "tilesetUid": 22, "x": 0, "y": 0, "w": 8, "h": 8 },
@@ -55760,7 +55760,7 @@
 							"width": 8,
 							"height": 10,
 							"defUid": 21,
-							"px": [2360,1456],
+							"px": [1528,2016],
 							"fieldInstances": [
 								{ "__identifier": "solid", "__type": "Bool", "__value": true, "__tile": null, "defUid": 23, "realEditorValues": [] },
 								{ "__identifier": "sprite", "__type": "String", "__value": "chara", "__tile": null, "defUid": 57, "realEditorValues": [] },
@@ -55768,8 +55768,8 @@
 								{ "__identifier": "glitched", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7202, "realEditorValues": [] },
 								{ "__identifier": "killOnCol", "__type": "Bool", "__value": false, "__tile": null, "defUid": 7001, "realEditorValues": [] }
 							],
-							"__worldX": 1720,
-							"__worldY": 496
+							"__worldX": 888,
+							"__worldY": 1056
 						}
 					]
 				},

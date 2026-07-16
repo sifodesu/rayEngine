@@ -18,6 +18,7 @@ public:
         float dotBlur{0.82f};
         float bleed{0.0f};
         float dotGridSize{1.0f};
+        int mergedDotRows{2};
         float hexGrid{0.0f};
         float alternateLineShift{0.5f};
         float scanline{0.0f};

@@ -231,6 +231,7 @@ static void drawCRTWindow() {
     ImGui::SliderFloat("Flou dots", &params.dotBlur, 0.0f, 1.0f, "%.2f");
     ImGui::SliderFloat("Bleed", &params.bleed, 0.0f, 2.5f, "%.2f");
     ImGui::SliderFloat("Dot grid size", &params.dotGridSize, 0.5f, 8.0f, "%.2f");
+    ImGui::SliderInt("Merged dot rows", &params.mergedDotRows, 1, 4);
     bool hexGrid = params.hexGrid >= 0.5f;
     if (ImGui::Checkbox("Hexagonal grid", &hexGrid)) {
         params.hexGrid = hexGrid ? 1.0f : 0.0f;

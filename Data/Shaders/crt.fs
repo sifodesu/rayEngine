@@ -21,6 +21,7 @@ uniform float dotMask;
 uniform float dotBlur;
 uniform float bleed;
 uniform float dotGridSize;
+uniform int mergedDotRows;
 uniform float hexGrid;
 uniform float alternateLineShift;
 uniform float scanline;
@@ -92,6 +93,14 @@ float gridYPitch() {
     return mix(1.0, 0.8660254, hexAmount());
 }
 
+vec2 dotCellSize() {
+    // Group consecutive generated dot rows into one taller phosphor cell.
+    // With the shipped 0.5-native-pixel grid, a value of two merges rows
+    // 0+1, 2+3, ... into vertical ovals instead of separate circles.
+    float rowCount = float(max(mergedDotRows, 1));
+    return vec2(gridSize(), gridSize() * gridYPitch() * rowCount);
+}
+
 vec4 sampleCRTComposite(vec2 uv) {
     vec2 nativeStep = max((displayRect.zw / max(nativeResolution, vec2(1.0))) / max(resolution, vec2(1.0)),
                           1.0 / max(resolution, vec2(1.0)));
@@ -130,27 +139,30 @@ vec4 sampleCRTComposite(vec2 uv) {
 
 vec4 sampleNativeRawDot(vec2 cell) {
     float rowShift = mod(cell.y, 2.0) * alternateLineShift;
+    vec2 cellSize = dotCellSize();
     vec2 nativeCenter = vec2(
         (cell.x + 0.5 + rowShift) * gridSize(),
-        (cell.y + 0.5) * gridSize() * gridYPitch()
+        (cell.y + 0.5) * cellSize.y
     );
     return sampleSafe(nativeToUv(nativeCenter));
 }
 
 vec4 sampleNativeDot(vec2 cell) {
     float rowShift = mod(cell.y, 2.0) * alternateLineShift;
+    vec2 cellSize = dotCellSize();
     vec2 nativeCenter = vec2(
         (cell.x + 0.5 + rowShift) * gridSize(),
-        (cell.y + 0.5) * gridSize() * gridYPitch()
+        (cell.y + 0.5) * cellSize.y
     );
     return sampleCRTComposite(nativeToUv(nativeCenter));
 }
 
 vec4 sampleNativePhosphorDot(vec2 cell) {
     float rowShift = mod(cell.y, 2.0) * alternateLineShift;
+    vec2 cellSize = dotCellSize();
     vec2 nativeCenter = vec2(
         (cell.x + 0.5 + rowShift) * gridSize(),
-        (cell.y + 0.5) * gridSize() * gridYPitch()
+        (cell.y + 0.5) * cellSize.y
     );
     return samplePhosphorSafe(nativeToUv(nativeCenter));
 }
@@ -187,7 +199,7 @@ void main() {
 
     vec2 sourcePx = sourceUv * resolution;
     vec2 nativePx = ((sourcePx - displayRect.xy) / max(displayRect.zw, vec2(1.0))) * nativeResolution;
-    vec2 dotPx = vec2(nativePx.x / gridSize(), nativePx.y / (gridSize() * gridYPitch()));
+    vec2 dotPx = nativePx / dotCellSize();
     float rowShift = mod(floor(dotPx.y), 2.0) * alternateLineShift;
     vec2 shiftedDotPx = dotPx - vec2(rowShift, 0.0);
     vec2 cell = floor(shiftedDotPx);

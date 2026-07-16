@@ -43,6 +43,11 @@ float readFloat(const json& j, const char* key, float fallback) {
     return j[key].get<float>();
 }
 
+int readInt(const json& j, const char* key, int fallback) {
+    if (!j.contains(key) || !j[key].is_number_integer()) return fallback;
+    return j[key].get<int>();
+}
+
 json colorToJson(Color color) {
     return {
         {"r", static_cast<int>(color.r)},
@@ -108,6 +113,7 @@ bool Shader_m::saveCRTParams() {
         {"dotBlur", params.dotBlur},
         {"bleed", params.bleed},
         {"dotGridSize", params.dotGridSize},
+        {"mergedDotRows", params.mergedDotRows},
         {"hexGrid", params.hexGrid},
         {"alternateLineShift", params.alternateLineShift},
         {"scanline", params.scanline},
@@ -153,6 +159,7 @@ bool Shader_m::loadCRTParams() {
         params.dotBlur = readFloat(j, "dotBlur", params.dotBlur);
         params.bleed = readFloat(j, "bleed", params.bleed);
         params.dotGridSize = readFloat(j, "dotGridSize", params.dotGridSize);
+        params.mergedDotRows = std::clamp(readInt(j, "mergedDotRows", params.mergedDotRows), 1, 4);
         params.hexGrid = readFloat(j, "hexGrid", params.hexGrid);
         params.alternateLineShift = readFloat(j, "alternateLineShift", params.alternateLineShift);
         params.scanline = readFloat(j, "scanline", params.scanline);
@@ -545,6 +552,8 @@ void Shader_m::uploadPassUniforms(Shader shader, const std::string& name, Textur
     if (loc >= 0) SetShaderValue(shader, loc, &params.bleed, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "dotGridSize");
     if (loc >= 0) SetShaderValue(shader, loc, &params.dotGridSize, SHADER_UNIFORM_FLOAT);
+    loc = GetShaderLocation(shader, "mergedDotRows");
+    if (loc >= 0) SetShaderValue(shader, loc, &params.mergedDotRows, SHADER_UNIFORM_INT);
     loc = GetShaderLocation(shader, "hexGrid");
     if (loc >= 0) SetShaderValue(shader, loc, &params.hexGrid, SHADER_UNIFORM_FLOAT);
     loc = GetShaderLocation(shader, "alternateLineShift");
